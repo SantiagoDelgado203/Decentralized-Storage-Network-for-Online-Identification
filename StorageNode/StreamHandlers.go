@@ -1,0 +1,111 @@
+/*
+By Santiago Delgado, December 2025
+
+# StreamHandlers.go
+
+This file defines all the handler functions that will process the different
+custom communication stream protocols.
+*/
+package main
+
+import (
+	"bufio"
+	"context"
+	"fmt"
+	"io"
+	"time"
+
+	"github.com/libp2p/go-libp2p/core/host"
+	"github.com/libp2p/go-libp2p/core/network"
+	"github.com/libp2p/go-libp2p/core/peer"
+	"github.com/libp2p/go-libp2p/core/protocol"
+)
+
+/*-------------------------- BASE INTERFACE-----------------------------------*/
+
+// Any Protocol MUST have a name and handler function
+type Protocol interface {
+	Name() protocol.ID
+	Handler(sm *StreamsMaster) network.StreamHandler
+}
+
+// main object to use protocols
+type StreamsMaster struct {
+	h         host.Host
+	protocols []Protocol
+}
+
+// Function to initialize stream master and set all handlers
+func HandlersInit(h host.Host) *StreamsMaster {
+	//create new stream master
+	sm := &StreamsMaster{
+		h: h,
+	}
+
+	//include all protocols
+	sm.protocols = []Protocol{
+		&PrintProtocol{},
+		// &OtherProtocol{},
+	}
+
+	//set them all
+	for _, p := range sm.protocols {
+		h.SetStreamHandler(p.Name(), p.Handler(sm))
+	}
+
+	//return stream master
+	return sm
+}
+
+/*-------------------------- PRINT PROTOCOL -----------------------------------*/
+
+type PrintProtocol struct{}
+
+// Name
+const PRINT_PROTOCOL = "/print/1.0.0"
+
+func (p *PrintProtocol) Name() protocol.ID {
+	return PRINT_PROTOCOL
+}
+
+func (p *PrintProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
+	return func(s network.Stream) {
+		defer s.Close()
+
+		reader := bufio.NewReader(s)
+		msg, err := reader.ReadString('\n')
+		if err != nil && err != io.EOF {
+			fmt.Println("Error reading:", err)
+			return
+		}
+
+		fmt.Println("Received message:", msg)
+
+		//How to reply
+		//remotePeer := s.Conn().RemotePeer()
+		// ctx := context.Background()
+
+		// err = sm.PrintSend(ctx, remotePeer, "Ack from PrintProtocol")
+		// if err != nil {
+		// 	fmt.Println("Send error:", err)
+		// }
+	}
+}
+
+func (p *StreamsMaster) PrintSend(ctx context.Context, peerID peer.ID, msg string) error {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	s, err := p.h.NewStream(ctx, peerID, PRINT_PROTOCOL)
+	if err != nil {
+		return err
+	}
+	defer s.Close()
+
+	w := bufio.NewWriter(s)
+	_, err = w.WriteString(msg + "\n")
+	if err != nil {
+		return err
+	}
+	return w.Flush()
+}

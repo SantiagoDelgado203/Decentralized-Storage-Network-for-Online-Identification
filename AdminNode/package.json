@@ -18,11 +18,13 @@
     "@libp2p/tcp": "^11.0.9",
     "@libp2p/tls": "^3.0.9",
     "@libp2p/websockets": "^10.1.2",
+    "cors": "^2.8.5",
     "express": "^5.2.1",
     "libp2p": "^3.1.2",
     "uint8arrays": "^5.1.0"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^24.10.1",
     "ts-node": "^10.9.2",
