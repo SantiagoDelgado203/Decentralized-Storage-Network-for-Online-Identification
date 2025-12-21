@@ -15,6 +15,7 @@ The desired node behavior is as follows:
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"time"
 
@@ -34,6 +35,26 @@ func main() {
 
 	//allow time for connection
 	time.Sleep(5 * time.Second)
+
+	peerID, err := peer.Decode("12D3KooWPyBkFNSq6YdzB7SiJBobp4rVDi6Ts8YLmnV69tyHZRgX")
+	if err != nil {
+		fmt.Println("invalid peer ID:", err)
+	}
+
+	s, err := h.NewStream(ctx, peerID, "/get-peer-list-protocol/1.0.0")
+	if err != nil {
+		fmt.Println("failed to open stream:", err)
+		return
+	}
+	defer s.Close()
+
+	w := bufio.NewWriter(s)
+	_, err = w.WriteString("hey\n")
+	if err != nil {
+		fmt.Println("write failed:", err)
+		return
+	}
+	w.Flush()
 
 	//Initialize the stream handlers
 	sm := HandlersInit(h)

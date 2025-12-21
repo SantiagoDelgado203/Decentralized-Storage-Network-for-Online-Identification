@@ -141,7 +141,7 @@ func constantConnection(ctx context.Context, h host.Host, peers []string) {
 				_ = h.Connect(ctx, *pi)
 			}
 
-			time.Sleep(5 * time.Second)
+			time.Sleep(1 * time.Second)
 		}
 	}
 }

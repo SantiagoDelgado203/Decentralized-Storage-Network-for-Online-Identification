@@ -5,6 +5,10 @@ import { pipe } from "it-pipe";
 import { multiaddr } from "@multiformats/multiaddr";
 import { lpStream } from '@libp2p/utils'
 import cors from "cors";
+import { isLibp2p } from "libp2p";
+import { fromString as uint8ArrayFromString } from 'uint8arrays/from-string'
+import { toString as uint8ArrayToString } from 'uint8arrays/to-string'
+import type { Stream } from '@libp2p/interface'
 
 const app = express();
 app.use(express.json());
@@ -43,6 +47,8 @@ app.post("/test", async (req, res) => {
 });
 
 
+
+
 const PORT = 5000;
 app.listen(PORT, async () => {
   node = await startLibp2pNode();
@@ -56,5 +62,15 @@ app.listen(PORT, async () => {
 
   //stream.close()
 
+  await node.handle('/get-peer-list-protocol/1.0.0', (stream : Stream) => {
+    stream.addEventListener("message", evt => {
+      //echo
+      //stream.send(evt.data)
+      console.log("Yo this node wants stuff")
+    })
+    stream.addEventListener('remoteCloseWrite', () => {
+    stream.close()
+  })
+  })
 
 });
