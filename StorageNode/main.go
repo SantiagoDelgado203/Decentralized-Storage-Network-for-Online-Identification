@@ -1,78 +1,38 @@
-/*
-By Santiago Delgado, December 2025
-
-main.go
-
-This file will describe the main behavior of the node, as the main function will be the one
-being executed.
-
-The desired node behavior is as follows:
-  - Will initialize/check for all necessary requirements
-  - Will start libp2p node with preconfigured specifications
-  - Will constantly try to connect with other nodes in the network in the background
-  - Will set stream handlers to react to the different type of requests
-*/
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"time"
-
-	"github.com/libp2p/go-libp2p/core/peer"
+	"log"
+	"node_prototype/exec"
+	"os"
 )
 
-// main execution
 func main() {
-
-	//TODO: init()
-
-	//Start the node
-	ctx, h, _, peers := node_start("11111", "myapp")
-
-	//connects to peers indefinitely
-	go constantConnection(ctx, h, peers)
-
-	//allow time for connection
-	time.Sleep(5 * time.Second)
-
-	peerID, err := peer.Decode("12D3KooWPyBkFNSq6YdzB7SiJBobp4rVDi6Ts8YLmnV69tyHZRgX")
-	if err != nil {
-		fmt.Println("invalid peer ID:", err)
+	if len(os.Args) < 2 {
+		usage()
+		os.Exit(1)
 	}
 
-	s, err := h.NewStream(ctx, peerID, "/get-peer-list-protocol/1.0.0")
-	if err != nil {
-		fmt.Println("failed to open stream:", err)
-		return
-	}
-	defer s.Close()
-
-	w := bufio.NewWriter(s)
-	_, err = w.WriteString("hey\n")
-	if err != nil {
-		fmt.Println("write failed:", err)
-		return
-	}
-	w.Flush()
-
-	//Initialize the stream handlers
-	sm := HandlersInit(h)
-
-	//Example usage of print protocol
-	for {
-		peerID, err := peer.Decode("QmPFryeZzQ1UmzKr8NbFZny6iJ42rXSbJ3M68a4gijjGmq")
-		if err != nil {
-			fmt.Println("invalid peer ID:", err)
-			break
+	switch os.Args[1] {
+	case "init":
+		if err := exec.Init(); err != nil {
+			log.Fatal(err)
 		}
-		err = sm.PrintSend(ctx, peerID, "Hello from Stream Master")
-		if err != nil {
-			fmt.Println(err)
+	case "run":
+		if err := exec.NodeStart(); err != nil {
+			log.Fatal(err)
 		}
-		time.Sleep(2 * time.Second)
+	default:
+		usage()
+		os.Exit(1)
 	}
+}
 
-	select {}
+func usage() {
+	fmt.Println(
+		`Usage: ./main [option]
 
+Options:
+  init    Run one-time initialization
+  run     Start libp2p node`)
 }
