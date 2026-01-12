@@ -5,7 +5,7 @@ import { startNode } from './p2p/node'
 * By Santiago Delgado
 * 
 * This file is the one that will execute
-* This file should containt the node's main logic
+* This file should have the node's main logic
 */
 
 const PORT = 5000

@@ -55,7 +55,7 @@ Generates CID from given key and then executes dht.Provide()
 
 Node will claim to provide whatever the content is behind the CID generated from key.
 */
-func DHT_provide(ctx context.Context, dht *dht.IpfsDHT, key string) (err error) {
+func DHTProvide(ctx context.Context, dht *dht.IpfsDHT, key string) (err error) {
 
 	//generate the ContentID from the key
 	mh, _ := multihash.Sum([]byte(key), multihash.SHA2_256, -1)
@@ -75,7 +75,7 @@ Generates CID from given key and then executes dht.FindProviders()
 
 The node will either receive a list of available providers or an error.
 */
-func GetProviders(ctx context.Context, dht *dht.IpfsDHT, key string) (providers_list []peer.AddrInfo, err error) {
+func DHTGetProviders(ctx context.Context, dht *dht.IpfsDHT, key string) (providers_list []peer.AddrInfo, err error) {
 
 	//generate the ContentID from the key
 	mh, _ := multihash.Sum([]byte(key), multihash.SHA2_256, -1)

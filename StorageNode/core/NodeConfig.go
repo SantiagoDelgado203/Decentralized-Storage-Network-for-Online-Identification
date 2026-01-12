@@ -5,6 +5,8 @@ StartUp.go
 
 This file contains functions related to the starting process of a node.
 
+If we need to change something from the configuration of a node, here it is.
+
 */
 
 package core

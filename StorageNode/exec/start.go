@@ -1,7 +1,7 @@
 /*
 By Santiago Delgado, December 2025
 
-main.go
+start.go
 
 This file will describe the main behavior of the node, as the main function will be the one
 being executed.
@@ -15,11 +15,8 @@ The desired node behavior is as follows:
 package exec
 
 import (
-	"fmt"
 	"node_prototype/core"
 	"time"
-
-	"github.com/libp2p/go-libp2p/core/peer"
 )
 
 // main execution
@@ -57,21 +54,21 @@ func NodeStart() (err error) {
 	// w.Flush()
 
 	//Initialize the stream handlers
-	sm := core.HandlersInit(h)
+	core.HandlersInit(h)
 
 	//Example usage of print protocol
-	for {
-		peerID, err := peer.Decode("QmPFryeZzQ1UmzKr8NbFZny6iJ42rXSbJ3M68a4gijjGmq")
-		if err != nil {
-			fmt.Println("invalid peer ID:", err)
-			break
-		}
-		err = sm.PrintSend(ctx, peerID, "Hello from Stream Master")
-		if err != nil {
-			fmt.Println(err)
-		}
-		time.Sleep(2 * time.Second)
-	}
+	// for {
+	// 	peerID, err := peer.Decode("12D3KooWMWsFREpYuZjYLwRK5bkW4xMqYGtwDEzk3NP3XKNkkGFz")
+	// 	if err != nil {
+	// 		fmt.Println("invalid peer ID:", err)
+	// 		break
+	// 	}
+	// 	err = sm.PrintSend(ctx, peerID, "Hello from Stream Master")
+	// 	if err != nil {
+	// 		fmt.Println(err)
+	// 	}
+	// 	time.Sleep(2 * time.Second)
+	// }
 
 	select {}
 
