@@ -61,13 +61,15 @@ func HandlersInit(h host.Host) *StreamsMaster {
 
 type PrintProtocol struct{}
 
-// Name
+// print protocol name
 const PRINT_PROTOCOL = "/print/1.0.0"
 
+// name getter
 func (p *PrintProtocol) Name() protocol.ID {
 	return PRINT_PROTOCOL
 }
 
+// handler for incoming print protocol messages
 func (p *PrintProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 	return func(s network.Stream) {
 		defer s.Close()
@@ -92,6 +94,7 @@ func (p *PrintProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 	}
 }
 
+// function to send messages through print protocol
 func (p *StreamsMaster) PrintSend(ctx context.Context, peerID peer.ID, msg string) error {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
@@ -109,3 +112,5 @@ func (p *StreamsMaster) PrintSend(ctx context.Context, peerID peer.ID, msg strin
 	}
 	return w.Flush()
 }
+
+// #------------------------------------------------------------------------------------------------#
