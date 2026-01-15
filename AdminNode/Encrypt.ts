@@ -117,3 +117,6 @@ const input = "Hello Admin";
 const encrypted = encryptData(input, key);
 
 console.log("Encrypted output:", encrypted);
+
+// #------------------------------------------------------------------------------------------------#
+
