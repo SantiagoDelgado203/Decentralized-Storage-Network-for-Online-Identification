@@ -15,7 +15,7 @@ The desired node behavior is as follows:
 package exec
 
 import (
-	"node_prototype/core"
+	"node/core"
 	"time"
 )
 
@@ -25,7 +25,7 @@ func NodeStart() (err error) {
 	//TODO: init()
 
 	//Start the node
-	ctx, h, _, peers := core.NodeCreate("11111", "myapp")
+	ctx, h, _, peers := core.NodeCreate(core.ReadPrivateKeyFromFile("ID.json"), "myapp")
 
 	//connects to peers indefinitely
 	go core.ConstantConnection(ctx, h, peers)

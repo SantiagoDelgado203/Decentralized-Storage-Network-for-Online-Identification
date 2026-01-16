@@ -9,6 +9,8 @@ package core
 
 import (
 	"context"
+	"crypto/ed25519"
+	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -31,8 +33,24 @@ type BootstrapKeys struct {
 // path to file with list of boostrap nodes
 var bootstrapFile = "Bootstrap.txt"
 
+func PrivKeyFromSeed(seed string) (crypto.PrivKey, error) {
+	// Hash → 32-byte seed
+	hash := sha256.Sum256([]byte(seed))
+
+	// Ed25519 private key (64 bytes)
+	edPriv := ed25519.NewKeyFromSeed(hash[:])
+
+	// Convert to libp2p private key
+	priv, err := crypto.UnmarshalEd25519PrivateKey(edPriv)
+	if err != nil {
+		return nil, err
+	}
+
+	return priv, nil
+}
+
 // will read the ID.json, fetch the private key, and return it in crypto.PrivKey format
-func readPrivateKeyFromFile(filename string) crypto.PrivKey {
+func ReadPrivateKeyFromFile(filename string) crypto.PrivKey {
 	data, err := os.ReadFile(filename)
 	if err != nil {
 		panic(fmt.Sprintf("Failed to read key file: %v", err))
