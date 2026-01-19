@@ -41,23 +41,18 @@ router.post('/user-info', async (req: Request, res: Response) => {
 
   const node = getNode()
   const in_payload = req.body
+  const user_id = in_payload.UID
   const user_data = in_payload.user_data
-  const admin_signature = in_payload.admin_signature
-
-  //TODO: check validity
-  if(!admin_signature){
-    res.json({
-      reply: `Invalid admin credentials!`
-    })
-    return
-  }
 
   //TODO: encrypt
+
+  console.log(in_payload)
 
   const encrypted_user = "foo"
   const symmetric_key = "foo"
 
   const out_payload = {
+    id: user_id,
     u: encrypted_user,
     k: symmetric_key
   }
@@ -65,7 +60,7 @@ router.post('/user-info', async (req: Request, res: Response) => {
   //dial storage network with new user protocol
   //TODO: replace static node multiaddress to random node from peerlist
   const stream = await node.dialProtocol(
-    multiaddr("/ip4/10.0.0.183/tcp/57692/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7"),
+    multiaddr("/ip4/10.0.0.183/tcp/29427/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7"),
     '/new-user/1.0.0'
   )
   stream.send(new TextEncoder().encode(JSON.stringify(out_payload)))

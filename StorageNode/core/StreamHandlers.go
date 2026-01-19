@@ -149,9 +149,11 @@ func (p *NewUserProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 			return
 		}
 
-		// fmt.Printf("\nEncrypted data: %s \nKey: %s\n", data.UserCipher, data.Key)
+		fmt.Printf("\nEncrypted data: %s \nKey: %s\n UID: %s\n", data.UserCipher, data.Key, data.UID)
 
-		//TODO: split key into fragments. then, distribute user cipher and key fragments
+		//TODO: split key into fragments.
+
+		//TODO: generate hashes from user id and labels. then, distribute user cipher and key fragments to other nodes
 
 	}
 }
