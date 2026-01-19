@@ -1,75 +1,53 @@
 /*
 By Santiago Delgado, December 2025
+Updated: January 2026
 
 start.go
 
-This file will describe the main behavior of the node, as the main function will be the one
-being executed.
+Main execution logic for the storage node.
 
-The desired node behavior is as follows:
-  - Will initialize/check for all necessary requirements
-  - Will start libp2p node with preconfigured specifications
-  - Will constantly try to connect with other nodes in the network in the background
-  - Will set stream handlers to react to the different type of requests
+The node behavior:
+  - Loads configuration from environment variables
+  - Starts libp2p node with configured settings
+  - Continuously connects to bootstrap peers
+  - Sets up stream handlers for custom protocols
 */
 package exec
 
 import (
+	"fmt"
+	"node_prototype/config"
 	"node_prototype/core"
 	"time"
 )
 
-// main execution
-func NodeStart() (err error) {
+// NodeStart is the main execution function for the node
+func NodeStart() error {
+	cfg := config.Get()
 
-	//TODO: init()
+	fmt.Println("🚀 Starting StorageNode...")
+	fmt.Printf("   Port: %s\n", cfg.Port)
+	fmt.Printf("   Namespace: %s\n", cfg.Namespace)
+	fmt.Printf("   Data Dir: %s\n", cfg.DataDir)
 
-	//Start the node
-	ctx, h, _, peers := core.NodeCreate("11111", "myapp")
+	if cfg.HasBootstrapPeers() {
+		fmt.Printf("   Bootstrap Peers: %d configured\n", len(cfg.BootstrapPeers))
+	}
 
-	//connects to peers indefinitely
+	// Start the node using configuration
+	ctx, h, _, peers := core.NodeCreate()
+
+	// Connect to peers in the background
 	go core.ConstantConnection(ctx, h, peers)
 
-	//allow time for connection
+	// Allow time for initial connections
 	time.Sleep(5 * time.Second)
 
-	// peerID, err := peer.Decode("12D3KooWPyBkFNSq6YdzB7SiJBobp4rVDi6Ts8YLmnV69tyHZRgX")
-	// if err != nil {
-	// 	fmt.Println("invalid peer ID:", err)
-	// }
-
-	// s, err := h.NewStream(ctx, peerID, "/get-peer-list-protocol/1.0.0")
-	// if err != nil {
-	// 	fmt.Println("failed to open stream:", err)
-	// 	return
-	// }
-	// defer s.Close()
-
-	// w := bufio.NewWriter(s)
-	// _, err = w.WriteString("hey\n")
-	// if err != nil {
-	// 	fmt.Println("write failed:", err)
-	// 	return
-	// }
-	// w.Flush()
-
-	//Initialize the stream handlers
+	// Initialize stream handlers
 	core.HandlersInit(h)
 
-	//Example usage of print protocol
-	// for {
-	// 	peerID, err := peer.Decode("12D3KooWMWsFREpYuZjYLwRK5bkW4xMqYGtwDEzk3NP3XKNkkGFz")
-	// 	if err != nil {
-	// 		fmt.Println("invalid peer ID:", err)
-	// 		break
-	// 	}
-	// 	err = sm.PrintSend(ctx, peerID, "Hello from Stream Master")
-	// 	if err != nil {
-	// 		fmt.Println(err)
-	// 	}
-	// 	time.Sleep(2 * time.Second)
-	// }
+	fmt.Println("✅ Node is running. Press Ctrl+C to stop.")
 
+	// Block forever (node runs until interrupted)
 	select {}
-
 }

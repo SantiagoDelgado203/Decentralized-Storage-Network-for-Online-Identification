@@ -1,0 +1,121 @@
+# =============================================================================
+# Decentralized Storage Network - Docker Compose (Local Development)
+# =============================================================================
+# Usage:
+#   docker-compose up -d              # Start all services
+#   docker-compose up -d --scale storage-node=3   # Start with 3 worker nodes
+#   docker-compose logs -f            # View logs
+#   docker-compose down               # Stop all services
+# =============================================================================
+
+services:
+  # ===========================================================================
+  # Bootstrap Node - The first node that others connect to
+  # ===========================================================================
+  storage-bootstrap:
+    build:
+      context: ./StorageNode
+      dockerfile: Dockerfile
+    container_name: storage-bootstrap
+    environment:
+      - DSN_PORT=11111
+      - DSN_NAMESPACE=dsn
+      - DSN_DATA_DIR=/app/data
+    volumes:
+      - ./bootstrap-identity:/app/data:ro  # Read-only, use pre-generated identity
+    networks:
+      - dsn-network
+    ports:
+      - "11111:11111/tcp"
+      - "11111:11111/udp"
+    healthcheck:
+      test: ["CMD", "pgrep", "storagenode"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # ===========================================================================
+  # Storage Worker Nodes - Connect to bootstrap, can be scaled
+  # ===========================================================================
+  storage-node:
+    build:
+      context: ./StorageNode
+      dockerfile: Dockerfile
+    environment:
+      - DSN_PORT=11111
+      - DSN_NAMESPACE=dsn
+      - DSN_DATA_DIR=/app/data
+      - DSN_BOOTSTRAP_PEERS=/dns4/storage-bootstrap/tcp/11111/p2p/QmaTPiRLg64y6wwYXybwsQLVUqqzqwpJSNQ8k5T5e6MyAG
+    volumes:
+      - storage-node-data:/app/data
+    networks:
+      - dsn-network
+    depends_on:
+      storage-bootstrap:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ===========================================================================
+  # Admin Node - API gateway for the network
+  # ===========================================================================
+  admin-node:
+    build:
+      context: ./AdminNode
+      dockerfile: Dockerfile
+    container_name: admin-node
+    environment:
+      - ADMIN_API_PORT=5000
+      - ADMIN_P2P_PORT=4001
+      - ADMIN_P2P_WS_PORT=4002
+      - ADMIN_CORS_ORIGINS=http://localhost:3000,http://web-portal:3000
+      - DSN_NAMESPACE=dsn
+      - DSN_BOOTSTRAP_PEERS=/dns4/storage-bootstrap/tcp/11111/p2p/QmaTPiRLg64y6wwYXybwsQLVUqqzqwpJSNQ8k5T5e6MyAG
+    networks:
+      - dsn-network
+    ports:
+      - "5000:5000"     # API
+      - "4001:4001"     # P2P TCP
+      - "4002:4002"     # P2P WebSocket
+    depends_on:
+      storage-bootstrap:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # ===========================================================================
+  # Web Portal - User-facing frontend
+  # ===========================================================================
+  web-portal:
+    build:
+      context: ./web-portal
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=http://localhost:5000
+    container_name: web-portal
+    networks:
+      - dsn-network
+    ports:
+      - "3000:3000"
+    depends_on:
+      admin-node:
+        condition: service_healthy
+    restart: unless-stopped
+
+# =============================================================================
+# Networks
+# =============================================================================
+networks:
+  dsn-network:
+    driver: bridge
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  storage-node-data:
+    driver: local

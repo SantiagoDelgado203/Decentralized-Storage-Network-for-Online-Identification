@@ -1,9 +1,11 @@
 /*
 By Santiago Delgado, December 2025
+Updated: January 2026
 
-# Utils.go
+Utils.go
 
-This file will define a variety of functions utilized in different contexts.
+This file defines utility functions used throughout the node.
+Updated to use configuration module for file paths.
 */
 package core
 
@@ -16,31 +18,30 @@ import (
 	"strings"
 	"time"
 
+	"node_prototype/config"
+
 	"github.com/libp2p/go-libp2p/core/crypto"
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/multiformats/go-multiaddr"
 )
 
-// struct to define json structure of keys
+// BootstrapKeys defines the JSON structure for identity keys
 type BootstrapKeys struct {
 	PrivateKey string `json:"private_key"`
 	PublicKey  string `json:"public_key"`
 }
 
-// path to file with list of boostrap nodes
-var bootstrapFile = "Bootstrap.txt"
-
-// will read the ID.json, fetch the private key, and return it in crypto.PrivKey format
+// readPrivateKeyFromFile reads the ID file and returns the private key
 func readPrivateKeyFromFile(filename string) crypto.PrivKey {
 	data, err := os.ReadFile(filename)
 	if err != nil {
-		panic(fmt.Sprintf("Failed to read key file: %v", err))
+		panic(fmt.Sprintf("Failed to read key file '%s': %v", filename, err))
 	}
 
 	var keys BootstrapKeys
 	if err := json.Unmarshal(data, &keys); err != nil {
-		panic(fmt.Sprintf("Failed to parse JSON: %v", err))
+		panic(fmt.Sprintf("Failed to parse JSON from '%s': %v", filename, err))
 	}
 
 	privBytes, err := base64.StdEncoding.DecodeString(keys.PrivateKey)
@@ -56,14 +57,17 @@ func readPrivateKeyFromFile(filename string) crypto.PrivKey {
 	return priv
 }
 
-// gets bootstrap nodes from file, returns list of strings
+// readBootstrapPeers reads bootstrap nodes from the configured file
 func readBootstrapPeers() []string {
+	cfg := config.Get()
+	bootstrapFile := cfg.BootstrapFilePath()
+
 	data, err := os.ReadFile(bootstrapFile)
 	if err != nil {
 		if os.IsNotExist(err) {
 			return []string{}
 		}
-		panic(fmt.Sprintf("Failed to read bootstrap file: %v", err))
+		panic(fmt.Sprintf("Failed to read bootstrap file '%s': %v", bootstrapFile, err))
 	}
 
 	lines := strings.Split(strings.TrimSpace(string(data)), "\n")
@@ -76,68 +80,74 @@ func readBootstrapPeers() []string {
 	return peers
 }
 
-// writes the node address to the bootstrap list
+// addPeerToBootstrap adds a peer address to the bootstrap file if not already present
 func addPeerToBootstrap(addr string) {
+	cfg := config.Get()
+	bootstrapFile := cfg.BootstrapFilePath()
+
 	peers := readBootstrapPeers()
 	for _, p := range peers {
 		if p == addr {
-			return
+			return // Already exists
 		}
 	}
+
 	f, err := os.OpenFile(bootstrapFile, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		fmt.Println("Error writing to bootstrap file:", err)
+		fmt.Println("⚠️  Error writing to bootstrap file:", err)
 		return
 	}
 	defer f.Close()
+
 	if _, err := f.WriteString(addr + "\n"); err != nil {
-		fmt.Println("Error writing to bootstrap file:", err)
+		fmt.Println("⚠️  Error writing to bootstrap file:", err)
 		return
 	}
 	fmt.Println("📝 Added self to Bootstrap.txt:", addr)
 }
 
-// endlessly connects to nodes in the bootstrap list
+// ConstantConnection continuously attempts to connect to peers in the bootstrap list
 func ConstantConnection(ctx context.Context, h host.Host, peers []string) {
+	// Start connection counter in background
 	go func() {
 		for {
 			select {
 			case <-ctx.Done():
-				fmt.Println("\n⛔ constantConnection stopped by context")
+				fmt.Println("\n⛔ Connection monitor stopped")
 				return
 			default:
 				conns := h.Network().Conns()
-				fmt.Printf("\r🔌 Active connections: %d", len(conns))
+				fmt.Printf("\r🔌 Active connections: %d   ", len(conns))
 				time.Sleep(1 * time.Second)
 			}
 		}
 	}()
 
-	// main connection loop
+	// Main connection loop
 	for {
 		select {
 		case <-ctx.Done():
-			fmt.Println("\n⛔ constantConnection stopped by context")
+			fmt.Println("\n⛔ Connection loop stopped")
 			return
 		default:
-
 			for _, addr := range peers {
+				// Skip self
 				if strings.Contains(addr, h.ID().String()) {
 					continue
 				}
 
 				ma, err := multiaddr.NewMultiaddr(addr)
 				if err != nil {
-					fmt.Println("Invalid multiaddr:", addr)
+					// Only log once, not on every iteration
 					continue
 				}
 
 				pi, err := peer.AddrInfoFromP2pAddr(ma)
 				if err != nil {
-					fmt.Println("Invalid peer info:", addr)
 					continue
 				}
 
+				// Attempt connection (non-blocking, errors are expected for unreachable peers)
 				_ = h.Connect(ctx, *pi)
 			}
 

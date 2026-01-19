@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+
+# Build output (will be built in container)
+.next/
+out/
+
+# Development files
+*.log
+npm-debug.log*
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+README*
+
+# Environment files (passed at build time)
+.env
+.env.*
+!.env.example
+
+# Test files
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+__tests__/
+coverage/
+cypress/

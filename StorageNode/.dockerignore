@@ -1,0 +1,30 @@
+# Binary files
+main.exe
+storagenode
+*.exe
+
+# Data files (should be mounted as volumes)
+ID.json
+Bootstrap.txt
+data/
+
+# Development files
+*.log
+*.tmp
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+README*
+
+# Test files
+*_test.go
