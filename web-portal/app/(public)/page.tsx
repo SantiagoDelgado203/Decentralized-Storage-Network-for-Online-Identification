@@ -1,6 +1,8 @@
 "use client"
 import Image from "next/image";
 import Link from "next/link"
+import { sendUserData } from "@/Connectors";
+import { TestUserInfo } from "@/Models";
 
 import { useState } from "react";
 
@@ -9,16 +11,17 @@ export default function Home() {
   const [response, setResponse] = useState("");
 
   const sendRequest = async () => {
-    const res = await fetch("http://localhost:5000/api/test", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const test: TestUserInfo ={
+      Name : "Santiago",
+      DOB : {
+        year : 2003,
+        month: 9,
+        day: 2
       },
-      body: JSON.stringify({ message: text }),
-    });
-
-    const data = await res.json();
-    setResponse(data.reply);
+      Address : "123 Fake Street, WPB, FL, USA"
+    }
+    const res = sendUserData(test)
+    setResponse(await res);
   };
 
   return (
