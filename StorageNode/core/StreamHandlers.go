@@ -113,3 +113,70 @@ func (p *StreamsMaster) PrintSend(ctx context.Context, peerID peer.ID, msg strin
 	}
 	return w.Flush()
 }
+
+/*------------------------------------DATA STORE PROTOCOL-------------------------------------------*/
+type DataStoreProtocol struct{}
+
+const DATASTORE_PROTOCOL = "/data-store-protocol/1.0.0"
+
+// name getter
+func (p *DataStoreProtocol) Name() protocol.ID {
+	return DATASTORE_PROTOCOL
+}
+
+// handler for incoming data store protocol dials
+func (p *DataStoreProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
+	return func(s network.Stream) {
+		defer s.Close()
+
+		reader := bufio.NewReader(s)
+		msg, err := reader.ReadString('\n')
+		if err != nil && err != io.EOF {
+			fmt.Println("Error reading:", err)
+			return
+		}
+		fmt.Println("Received message:", msg)
+
+		//TODO: Here you should decode the received msg to json and store the data block with its hash.
+		//Reminder to Santiago: USE DHT PROVIDE FOR STORAGE, MODIFY STREAM MASTER TO INCLUDE DHT IN ADDITION TO LIBP2P HOST
+
+	}
+}
+
+// function to send user data store requests to other nodes
+func (p *StreamsMaster) DataStoreSend(ctx context.Context, peerID peer.ID, cipher string) error {
+	return nil
+}
+
+//IS THERE ANY USE TO SEPARATING FRAGMENTS AND DATA BLOCKS IN DIFFERENT PROTOCOLS? SANTIAGO AT 1AM THINKS NO
+
+// /*------------------------------------FRAGMENT STORE PROTOCOL-------------------------------------------*/
+// type FragmentStoreProtocol struct{}
+
+// const FRAGMENTSTORE_PROTOCOL = "/data-store-protocol/1.0.0"
+
+// // name getter
+// func (p *FragmentStoreProtocol) Name() protocol.ID {
+// 	return FRAGMENTSTORE_PROTOCOL
+// }
+
+// // handler for incoming fragment store protocol dials
+// func (p *FragmentStoreProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
+// 	return func(s network.Stream) {
+// 		defer s.Close()
+
+// 		reader := bufio.NewReader(s)
+// 		msg, err := reader.ReadString('\n')
+// 		if err != nil && err != io.EOF {
+// 			fmt.Println("Error reading:", err)
+// 			return
+// 		}
+// 		fmt.Println("Received message:", msg)
+
+// 	}
+// }
+
+// // function to send key fragments store requests to other nodes
+// func (p *StreamsMaster) FragmentStoreSend(ctx context.Context, peerID peer.ID, fragment string) error {
+// 	return nil
+// }
