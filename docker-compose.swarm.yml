@@ -1,0 +1,156 @@
+# =============================================================================
+# Decentralized Storage Network - Docker Swarm (Production)
+# =============================================================================
+# Usage:
+#   docker swarm init                                    # Initialize swarm (once)
+#   docker stack deploy -c docker-compose.swarm.yml dsn  # Deploy stack
+#   docker stack services dsn                            # List services
+#   docker service scale dsn_storage-node=10             # Scale to 10 nodes
+#   docker stack rm dsn                                  # Remove stack
+# =============================================================================
+
+services:
+  # ===========================================================================
+  # Bootstrap Node - Single instance, stable identity
+  # ===========================================================================
+  storage-bootstrap:
+    image: dsn/storage-node:latest
+    environment:
+      - DSN_PORT=11111
+      - DSN_NAMESPACE=dsn
+      - DSN_DATA_DIR=/app/data
+    volumes:
+      - bootstrap-data:/app/data
+    networks:
+      - dsn-overlay
+    ports:
+      - target: 11111
+        published: 11111
+        protocol: tcp
+        mode: host
+      - target: 11111
+        published: 11111
+        protocol: udp
+        mode: host
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager  # Always on manager for stability
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 128M
+
+  # ===========================================================================
+  # Storage Worker Nodes - Scalable across swarm
+  # ===========================================================================
+  storage-node:
+    image: dsn/storage-node:latest
+    environment:
+      - DSN_PORT=11111
+      - DSN_NAMESPACE=dsn
+      - DSN_DATA_DIR=/app/data
+      - DSN_BOOTSTRAP_PEERS=/dns4/storage-bootstrap/tcp/11111/p2p/QmaTPiRLg64y6wwYXybwsQLVUqqzqwpJSNQ8k5T5e6MyAG
+    volumes:
+      - storage-node-data:/app/data
+    networks:
+      - dsn-overlay
+    deploy:
+      mode: replicated
+      replicas: 3  # Start with 3, scale as needed
+      update_config:
+        parallelism: 1
+        delay: 10s
+        failure_action: rollback
+      rollback_config:
+        parallelism: 1
+        delay: 10s
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 128M
+
+  # ===========================================================================
+  # Admin Node - API Gateway
+  # ===========================================================================
+  admin-node:
+    image: dsn/admin-node:latest
+    environment:
+      - ADMIN_API_PORT=5000
+      - ADMIN_P2P_PORT=4001
+      - ADMIN_P2P_WS_PORT=4002
+      - ADMIN_CORS_ORIGINS=http://localhost:3000,http://web-portal:3000
+      - DSN_NAMESPACE=dsn
+      - DSN_BOOTSTRAP_PEERS=/dns4/storage-bootstrap/tcp/11111/p2p/QmaTPiRLg64y6wwYXybwsQLVUqqzqwpJSNQ8k5T5e6MyAG
+    networks:
+      - dsn-overlay
+    ports:
+      - "5000:5000"
+      - "4001:4001"
+      - "4002:4002"
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 64M
+
+  # ===========================================================================
+  # Web Portal - Frontend
+  # ===========================================================================
+  web-portal:
+    image: dsn/web-portal:latest
+    networks:
+      - dsn-overlay
+    ports:
+      - "3000:3000"
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 64M
+
+# =============================================================================
+# Networks - Overlay for cross-host communication
+# =============================================================================
+networks:
+  dsn-overlay:
+    driver: overlay
+    attachable: true
+
+# =============================================================================
+# Volumes - Persistent storage
+# =============================================================================
+volumes:
+  bootstrap-data:
+    driver: local
+  storage-node-data:
+    driver: local

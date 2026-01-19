@@ -1,18 +1,11 @@
-package exec
-
 /*
-TODO: Set up everything that is needed, including:
+Initialization module for StorageNode
+Handles first-time setup including identity generation.
 
-- NoSQL database set up
-
-- Generate digital certificate/identity document
-
-- Check existence of peerlist
-
-- Any other additional configurations
-
-If something goes wrong, do not return anithing. Use panic() instead with a error message
+By Santiago Delgado, December 2025
+Updated: January 2026
 */
+package exec
 
 import (
 	"crypto/rand"
@@ -20,80 +13,177 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 
-	"node/core" // 如果你 zip 里的 core 包路径不是 node/core，按实际改
+	"node/config"
 
 	"github.com/libp2p/go-libp2p/core/crypto"
+	"github.com/libp2p/go-libp2p/core/peer"
 )
 
-const (
-	idFile        = "ID.json"
-	bootstrapFile = "Bootstrap.txt"
-)
-
-// 建议你用环境变量，方便 5 台电脑改连接串
-func mongoURI() string {
-	if v := os.Getenv("MONGO_URI"); v != "" {
-		return v
-	}
-	return "mongodb://localhost:27017"
+// IdentityKeys represents the JSON structure for storing keys
+type IdentityKeys struct {
+	PrivateKey string `json:"private_key"`
+	PublicKey  string `json:"public_key"`
 }
 
+// Init performs one-time initialization for the node
+// - Creates data directory if needed
+// - Generates identity (keypair) if ID.json doesn't exist
+// - Creates empty Bootstrap.txt if it doesn't exist
 func Init() error {
-	fmt.Println("🔧 Init start...")
+	cfg := config.Load()
 
-	// 1) Bootstrap.txt
-	if _, err := os.Stat(bootstrapFile); os.IsNotExist(err) {
-		if err := os.WriteFile(bootstrapFile, []byte(""), 0644); err != nil {
-			panic(fmt.Sprintf("Init: create %s failed: %v", bootstrapFile, err))
-		}
-		fmt.Println("✅ Bootstrap.txt created")
-	} else {
-		fmt.Println("✅ Bootstrap.txt exists")
+	fmt.Println("🔧 Initializing StorageNode...")
+	fmt.Printf("   Data directory: %s\n", cfg.DataDir)
+
+	// Create data directory if it doesn't exist
+	if err := ensureDataDir(cfg.DataDir); err != nil {
+		return fmt.Errorf("failed to create data directory: %w", err)
 	}
 
-	// 2) ID.json
-	if _, err := os.Stat(idFile); os.IsNotExist(err) {
-		priv, pub, err := crypto.GenerateEd25519Key(rand.Reader)
-		if err != nil {
-			panic(fmt.Sprintf("Init: generate key failed: %v", err))
-		}
-
-		privBytes, err := crypto.MarshalPrivateKey(priv)
-		if err != nil {
-			panic(fmt.Sprintf("Init: marshal priv failed: %v", err))
-		}
-		pubBytes, err := crypto.MarshalPublicKey(pub)
-		if err != nil {
-			panic(fmt.Sprintf("Init: marshal pub failed: %v", err))
-		}
-
-		keys := core.BootstrapKeys{
-			PrivateKey: base64.StdEncoding.EncodeToString(privBytes),
-			PublicKey:  base64.StdEncoding.EncodeToString(pubBytes),
-		}
-
-		b, err := json.MarshalIndent(keys, "", "  ")
-		if err != nil {
-			panic(fmt.Sprintf("Init: marshal ID.json failed: %v", err))
-		}
-		if err := os.WriteFile(idFile, b, 0600); err != nil {
-			panic(fmt.Sprintf("Init: write ID.json failed: %v", err))
-		}
-		fmt.Println("✅ ID.json created")
-	} else {
-		fmt.Println("✅ ID.json exists")
+	// Generate identity if needed
+	if err := ensureIdentity(cfg); err != nil {
+		return fmt.Errorf("failed to initialize identity: %w", err)
 	}
 
-	// 3) MongoDB connect test (关键)
-	fmt.Println("🔌 Checking MongoDB:", mongoURI())
-	db, err := core.NewDatabase(mongoURI())
-	if err != nil {
-		panic(fmt.Sprintf("Init: MongoDB connect failed: %v", err))
+	// Create Bootstrap.txt if needed
+	if err := ensureBootstrapFile(cfg); err != nil {
+		return fmt.Errorf("failed to initialize bootstrap file: %w", err)
 	}
-	_ = db.Close()
-	fmt.Println("✅ MongoDB OK")
 
-	fmt.Println("🎉 Init complete")
+	fmt.Println("✅ Initialization complete!")
 	return nil
+}
+
+// ensureDataDir creates the data directory if it doesn't exist
+func ensureDataDir(dir string) error {
+	if dir == "." {
+		return nil // Current directory always exists
+	}
+
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		fmt.Printf("   Creating data directory: %s\n", dir)
+		return os.MkdirAll(dir, 0755)
+	}
+	return nil
+}
+
+// ensureIdentity generates a new identity if ID.json doesn't exist
+func ensureIdentity(cfg *config.Config) error {
+	idPath := cfg.IDFilePath()
+
+	// Check if identity already exists
+	if _, err := os.Stat(idPath); err == nil {
+		// File exists, read and display peer ID
+		peerID, err := getPeerIDFromFile(idPath)
+		if err != nil {
+			return fmt.Errorf("identity file exists but is invalid: %w", err)
+		}
+		fmt.Printf("   ✓ Identity exists: %s\n", peerID)
+		return nil
+	}
+
+	fmt.Println("   Generating new identity...")
+
+	// Generate new RSA keypair (2048 bits for compatibility)
+	priv, pub, err := crypto.GenerateKeyPairWithReader(crypto.RSA, 2048, rand.Reader)
+	if err != nil {
+		return fmt.Errorf("failed to generate keypair: %w", err)
+	}
+
+	// Marshal keys to bytes
+	privBytes, err := crypto.MarshalPrivateKey(priv)
+	if err != nil {
+		return fmt.Errorf("failed to marshal private key: %w", err)
+	}
+
+	pubBytes, err := crypto.MarshalPublicKey(pub)
+	if err != nil {
+		return fmt.Errorf("failed to marshal public key: %w", err)
+	}
+
+	// Create identity structure
+	identity := IdentityKeys{
+		PrivateKey: base64.StdEncoding.EncodeToString(privBytes),
+		PublicKey:  base64.StdEncoding.EncodeToString(pubBytes),
+	}
+
+	// Write to file
+	data, err := json.MarshalIndent(identity, "", "  ")
+	if err != nil {
+		return fmt.Errorf("failed to marshal identity JSON: %w", err)
+	}
+
+	if err := os.WriteFile(idPath, data, 0600); err != nil {
+		return fmt.Errorf("failed to write identity file: %w", err)
+	}
+
+	// Get and display the peer ID
+	peerID, err := peer.IDFromPublicKey(pub)
+	if err != nil {
+		return fmt.Errorf("failed to derive peer ID: %w", err)
+	}
+
+	fmt.Printf("   ✓ Generated new identity!\n")
+	fmt.Printf("   📋 Peer ID: %s\n", peerID.String())
+	fmt.Printf("   📁 Saved to: %s\n", idPath)
+
+	return nil
+}
+
+// ensureBootstrapFile creates an empty Bootstrap.txt if it doesn't exist
+func ensureBootstrapFile(cfg *config.Config) error {
+	bootstrapPath := cfg.BootstrapFilePath()
+
+	if _, err := os.Stat(bootstrapPath); err == nil {
+		fmt.Printf("   ✓ Bootstrap file exists: %s\n", bootstrapPath)
+		return nil
+	}
+
+	// Ensure parent directory exists
+	dir := filepath.Dir(bootstrapPath)
+	if dir != "." {
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			return err
+		}
+	}
+
+	// Create empty file
+	if err := os.WriteFile(bootstrapPath, []byte(""), 0644); err != nil {
+		return fmt.Errorf("failed to create bootstrap file: %w", err)
+	}
+
+	fmt.Printf("   ✓ Created bootstrap file: %s\n", bootstrapPath)
+	return nil
+}
+
+// getPeerIDFromFile reads an identity file and returns the peer ID
+func getPeerIDFromFile(path string) (string, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return "", err
+	}
+
+	var keys IdentityKeys
+	if err := json.Unmarshal(data, &keys); err != nil {
+		return "", err
+	}
+
+	pubBytes, err := base64.StdEncoding.DecodeString(keys.PublicKey)
+	if err != nil {
+		return "", err
+	}
+
+	pub, err := crypto.UnmarshalPublicKey(pubBytes)
+	if err != nil {
+		return "", err
+	}
+
+	peerID, err := peer.IDFromPublicKey(pub)
+	if err != nil {
+		return "", err
+	}
+
+	return peerID.String(), nil
 }
