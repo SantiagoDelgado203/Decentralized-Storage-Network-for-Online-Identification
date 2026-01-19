@@ -1,12 +1,11 @@
 /*
 By Santiago Delgado, December 2025
+Updated: January 2026
 
-StartUp.go
+NodeConfig.go
 
 This file contains functions related to the starting process of a node.
-
-If we need to change something from the configuration of a node, here it is.
-
+Now supports configuration via environment variables for Docker deployment.
 */
 
 package core
@@ -15,10 +14,10 @@ import (
 	"context"
 	"fmt"
 
+	"node/config"
+
 	"github.com/libp2p/go-libp2p"
 	dht "github.com/libp2p/go-libp2p-kad-dht"
-
-	// "github.com/libp2p/go-libp2p-record"
 
 	tls "github.com/libp2p/go-libp2p/p2p/security/tls"
 	quic "github.com/libp2p/go-libp2p/p2p/transport/quic"
@@ -31,73 +30,219 @@ import (
 	"github.com/multiformats/go-multiaddr"
 )
 
-// Starts the p2p node listening in the passed address and creates a new custom namespace
-func NodeCreate(priv crypto.PrivKey, custom_namespace string) (context.Context, host.Host, *dht.IpfsDHT, []string) {
-	//create context
+// NodeCreate starts the p2p node using configuration from environment
+// Returns context, host, DHT, and list of bootstrap peers
+func NodeCreate() (context.Context, host.Host, *dht.IpfsDHT, []string) {
+	cfg := config.Get()
+	return NodeCreateWithConfig(cfg.Port, cfg.Namespace)
+}
+
+// NodeCreateWithPrivKey starts the p2p node with a provided private key
+// Used for test nodes with deterministic peer IDs
+func NodeCreateWithPrivKey(priv crypto.PrivKey, customNamespace string) (context.Context, host.Host, *dht.IpfsDHT, []string) {
+	cfg := config.Get()
+
+	// Create context
 	ctx := context.Background()
 
-	//Get priv key from ID file (specifically, from node's private key)
-	// priv := readPrivateKeyFromFile("ID.json")
+	port := cfg.Port
 
-	//Start new node host, specifying constant ID and listening address
-	h, err := libp2p.New(
+	// Build listen addresses
+	listenAddrs := []string{
+		fmt.Sprintf("/ip4/0.0.0.0/udp/%s/quic-v1", port),
+		fmt.Sprintf("/ip4/0.0.0.0/tcp/%s", port),
+	}
+
+	// Build libp2p options
+	opts := []libp2p.Option{
 		libp2p.Identity(priv),
-		libp2p.ListenAddrStrings("/ip4/0.0.0.0/udp/0/quic-v1"),
-		libp2p.ListenAddrStrings("/ip4/0.0.0.0/tcp/0"),
-		//quic transpot, with tcp+tls as a fallback
+		libp2p.ListenAddrStrings(listenAddrs...),
+		// QUIC transport with TCP+TLS as fallback
 		libp2p.Transport(quic.NewTransport),
 		libp2p.Transport(tcp.NewTCPTransport),
 		libp2p.Security(tls.ID, tls.New),
-	)
-	if err != nil {
-		panic(err)
 	}
 
-	//get bootstrap peers from file
-	bootstrapPeers := readBootstrapPeers()
+	// Add announce addresses if configured (for Docker/NAT)
+	if cfg.HasAnnounceAddresses() {
+		var announceAddrs []multiaddr.Multiaddr
+		for _, addr := range cfg.AnnounceAddresses {
+			ma, err := multiaddr.NewMultiaddr(addr)
+			if err != nil {
+				fmt.Printf("⚠️  Invalid announce address: %s (%v)\n", addr, err)
+				continue
+			}
+			announceAddrs = append(announceAddrs, ma)
+		}
+		if len(announceAddrs) > 0 {
+			opts = append(opts, libp2p.AddrsFactory(func([]multiaddr.Multiaddr) []multiaddr.Multiaddr {
+				return announceAddrs
+			}))
+		}
+	}
 
-	//create DHT
+	// Start new node host
+	h, err := libp2p.New(opts...)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to create libp2p host: %v", err))
+	}
+
+	// Get bootstrap peers (from env first, then file)
+	bootstrapPeers := getBootstrapPeers(cfg)
+
+	// Create DHT
 	kadDHT, err := dht.New(
 		ctx,
 		h,
-		//IMPORTANT! Use ModeAutoServer. Will function as Server by defaul, allowing to receive and send requests/responses
+		// Use ModeAutoServer - functions as server by default
 		dht.Mode(dht.ModeAutoServer),
-		//Bootstrap know nodes in DHT
-		dht.BootstrapPeers(func() []peer.AddrInfo {
-			var bootstrap_addresses []peer.AddrInfo
-
-			for p := range bootstrapPeers {
-				ma, err := multiaddr.NewMultiaddr(bootstrapPeers[p])
-				if err != nil {
-					panic(err)
-				}
-
-				pi, err := peer.AddrInfoFromP2pAddr(ma)
-				if err != nil {
-					panic(err)
-				}
-				bootstrap_addresses = append(bootstrap_addresses, *pi)
-			}
-
-			return bootstrap_addresses
-		}()...),
-		//Pass custom validator for custom prefix
-		dht.NamespacedValidator(custom_namespace, LazyValidator{}),
-		//Establish protocol prefix
-		dht.ProtocolPrefix(protocol.ID(fmt.Sprintf("/%s", custom_namespace))),
+		// Bootstrap with known nodes
+		dht.BootstrapPeers(parseBootstrapPeers(bootstrapPeers)...),
+		// Custom validator for namespace
+		dht.NamespacedValidator(customNamespace, LazyValidator{}),
+		// Protocol prefix
+		dht.ProtocolPrefix(protocol.ID(fmt.Sprintf("/%s", customNamespace))),
 	)
 	if err != nil {
-		panic(err)
+		panic(fmt.Sprintf("Failed to create DHT: %v", err))
 	}
 
 	fmt.Println("✅ Node ID:", h.ID())
 	fmt.Println("🌐 Listening on:", h.Addrs())
 
-	//add self to bootstrap list
+	if cfg.HasAnnounceAddresses() {
+		fmt.Println("📢 Announcing:", cfg.AnnounceAddresses)
+	}
+
+	// Add self to bootstrap file (for local development)
 	if len(h.Addrs()) > 0 {
 		selfAddr := fmt.Sprintf("%s/p2p/%s", h.Addrs()[0].String(), h.ID().String())
 		addPeerToBootstrap(selfAddr)
 	}
 
 	return ctx, h, kadDHT, bootstrapPeers
+}
+
+// NodeCreateWithConfig starts the p2p node with explicit port and namespace
+// This allows for manual override when needed
+func NodeCreateWithConfig(port string, customNamespace string) (context.Context, host.Host, *dht.IpfsDHT, []string) {
+	cfg := config.Get()
+
+	// Create context
+	ctx := context.Background()
+
+	// Get private key from ID file
+	priv := readPrivateKeyFromFile(cfg.IDFilePath())
+
+	// Build listen addresses
+	listenAddrs := []string{
+		fmt.Sprintf("/ip4/0.0.0.0/udp/%s/quic-v1", port),
+		fmt.Sprintf("/ip4/0.0.0.0/tcp/%s", port),
+	}
+
+	// Build libp2p options
+	opts := []libp2p.Option{
+		libp2p.Identity(priv),
+		libp2p.ListenAddrStrings(listenAddrs...),
+		// QUIC transport with TCP+TLS as fallback
+		libp2p.Transport(quic.NewTransport),
+		libp2p.Transport(tcp.NewTCPTransport),
+		libp2p.Security(tls.ID, tls.New),
+	}
+
+	// Add announce addresses if configured (for Docker/NAT)
+	if cfg.HasAnnounceAddresses() {
+		var announceAddrs []multiaddr.Multiaddr
+		for _, addr := range cfg.AnnounceAddresses {
+			ma, err := multiaddr.NewMultiaddr(addr)
+			if err != nil {
+				fmt.Printf("⚠️  Invalid announce address: %s (%v)\n", addr, err)
+				continue
+			}
+			announceAddrs = append(announceAddrs, ma)
+		}
+		if len(announceAddrs) > 0 {
+			opts = append(opts, libp2p.AddrsFactory(func([]multiaddr.Multiaddr) []multiaddr.Multiaddr {
+				return announceAddrs
+			}))
+		}
+	}
+
+	// Start new node host
+	h, err := libp2p.New(opts...)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to create libp2p host: %v", err))
+	}
+
+	// Get bootstrap peers (from env first, then file)
+	bootstrapPeers := getBootstrapPeers(cfg)
+
+	// Create DHT
+	kadDHT, err := dht.New(
+		ctx,
+		h,
+		// Use ModeAutoServer - functions as server by default
+		dht.Mode(dht.ModeAutoServer),
+		// Bootstrap with known nodes
+		dht.BootstrapPeers(parseBootstrapPeers(bootstrapPeers)...),
+		// Custom validator for namespace
+		dht.NamespacedValidator(customNamespace, LazyValidator{}),
+		// Protocol prefix
+		dht.ProtocolPrefix(protocol.ID(fmt.Sprintf("/%s", customNamespace))),
+	)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to create DHT: %v", err))
+	}
+
+	fmt.Println("✅ Node ID:", h.ID())
+	fmt.Println("🌐 Listening on:", h.Addrs())
+
+	if cfg.HasAnnounceAddresses() {
+		fmt.Println("📢 Announcing:", cfg.AnnounceAddresses)
+	}
+
+	// Add self to bootstrap file (for local development)
+	if len(h.Addrs()) > 0 {
+		selfAddr := fmt.Sprintf("%s/p2p/%s", h.Addrs()[0].String(), h.ID().String())
+		addPeerToBootstrap(selfAddr)
+	}
+
+	return ctx, h, kadDHT, bootstrapPeers
+}
+
+// getBootstrapPeers returns bootstrap peers from config (env) or file
+func getBootstrapPeers(cfg *config.Config) []string {
+	// Environment variable takes precedence
+	if cfg.HasBootstrapPeers() {
+		fmt.Println("📋 Using bootstrap peers from environment")
+		return cfg.BootstrapPeers
+	}
+
+	// Fall back to file
+	fmt.Println("📋 Using bootstrap peers from file")
+	return readBootstrapPeers()
+}
+
+// parseBootstrapPeers converts multiaddr strings to peer.AddrInfo
+// Supports both /ip4/ and /dns4/ addresses
+func parseBootstrapPeers(peers []string) []peer.AddrInfo {
+	var bootstrapAddrs []peer.AddrInfo
+
+	for _, peerAddr := range peers {
+		ma, err := multiaddr.NewMultiaddr(peerAddr)
+		if err != nil {
+			fmt.Printf("⚠️  Invalid bootstrap multiaddr: %s (%v)\n", peerAddr, err)
+			continue
+		}
+
+		pi, err := peer.AddrInfoFromP2pAddr(ma)
+		if err != nil {
+			fmt.Printf("⚠️  Invalid bootstrap peer info: %s (%v)\n", peerAddr, err)
+			continue
+		}
+
+		bootstrapAddrs = append(bootstrapAddrs, *pi)
+	}
+
+	return bootstrapAddrs
 }

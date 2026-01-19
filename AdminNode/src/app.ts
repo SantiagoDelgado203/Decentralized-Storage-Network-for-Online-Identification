@@ -1,22 +1,32 @@
+/**
+ * CONFIGURATION FILE
+ * By Santiago Delgado
+ * Updated: January 2026
+ * 
+ * Express app configuration with environment-based CORS
+ */
+
 import express from 'express'
-import apiRoutes from './routes/api'
-import cors from "cors";
-
-
-
-/*CONFIGURATION FILE
-By Santiago Delgado
-*/
+import cors from 'cors'
+import apiRoutes from './routes/api.js'
+import { getConfig } from './config.js'
 
 const app = express()
+const config = getConfig()
 
+// Configure CORS with environment-based origins
 app.use(cors({
-  origin: "http://localhost:3000", // Next.js dev server
-  methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type"],
-}));
+  origin: config.corsOrigins,
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
+}))
 
 app.use(express.json())
 app.use('/api', apiRoutes)
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() })
+})
 
 export default app

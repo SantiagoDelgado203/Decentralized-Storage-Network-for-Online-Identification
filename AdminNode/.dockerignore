@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Development files
+*.log
+npm-debug.log*
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+*.md
+README*
+
+# Environment files (should be passed at runtime)
+.env
+.env.*
+
+# Test files
+*.test.ts
+*.spec.ts
+__tests__/
+coverage/
