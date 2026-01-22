@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
-	"node_prototype/exec"
+	"node/exec"
 	"os"
 )
 

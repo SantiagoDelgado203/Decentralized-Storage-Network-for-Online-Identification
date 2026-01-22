@@ -16,7 +16,7 @@ package exec
 
 import (
 	"fmt"
-	"node_prototype/core"
+	"node/core"
 	"time"
 
 	"github.com/libp2p/go-libp2p/core/peer"
