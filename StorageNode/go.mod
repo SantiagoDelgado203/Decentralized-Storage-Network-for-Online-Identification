@@ -1,4 +1,4 @@
-module node_prototype
+module node
 
 go 1.25.1
 
