@@ -3,8 +3,10 @@
  * By Santiago Delgado
  * Updated: January 2026
  * 
- * All functions regarding node operations
- * Now supports configuration via environment variables
+ * All function regarding node operations
+ * May use anotehr file for stream handlers in the future for better organization
+ * 
+ * 
  */
 
 import { createLibp2p, type Libp2p } from 'libp2p'
@@ -34,18 +36,22 @@ export async function startNode(): Promise<Libp2p> {
   })
 
   // Print protocol handler
-  node.handle('/print/1.0.0', (data) => {
-    const { stream } = data
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  node.handle('/print/1.0.0', async (data: any) => {
+    const stream = data.stream
     console.log('📥 Incoming stream on /print/1.0.0')
 
-    stream.addEventListener('message', evt => {
-      console.log('Message received:', evt.data)
-      stream.send(evt.data)
-    })
-
-    stream.addEventListener('remoteCloseWrite', () => {
-      stream.close()
-    })
+    try {
+      // Read data from the stream source
+      for await (const chunk of stream.source) {
+        const message = new TextDecoder().decode(chunk.subarray())
+        console.log('Message received:', message)
+      }
+    } catch (err) {
+      console.error('Stream error:', err)
+    } finally {
+      await stream.close()
+    }
   })
 
   await node.start()
@@ -82,12 +88,15 @@ export function getNode(): Libp2p {
  */
 export async function dialPeer(peerMultiaddr: string, message: string): Promise<void> {
   const n = getNode()
-  const stream = await n.dialProtocol(multiaddr(peerMultiaddr), '/print/1.0.0')
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const stream = await n.dialProtocol(multiaddr(peerMultiaddr), '/print/1.0.0') as any
 
-  stream.send(new TextEncoder().encode(message))
+  // Write message to the stream sink
+  const encoder = new TextEncoder()
+  await stream.sink([encoder.encode(message + '\n')])
   console.log('📤 Sent message to peer')
 
-  stream.close()
+  await stream.close()
 }
 
 /**
