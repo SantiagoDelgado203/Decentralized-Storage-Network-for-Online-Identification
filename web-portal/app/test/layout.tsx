@@ -1,4 +1,3 @@
-
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Image from "next/image";
@@ -31,7 +30,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {/* Header */}
-        <header className="sticky top-0 z-50 w-full bg-black shadow-lg shadow-green-950">
+        <header className="sticky top-0 z-50 w-full bg-white dark:bg-black shadow-lg shadow-green-950">
           <div className="flex items-center justify-between p-6 md:p-5">
             {/* Logo */}
             <Link href="/">
@@ -49,14 +48,14 @@ export default function RootLayout({
 
             {/* Navigation */}
             <nav className="hidden md:flex gap-15 mr-10">
-              <Link href="/history" className="hover:text-green-400 transition">
-                History
+              <Link href="/register" className="hover:text-green-400 transition">
+                Register
               </Link>
-              <Link href="/help" className="hover:text-green-400 transition">
-                Help
+              <Link href="/login" className="hover:text-green-400 transition">
+                Login
               </Link>
-              <Link href="/profile" className="hover:text-green-400 transition">
-                Profile
+              <Link href="/about-us" className="hover:text-green-400 transition">
+                About Us
               </Link>
             </nav>
           </div>
@@ -69,7 +68,7 @@ export default function RootLayout({
 
         {/* Footer */}
         <footer className=" dark:bg-[#0a0a0a]">
-            Lorem ipsum
+          Lorem ipsum
         </footer>
       </body>
     </html>
