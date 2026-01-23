@@ -12,32 +12,8 @@ import { request } from 'node:http';
 
 const router = Router()
 
-router.post("/test", async (req: Request, res: Response) => {
 
-  const node = getNode()
-
-  console.log("Got it!")
-
-  const { message } = req.body;
-
-  console.log("Received:", JSON.parse(message));
-
-  res.json({
-    reply: `Server received: ${message}`,
-  });
-
-  const stream = await node.dialProtocol(multiaddr("/ip4/10.12.144.252/tcp/11111/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7"), '/print/1.0.0');
-
-  stream.send(new TextEncoder().encode(req.body.message))
-
-  console.log(stream)
-
-  stream.close()
-
-  
-});
-
-router.post('/user-info', async (req: Request, res: Response) => {
+router.post('/net/user-info', async (req: Request, res: Response) => {
 
   const node = getNode()
   const in_payload = req.body
