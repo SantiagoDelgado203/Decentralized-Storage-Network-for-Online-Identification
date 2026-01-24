@@ -4,6 +4,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import "../globals.css";
+import { redirect } from "next/navigation";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,6 +26,9 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+
+  //here we can check the session/auth/whatever and redirect if not valid
+
   return (
     <html lang="en">
       <body
