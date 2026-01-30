@@ -11,6 +11,8 @@ package core
 
 import (
 	"context"
+	"crypto/ed25519"
+	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -32,7 +34,25 @@ type BootstrapKeys struct {
 	PublicKey  string `json:"public_key"`
 }
 
-// readPrivateKeyFromFile reads the ID file and returns the private key
+// PrivKeyFromSeed generates a deterministic private key from a seed string
+// Useful for testing or when you need reproducible keys
+func PrivKeyFromSeed(seed string) (crypto.PrivKey, error) {
+	// Hash → 32-byte seed
+	hash := sha256.Sum256([]byte(seed))
+
+	// Ed25519 private key (64 bytes)
+	edPriv := ed25519.NewKeyFromSeed(hash[:])
+
+	// Convert to libp2p private key
+	priv, err := crypto.UnmarshalEd25519PrivateKey(edPriv)
+	if err != nil {
+		return nil, err
+	}
+
+	return priv, nil
+}
+
+// readPrivateKeyFromFile reads the ID file and returns the private key (internal use)
 func readPrivateKeyFromFile(filename string) crypto.PrivKey {
 	data, err := os.ReadFile(filename)
 	if err != nil {
@@ -55,6 +75,11 @@ func readPrivateKeyFromFile(filename string) crypto.PrivKey {
 	}
 
 	return priv
+}
+
+// ReadPrivateKeyFromFile reads the ID file and returns the private key (exported for external use)
+func ReadPrivateKeyFromFile(filename string) crypto.PrivKey {
+	return readPrivateKeyFromFile(filename)
 }
 
 // readBootstrapPeers reads bootstrap nodes from the configured file

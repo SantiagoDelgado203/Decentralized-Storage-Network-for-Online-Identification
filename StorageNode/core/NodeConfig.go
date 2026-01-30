@@ -23,6 +23,7 @@ import (
 	quic "github.com/libp2p/go-libp2p/p2p/transport/quic"
 	tcp "github.com/libp2p/go-libp2p/p2p/transport/tcp"
 
+	"github.com/libp2p/go-libp2p/core/crypto"
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/libp2p/go-libp2p/core/protocol"
@@ -36,16 +37,30 @@ func NodeCreate() (context.Context, host.Host, *dht.IpfsDHT, []string) {
 	return NodeCreateWithConfig(cfg.Port, cfg.Namespace)
 }
 
+// NodeCreateWithKey starts the p2p node with an explicit private key and namespace
+// This allows for manual override when needed (e.g., testing with seed-based keys)
+func NodeCreateWithKey(priv crypto.PrivKey, customNamespace string) (context.Context, host.Host, *dht.IpfsDHT, []string) {
+	cfg := config.Get()
+	return nodeCreateInternal(priv, cfg.Port, customNamespace)
+}
+
 // NodeCreateWithConfig starts the p2p node with explicit port and namespace
 // This allows for manual override when needed
 func NodeCreateWithConfig(port string, customNamespace string) (context.Context, host.Host, *dht.IpfsDHT, []string) {
 	cfg := config.Get()
 
-	// Create context
-	ctx := context.Background()
-
 	// Get private key from ID file
 	priv := readPrivateKeyFromFile(cfg.IDFilePath())
+
+	return nodeCreateInternal(priv, port, customNamespace)
+}
+
+// nodeCreateInternal is the internal implementation for creating a node
+func nodeCreateInternal(priv crypto.PrivKey, port string, customNamespace string) (context.Context, host.Host, *dht.IpfsDHT, []string) {
+	cfg := config.Get()
+
+	// Create context
+	ctx := context.Background()
 
 	// Build listen addresses
 	listenAddrs := []string{
