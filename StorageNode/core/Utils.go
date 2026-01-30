@@ -129,6 +129,7 @@ func addPeerToBootstrap(addr string) {
 func ConstantConnection(ctx context.Context, h host.Host, peers []string) {
 	// Start connection counter in background
 	go func() {
+		ticker := 0
 		for {
 			select {
 			case <-ctx.Done():
@@ -137,6 +138,15 @@ func ConstantConnection(ctx context.Context, h host.Host, peers []string) {
 			default:
 				conns := h.Network().Conns()
 				fmt.Printf("\r🔌 Active connections: %d   ", len(conns))
+
+				// Every 30 seconds, print detailed peer list
+				ticker++
+				if ticker%30 == 0 && len(conns) > 0 {
+					fmt.Printf("\n📋 Connected peers:\n")
+					for i, conn := range conns {
+						fmt.Printf("   %d. %s\n", i+1, conn.RemotePeer().String()[:20]+"...")
+					}
+				}
 				time.Sleep(1 * time.Second)
 			}
 		}
