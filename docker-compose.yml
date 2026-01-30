@@ -47,8 +47,13 @@ services:
       - DSN_NAMESPACE=dsn
       - DSN_DATA_DIR=/app/data
       - DSN_BOOTSTRAP_PEERS=/dns4/storage-bootstrap/tcp/11111/p2p/QmaTPiRLg64y6wwYXybwsQLVUqqzqwpJSNQ8k5T5e6MyAG
-    volumes:
-      - storage-node-data:/app/data
+    # Each container generates its own unique identity (no shared volume)
+    # For persistent identities, use named volumes per node or seed-based IDs
+    healthcheck:
+      test: ["CMD", "pgrep", "storagenode"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
     networks:
       - dsn-network
     depends_on:
@@ -114,8 +119,5 @@ networks:
     driver: bridge
 
 # =============================================================================
-# Volumes
+# Volumes (bootstrap identity is mounted read-only from ./bootstrap-identity)
 # =============================================================================
-volumes:
-  storage-node-data:
-    driver: local
