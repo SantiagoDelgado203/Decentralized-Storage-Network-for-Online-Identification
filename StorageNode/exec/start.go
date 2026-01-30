@@ -16,8 +16,8 @@ package exec
 
 import (
 	"fmt"
-	"node_prototype/config"
-	"node_prototype/core"
+	"node/config"
+	"node/core"
 	"time"
 )
 

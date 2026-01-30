@@ -14,7 +14,7 @@ import (
 	"context"
 	"fmt"
 
-	"node_prototype/config"
+	"node/config"
 
 	"github.com/libp2p/go-libp2p"
 	dht "github.com/libp2p/go-libp2p-kad-dht"

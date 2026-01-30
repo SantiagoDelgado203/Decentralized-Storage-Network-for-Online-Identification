@@ -15,7 +15,7 @@ func TestNode(idseed string) (err error) {
 	}
 
 	//Start the node
-	ctx, h, _, peers := core.NodeCreate(priv, "myapp")
+	ctx, h, _, peers := core.NodeCreateWithKey(priv, "myapp")
 
 	//connects to peers indefinitely
 	go core.ConstantConnection(ctx, h, peers)
