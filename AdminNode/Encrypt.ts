@@ -111,12 +111,13 @@ function encryptData(plaintext: string, key: Buffer): string {
     return output.toString("base64");
 }
 
-const key = Buffer.from("12345678901234567890123456789012"); // 32 bytes = AES-256
+// Example usage:
+// const key = Buffer.from("12345678901234567890123456789012"); 
 
-const input = "Hello Admin";
-const encrypted = encryptData(input, key);
+// const input = "Hello Admin";
+// const encrypted = encryptData(input, key);
 
-console.log("Encrypted output:", encrypted);
+// console.log("Encrypted output:", encrypted);
 
 // #------------------------------------------------------------------------------------------------#
 
