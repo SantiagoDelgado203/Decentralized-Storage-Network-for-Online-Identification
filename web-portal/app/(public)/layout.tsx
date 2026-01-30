@@ -30,7 +30,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         {/* Header */}
-        <header className="sticky top-0 z-50 w-full bg-black shadow-lg shadow-green-950">
+        <header className="sticky top-0 z-50 w-full bg-white dark:bg-black shadow-lg shadow-green-950">
           <div className="flex items-center justify-between p-6 md:p-5">
             {/* Logo */}
             <Link href="/">
@@ -62,13 +62,23 @@ export default function RootLayout({
         </header>
 
         {/* Main content */}
-        <main className="m-5 md:m-10 lg:m-20">
+        <main className="m-5 md:m-10 lg:m-20 md:min-h-screen">
           {children}
         </main>
 
         {/* Footer */}
-        <footer className=" bg-black">
-          
+        <footer className=" h- dark:bg-black">
+          <div className=" flex flex-col md:flex-row w-10/12 px-5 md:py-10 mt-16 mx-auto justify-evenly">
+            <div className="border-r-2 border-y-gray-600 pr-20">
+              Lorem ipsum
+            </div>
+            <div className="border-r-2 border-y-gray-600 pr-20">
+              Lorem ipsum
+            </div>
+            <div className="border-r-2 border-y-gray-600 pr-20">
+              Lorem ipsum
+            </div>
+          </div>
         </footer>
       </body>
     </html>
