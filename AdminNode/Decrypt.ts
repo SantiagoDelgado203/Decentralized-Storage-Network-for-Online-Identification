@@ -64,7 +64,7 @@
 
 import crypto from "crypto";
 
-function decryptData(encryptedBase64: string, key: Buffer): string {
+export default function decryptData(encryptedBase64: string, key: Buffer): string {
     const data = Buffer.from(encryptedBase64, "base64");
 
     const nonceSize = 12;  
