@@ -2,12 +2,12 @@
 -- PostgreSQL database dump
 --
 
-\restrict ntZSj0FY8V5fzsPOAU80YVz0x01H23egXi970rtZS6kYCabyCI5MgDubcykbdqI
+\restrict myko5Rc28bhZaRqDv4qeWNGzWMPmCZAyyrMVbNJ9ZIQk2pGu9VHN7idq91q4jjc
 
 -- Dumped from database version 18.1
 -- Dumped by pg_dump version 18.1
 
--- Started on 2026-01-25 20:37:26
+-- Started on 2026-01-31 18:04:20
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -21,17 +21,36 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+--
+-- TOC entry 4 (class 2615 OID 2200)
+-- Name: public; Type: SCHEMA; Schema: -; Owner: pg_database_owner
+--
+
+CREATE SCHEMA public;
+
+
+ALTER SCHEMA public OWNER TO pg_database_owner;
+
+--
+-- TOC entry 5033 (class 0 OID 0)
+-- Dependencies: 4
+-- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: pg_database_owner
+--
+
+COMMENT ON SCHEMA public IS 'standard public schema';
+
+
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
 
 --
--- TOC entry 222 (class 1259 OID 16403)
+-- TOC entry 219 (class 1259 OID 16388)
 -- Name: providers; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.providers (
-    providerid integer NOT NULL,
+    providerid uuid DEFAULT gen_random_uuid() NOT NULL,
     registeredname character varying(255) NOT NULL,
     hashedpassword character varying(255) NOT NULL,
     salt character varying(64)
@@ -41,7 +60,7 @@ CREATE TABLE public.providers (
 ALTER TABLE public.providers OWNER TO postgres;
 
 --
--- TOC entry 221 (class 1259 OID 16402)
+-- TOC entry 220 (class 1259 OID 16396)
 -- Name: providers_providerid_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -57,8 +76,8 @@ CREATE SEQUENCE public.providers_providerid_seq
 ALTER SEQUENCE public.providers_providerid_seq OWNER TO postgres;
 
 --
--- TOC entry 5033 (class 0 OID 0)
--- Dependencies: 221
+-- TOC entry 5034 (class 0 OID 0)
+-- Dependencies: 220
 -- Name: providers_providerid_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -66,15 +85,15 @@ ALTER SEQUENCE public.providers_providerid_seq OWNED BY public.providers.provide
 
 
 --
--- TOC entry 224 (class 1259 OID 16417)
+-- TOC entry 221 (class 1259 OID 16397)
 -- Name: requests; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.requests (
-    requestid integer NOT NULL,
-    providerid integer,
+    requestid uuid DEFAULT gen_random_uuid() NOT NULL,
+    providerid uuid,
     companyname character varying(255) NOT NULL,
-    userid integer,
+    userid uuid,
     datarequests jsonb NOT NULL,
     status character varying(50) NOT NULL
 );
@@ -83,7 +102,7 @@ CREATE TABLE public.requests (
 ALTER TABLE public.requests OWNER TO postgres;
 
 --
--- TOC entry 223 (class 1259 OID 16416)
+-- TOC entry 222 (class 1259 OID 16406)
 -- Name: requests_requestid_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -99,8 +118,8 @@ CREATE SEQUENCE public.requests_requestid_seq
 ALTER SEQUENCE public.requests_requestid_seq OWNER TO postgres;
 
 --
--- TOC entry 5034 (class 0 OID 0)
--- Dependencies: 223
+-- TOC entry 5035 (class 0 OID 0)
+-- Dependencies: 222
 -- Name: requests_requestid_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -108,12 +127,12 @@ ALTER SEQUENCE public.requests_requestid_seq OWNED BY public.requests.requestid;
 
 
 --
--- TOC entry 220 (class 1259 OID 16389)
+-- TOC entry 223 (class 1259 OID 16407)
 -- Name: users; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.users (
-    userid integer NOT NULL,
+    userid uuid DEFAULT gen_random_uuid() NOT NULL,
     email character varying(255) NOT NULL,
     hashedpassword character varying(255) NOT NULL,
     salt character varying(64)
@@ -123,7 +142,7 @@ CREATE TABLE public.users (
 ALTER TABLE public.users OWNER TO postgres;
 
 --
--- TOC entry 219 (class 1259 OID 16388)
+-- TOC entry 224 (class 1259 OID 16415)
 -- Name: users_userid_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
@@ -139,8 +158,8 @@ CREATE SEQUENCE public.users_userid_seq
 ALTER SEQUENCE public.users_userid_seq OWNER TO postgres;
 
 --
--- TOC entry 5035 (class 0 OID 0)
--- Dependencies: 219
+-- TOC entry 5036 (class 0 OID 0)
+-- Dependencies: 224
 -- Name: users_userid_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
@@ -148,31 +167,7 @@ ALTER SEQUENCE public.users_userid_seq OWNED BY public.users.userid;
 
 
 --
--- TOC entry 4867 (class 2604 OID 16406)
--- Name: providers providerid; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.providers ALTER COLUMN providerid SET DEFAULT nextval('public.providers_providerid_seq'::regclass);
-
-
---
--- TOC entry 4868 (class 2604 OID 16420)
--- Name: requests requestid; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.requests ALTER COLUMN requestid SET DEFAULT nextval('public.requests_requestid_seq'::regclass);
-
-
---
--- TOC entry 4866 (class 2604 OID 16392)
--- Name: users userid; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY public.users ALTER COLUMN userid SET DEFAULT nextval('public.users_userid_seq'::regclass);
-
-
---
--- TOC entry 4874 (class 2606 OID 16413)
+-- TOC entry 4870 (class 2606 OID 16483)
 -- Name: providers providers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -181,7 +176,7 @@ ALTER TABLE ONLY public.providers
 
 
 --
--- TOC entry 4876 (class 2606 OID 16415)
+-- TOC entry 4872 (class 2606 OID 16422)
 -- Name: providers providers_registeredname_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -190,7 +185,7 @@ ALTER TABLE ONLY public.providers
 
 
 --
--- TOC entry 4878 (class 2606 OID 16428)
+-- TOC entry 4874 (class 2606 OID 16506)
 -- Name: requests requests_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -199,7 +194,7 @@ ALTER TABLE ONLY public.requests
 
 
 --
--- TOC entry 4870 (class 2606 OID 16401)
+-- TOC entry 4876 (class 2606 OID 16426)
 -- Name: users users_email_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -208,7 +203,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 4872 (class 2606 OID 16399)
+-- TOC entry 4878 (class 2606 OID 16461)
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -217,7 +212,7 @@ ALTER TABLE ONLY public.users
 
 
 --
--- TOC entry 4879 (class 2606 OID 16429)
+-- TOC entry 4879 (class 2606 OID 16499)
 -- Name: requests requests_providerid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -226,7 +221,7 @@ ALTER TABLE ONLY public.requests
 
 
 --
--- TOC entry 4880 (class 2606 OID 16434)
+-- TOC entry 4880 (class 2606 OID 16477)
 -- Name: requests requests_userid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -234,11 +229,11 @@ ALTER TABLE ONLY public.requests
     ADD CONSTRAINT requests_userid_fkey FOREIGN KEY (userid) REFERENCES public.users(userid);
 
 
--- Completed on 2026-01-25 20:37:26
+-- Completed on 2026-01-31 18:04:21
 
 --
 -- PostgreSQL database dump complete
 --
 
-\unrestrict ntZSj0FY8V5fzsPOAU80YVz0x01H23egXi970rtZS6kYCabyCI5MgDubcykbdqI
+\unrestrict myko5Rc28bhZaRqDv4qeWNGzWMPmCZAyyrMVbNJ9ZIQk2pGu9VHN7idq91q4jjc
 
