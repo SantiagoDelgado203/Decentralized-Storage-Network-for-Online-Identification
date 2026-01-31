@@ -62,23 +62,13 @@ export default function RootLayout({
         </header>
 
         {/* Main content */}
-        <main className="m-5 md:m-10 lg:m-20 md:min-h-screen">
+        <main className="m-5 md:m-10 lg:m-20">
           {children}
         </main>
 
         {/* Footer */}
-        <footer className=" h- dark:bg-black">
-          <div className=" flex flex-col md:flex-row w-10/12 px-5 md:py-10 mt-16 mx-auto justify-evenly">
-            <div className="border-r-2 border-y-gray-600 pr-20">
-              Lorem ipsum
-            </div>
-            <div className="border-r-2 border-y-gray-600 pr-20">
-              Lorem ipsum
-            </div>
-            <div className="border-r-2 border-y-gray-600 pr-20">
-              Lorem ipsum
-            </div>
-          </div>
+        <footer className=" dark:bg-[#0a0a0a]">
+          Lorem ipsum
         </footer>
       </body>
     </html>
