@@ -1,6 +1,9 @@
 import express from 'express'
 import apiRoutes from './routes/api'
 import cors from "cors";
+
+
+
 /*CONFIGURATION FILE
 By Santiago Delgado
 */

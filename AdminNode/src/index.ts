@@ -6,6 +6,7 @@ import { Pool } from 'pg';
 import dotenv from 'dotenv';
 import { Provider, Request, User } from '../Models';
 dotenv.config();
+import {decryptData, encryptData} from '../SymmetricEncryption'
 
 /*STARTUP FILE
 * By Santiago Delgado
@@ -28,6 +29,21 @@ async function start() {
 
   app.listen(PORT, () => {
     console.log(`API running at http://localhost:${PORT}`)
+
+    const input = "Hello Admin";
+    const key = Buffer.from("12345678901234567890123456789012"); 
+
+    const encrypted = encryptData(input, key);
+
+    console.log("Encrypted output:", encrypted);
+
+    try {
+        const result = decryptData(encrypted, key);
+        console.log("Decrypted output:", result);
+    } catch (err) {
+        console.error("Decryption failed:", err);
+    }
+
   })
   checkDatabase(pool)
   const new_user = await upsertUser(pool, new User({
