@@ -15,6 +15,7 @@ The desired node behavior is as follows:
 package exec
 
 import (
+	"fmt"
 	"node/core"
 	"time"
 )
@@ -25,7 +26,7 @@ func NodeStart() (err error) {
 	//TODO: init()
 
 	//Start the node
-	ctx, h, _, peers := core.NodeCreate(core.ReadPrivateKeyFromFile("ID.json"), "myapp")
+	ctx, h, dht, peers := core.NodeCreate(core.ReadPrivateKeyFromFile("ID.json"), "myapp")
 
 	//connects to peers indefinitely
 	go core.ConstantConnection(ctx, h, peers)
@@ -33,42 +34,52 @@ func NodeStart() (err error) {
 	//allow time for connection
 	time.Sleep(5 * time.Second)
 
-	// peerID, err := peer.Decode("12D3KooWPyBkFNSq6YdzB7SiJBobp4rVDi6Ts8YLmnV69tyHZRgX")
-	// if err != nil {
-	// 	fmt.Println("invalid peer ID:", err)
-	// }
-
-	// s, err := h.NewStream(ctx, peerID, "/get-peer-list-protocol/1.0.0")
-	// if err != nil {
-	// 	fmt.Println("failed to open stream:", err)
-	// 	return
-	// }
-	// defer s.Close()
-
-	// w := bufio.NewWriter(s)
-	// _, err = w.WriteString("hey\n")
-	// if err != nil {
-	// 	fmt.Println("write failed:", err)
-	// 	return
-	// }
-	// w.Flush()
-
 	//Initialize the stream handlers
 	core.HandlersInit(h)
 
-	//Example usage of print protocol
-	// for {
-	// 	peerID, err := peer.Decode("12D3KooWMWsFREpYuZjYLwRK5bkW4xMqYGtwDEzk3NP3XKNkkGFz")
-	// 	if err != nil {
-	// 		fmt.Println("invalid peer ID:", err)
-	// 		break
-	// 	}
-	// 	err = sm.PrintSend(ctx, peerID, "Hello from Stream Master")
-	// 	if err != nil {
-	// 		fmt.Println(err)
-	// 	}
-	// 	time.Sleep(2 * time.Second)
-	// }
+	test_d := "Santiago Delgado, 22 years old, bla bla bla"
+
+	fmt.Println("\nPlaintext:", test_d)
+
+	cipher, key, err := core.Encrypt([]byte(test_d))
+	if err != nil {
+		fmt.Println("Encrypt error:", err)
+		return
+	}
+
+	fmt.Printf("\nKey: %x", key)
+	fmt.Printf("\nCipher: %x", cipher)
+
+	decipher, err := core.Decrypt(key, cipher)
+	if err != nil {
+		fmt.Println("Decrypt error:", err)
+		return
+	}
+
+	fmt.Println("\nDecrypted:", string(decipher))
+
+	test_u := "\nTesting data from user! This will be encrypted, then a hashed to be provided"
+	CidHash := core.CidHash([]byte(test_u))
+	fmt.Println("\nTest: ", test_u, "\nThen, the generated Cid hash: ", CidHash)
+	err = core.DHTProvide(ctx, dht, CidHash)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	test_k := "Testing Key"
+	shares := core.SplitKey([]byte(test_k), 5, 3)
+	reconstruct := core.ReconstructKey(shares)
+	fmt.Printf("\nKey: %s\nShares: %x\nReconstructed: %s\n", test_k, shares, reconstruct)
+
+	fmt.Println("\nHashed Shares:")
+
+	for i, share := range shares {
+		hash := core.CidHash(share)
+
+		fmt.Printf("Share %d hash: %s\n", i, hash)
+
+		core.DHTProvide(ctx, dht, hash)
+	}
 
 	select {}
 
