@@ -2,3 +2,6 @@
 /ip4/10.0.0.183/tcp/3019/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7
 /ip4/10.0.0.183/tcp/16388/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7
 /ip4/10.0.0.183/tcp/17517/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7
+/ip4/10.0.0.183/tcp/37647/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7
+/ip4/10.0.0.183/tcp/7489/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7
+/ip4/10.0.0.183/tcp/55563/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7

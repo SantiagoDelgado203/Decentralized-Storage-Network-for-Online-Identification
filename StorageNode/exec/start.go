@@ -37,6 +37,27 @@ func NodeStart() (err error) {
 	//Initialize the stream handlers
 	core.HandlersInit(h)
 
+	test_d := "Santiago Delgado, 22 years old, bla bla bla"
+
+	fmt.Println("\nPlaintext:", test_d)
+
+	cipher, key, err := core.Encrypt([]byte(test_d))
+	if err != nil {
+		fmt.Println("Encrypt error:", err)
+		return
+	}
+
+	fmt.Printf("\nKey: %x", key)
+	fmt.Printf("\nCipher: %x", cipher)
+
+	decipher, err := core.Decrypt(key, cipher)
+	if err != nil {
+		fmt.Println("Decrypt error:", err)
+		return
+	}
+
+	fmt.Println("\nDecrypted:", string(decipher))
+
 	test_u := "\nTesting data from user! This will be encrypted, then a hashed to be provided"
 	CidHash := core.CidHash([]byte(test_u))
 	fmt.Println("\nTest: ", test_u, "\nThen, the generated Cid hash: ", CidHash)
