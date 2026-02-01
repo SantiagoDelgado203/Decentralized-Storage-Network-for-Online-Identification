@@ -22,7 +22,6 @@ import (
 	"os"
 
 	"node/core" // 如果你 zip 里的 core 包路径不是 node/core，按实际改
-	"node/storage"
 
 	"github.com/libp2p/go-libp2p/core/crypto"
 )
@@ -88,7 +87,7 @@ func Init() error {
 
 	// 3) MongoDB connect test (关键)
 	fmt.Println("🔌 Checking MongoDB:", mongoURI())
-	db, err := storage.NewDatabase(mongoURI())
+	db, err := core.NewDatabase(mongoURI())
 	if err != nil {
 		panic(fmt.Sprintf("Init: MongoDB connect failed: %v", err))
 	}

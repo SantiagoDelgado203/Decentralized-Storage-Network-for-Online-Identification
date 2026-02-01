@@ -1,10 +1,9 @@
-package storage
+package core
 
 import (
 	"context"
 	"fmt"
 	"log"
-	"node/models"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -45,7 +44,7 @@ func NewDatabase(connectionString string) (*Database, error) {
 
 // ---------------- Shamir fragments (shares) ----------------
 
-func (db *Database) StoreFragment(fragment models.Fragment) error {
+func (db *Database) StoreFragment(fragment Fragment) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -62,7 +61,7 @@ func (db *Database) StoreFragment(fragment models.Fragment) error {
 	return nil
 }
 
-func (db *Database) RetrieveFragmentsByHash(hash string) ([]models.Fragment, error) {
+func (db *Database) RetrieveFragmentsByHash(hash string) ([]Fragment, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -72,7 +71,7 @@ func (db *Database) RetrieveFragmentsByHash(hash string) ([]models.Fragment, err
 	}
 	defer cursor.Close(ctx)
 
-	var fragments []models.Fragment
+	var fragments []Fragment
 	if err := cursor.All(ctx, &fragments); err != nil {
 		return nil, fmt.Errorf("failed to decode fragments: %v", err)
 	}
@@ -103,7 +102,7 @@ func (db *Database) DeleteFragmentsByHash(hash string) error {
 
 // ---------------- Encrypted data blocks ----------------
 
-func (db *Database) StoreDataBlock(block models.DataBlock) error {
+func (db *Database) StoreDataBlock(block DataBlock) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -124,11 +123,11 @@ func (db *Database) StoreDataBlock(block models.DataBlock) error {
 	return nil
 }
 
-func (db *Database) RetrieveDataBlock(hash string) (*models.DataBlock, error) {
+func (db *Database) RetrieveDataBlock(hash string) (*DataBlock, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	var block models.DataBlock
+	var block DataBlock
 	err := db.dataBlocks.FindOne(ctx, bson.M{"hash": hash}).Decode(&block)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
