@@ -22,6 +22,14 @@ func main() {
 		if err := exec.NodeStart(); err != nil {
 			log.Fatal(err)
 		}
+	case "test":
+		if len(os.Args) < 3 {
+			usage()
+			os.Exit(1)
+		}
+		if err := exec.TestNode(os.Args[2]); err != nil {
+			log.Fatal(err)
+		}
 	default:
 		usage()
 		os.Exit(1)
@@ -33,6 +41,7 @@ func usage() {
 		`Usage: ./main [option]
 
 Options:
-  init    Run one-time initialization
-  run     Start libp2p node`)
+  init			Run one-time initialization
+  run			Start libp2p node
+  test <seed>	Runs a test node with deterministic PeerID generated from given <seed>`)
 }

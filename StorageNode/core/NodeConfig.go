@@ -5,6 +5,8 @@ StartUp.go
 
 This file contains functions related to the starting process of a node.
 
+If we need to change something from the configuration of a node, here it is.
+
 */
 
 package core
@@ -22,6 +24,7 @@ import (
 	quic "github.com/libp2p/go-libp2p/p2p/transport/quic"
 	tcp "github.com/libp2p/go-libp2p/p2p/transport/tcp"
 
+	"github.com/libp2p/go-libp2p/core/crypto"
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/libp2p/go-libp2p/core/protocol"
@@ -29,18 +32,18 @@ import (
 )
 
 // Starts the p2p node listening in the passed address and creates a new custom namespace
-func NodeCreate(port string, custom_namespace string) (context.Context, host.Host, *dht.IpfsDHT, []string) {
+func NodeCreate(priv crypto.PrivKey, custom_namespace string) (context.Context, host.Host, *dht.IpfsDHT, []string) {
 	//create context
 	ctx := context.Background()
 
 	//Get priv key from ID file (specifically, from node's private key)
-	priv := readPrivateKeyFromFile("ID.json")
+	// priv := readPrivateKeyFromFile("ID.json")
 
 	//Start new node host, specifying constant ID and listening address
 	h, err := libp2p.New(
 		libp2p.Identity(priv),
-		libp2p.ListenAddrStrings(fmt.Sprintf("/ip4/0.0.0.0/udp/%s/quic-v1", port)),
-		libp2p.ListenAddrStrings(fmt.Sprintf("/ip4/0.0.0.0/tcp/%s", port)),
+		libp2p.ListenAddrStrings("/ip4/0.0.0.0/udp/0/quic-v1"),
+		libp2p.ListenAddrStrings("/ip4/0.0.0.0/tcp/0"),
 		//quic transpot, with tcp+tls as a fallback
 		libp2p.Transport(quic.NewTransport),
 		libp2p.Transport(tcp.NewTCPTransport),

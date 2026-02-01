@@ -6,11 +6,13 @@ By Santiago Delgado, December 2025
 This file defines all the handler functions that will process the different
 custom communication stream protocols.
 */
+
 package core
 
 import (
 	"bufio"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"time"
@@ -45,6 +47,7 @@ func HandlersInit(h host.Host) *StreamsMaster {
 	//include all protocols
 	sm.protocols = []Protocol{
 		&PrintProtocol{},
+		&NewUserProtocol{},
 		// &OtherProtocol{},
 	}
 
@@ -61,13 +64,15 @@ func HandlersInit(h host.Host) *StreamsMaster {
 
 type PrintProtocol struct{}
 
-// Name
+// print protocol name
 const PRINT_PROTOCOL = "/print/1.0.0"
 
+// name getter
 func (p *PrintProtocol) Name() protocol.ID {
 	return PRINT_PROTOCOL
 }
 
+// handler for incoming print protocol messages
 func (p *PrintProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 	return func(s network.Stream) {
 		defer s.Close()
@@ -92,6 +97,7 @@ func (p *PrintProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 	}
 }
 
+// function to send messages through print protocol
 func (p *StreamsMaster) PrintSend(ctx context.Context, peerID peer.ID, msg string) error {
 	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
@@ -108,4 +114,51 @@ func (p *StreamsMaster) PrintSend(ctx context.Context, peerID peer.ID, msg strin
 		return err
 	}
 	return w.Flush()
+}
+
+/*------------------------------------NEW USER PROTOCOL----------------------------------------------*/
+type NewUserProtocol struct{}
+
+const NEWUSER_PROTOCOL = "/new-user/1.0.0"
+
+// name getter
+func (p *NewUserProtocol) Name() protocol.ID {
+	return NEWUSER_PROTOCOL
+}
+
+// handler for incoming new user protocol dials
+func (p *NewUserProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
+	return func(s network.Stream) {
+		defer s.Close()
+
+		//read payload (plain json string)
+		reader := bufio.NewReader(s)
+		msg, err := reader.ReadString('\n')
+		if err != nil && err != io.EOF {
+			fmt.Println("Error reading:", err)
+			return
+		}
+
+		//json object for go
+		var data NewUserJSON
+
+		//convert from json string to the object
+		err = json.Unmarshal([]byte(msg), &data)
+		if err != nil {
+			fmt.Println("error:", err)
+			return
+		}
+
+		fmt.Printf("\nEncrypted data: %s \nKey: %s\n UID: %s\n", data.UserCipher, data.Key, data.UID)
+
+		//TODO: split key into fragments.
+
+		//TODO: generate hashes from user id and labels. then, distribute user cipher and key fragments to other nodes
+
+	}
+}
+
+// function to send new user protocol (Not needed?)
+func (p *StreamsMaster) NewUserSend(ctx context.Context, peerID peer.ID) error {
+	return nil
 }
