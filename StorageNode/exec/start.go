@@ -23,8 +23,6 @@ import (
 // main execution
 func NodeStart() (err error) {
 
-	//TODO: init()
-
 	//Start the node
 	ctx, h, dht, peers := core.NodeCreate(core.ReadPrivateKeyFromFile("ID.json"), "myapp")
 
@@ -35,6 +33,11 @@ func NodeStart() (err error) {
 	time.Sleep(5 * time.Second)
 
 	//Initialize the stream handlers
+	// sm := core.HandlersInit(h)
+
+	db, err := core.NewDatabase("mongodb://localhost:27017")
+	if err != nil {
+		panic(err)
 	core.HandlersInit(h)
 
 	test_d := "Santiago Delgado, 22 years old, bla bla bla"
@@ -80,6 +83,19 @@ func NodeStart() (err error) {
 
 		core.DHTProvide(ctx, dht, hash)
 	}
+
+	example := core.Fragment{
+		// ID:        primitive.NewObjectID(),
+		Hash:      "exmaple",
+		Share:     "example",
+		X:         5,
+		Threshold: 3,
+		Total:     5,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	db.StoreFragment(example)
 
 	select {}
 
