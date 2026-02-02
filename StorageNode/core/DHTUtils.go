@@ -55,17 +55,14 @@ Generates CID from given key and then executes dht.Provide()
 
 Node will claim to provide whatever the content is behind the CID generated from key.
 */
-func DHTProvide(ctx context.Context, dht *dht.IpfsDHT, key string) (err error) {
+func DHTProvide(ctx context.Context, dht *dht.IpfsDHT, cid cid.Cid) (err error) {
 
-	//generate the ContentID from the key
-	mh, _ := multihash.Sum([]byte(key), multihash.SHA2_256, -1)
-	c := cid.NewCidV1(cid.Raw, mh)
-
-	if err := dht.Provide(ctx, c, true); err != nil {
+	if err := dht.Provide(ctx, cid, true); err != nil {
 		//Return error if failed to provide key
 		return err
 	} else {
 		//Return nil error in case of success
+		fmt.Println("Success providing : ", cid)
 		return nil
 	}
 }

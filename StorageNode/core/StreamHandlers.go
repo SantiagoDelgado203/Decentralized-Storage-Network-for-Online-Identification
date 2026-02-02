@@ -46,6 +46,8 @@ func HandlersInit(h host.Host) *StreamsMaster {
 	//include all protocols
 	sm.protocols = []Protocol{
 		&PrintProtocol{},
+		&UploadProtocol{},
+		&StoreProtocol{},
 		// &OtherProtocol{},
 	}
 
@@ -114,69 +116,77 @@ func (p *StreamsMaster) PrintSend(ctx context.Context, peerID peer.ID, msg strin
 	return w.Flush()
 }
 
-/*------------------------------------DATA STORE PROTOCOL-------------------------------------------*/
-type DataStoreProtocol struct{}
+/*------------------------------------UPLOAD PROTOCOL----------------------------------------------*/
+type UploadProtocol struct{}
 
-const DATASTORE_PROTOCOL = "/data-store-protocol/1.0.0"
+const UPLOAD_PROTOCOL = "/upload/1.0.0"
 
 // name getter
-func (p *DataStoreProtocol) Name() protocol.ID {
-	return DATASTORE_PROTOCOL
+func (p *UploadProtocol) Name() protocol.ID {
+	return UPLOAD_PROTOCOL
 }
 
-// handler for incoming data store protocol dials
-func (p *DataStoreProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
+// handler for incoming new user protocol dials
+func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 	return func(s network.Stream) {
 		defer s.Close()
 
-		reader := bufio.NewReader(s)
-		msg, err := reader.ReadString('\n')
-		if err != nil && err != io.EOF {
-			fmt.Println("Error reading:", err)
-			return
-		}
-		fmt.Println("Received message:", msg)
+		//SYED
 
-		//TODO: Here you should decode the received msg to json and store the data block with its hash.
-		//Reminder to Santiago: USE DHT PROVIDE FOR STORAGE, MODIFY STREAM MASTER TO INCLUDE DHT IN ADDITION TO LIBP2P HOST
+		// read payload (plain json string)
+		// reader := bufio.NewReader(s)
+		// msg, err := reader.ReadString('\n')
+		// if err != nil && err != io.EOF {
+		// 	fmt.Println("Error reading:", err)
+		// 	return
+		// }
+
+		// //json object for go
+		// var data Fragment
+
+		// //convert from json string to the object
+		// err = json.Unmarshal([]byte(msg), &data)
+		// if err != nil {
+		// 	fmt.Println("error:", err)
+		// 	return
+		// }
+
+		// data.Hash
+
+		// fmt.Printf("\nEncrypted data: %s \nKey: %s\n UID: %s\n", data.UserCipher, data.Key, data.UID)
+
+		//TODO: split key into fragments.
+
+		//TODO: generate hashes from user id and labels. then, distribute user cipher and key fragments to other nodes
 
 	}
 }
 
-// function to send user data store requests to other nodes
-func (p *StreamsMaster) DataStoreSend(ctx context.Context, peerID peer.ID, cipher string) error {
+// function to send upload protocol (Not needed?)
+func (p *StreamsMaster) UploadSend(ctx context.Context, peerID peer.ID) error {
 	return nil
 }
 
-//IS THERE ANY USE TO SEPARATING FRAGMENTS AND DATA BLOCKS IN DIFFERENT PROTOCOLS? SANTIAGO AT 1AM THINKS NO
+/*------------------------------------STORE  ----------------------------------------------*/
 
-// /*------------------------------------FRAGMENT STORE PROTOCOL-------------------------------------------*/
-// type FragmentStoreProtocol struct{}
+type StoreProtocol struct{}
 
-// const FRAGMENTSTORE_PROTOCOL = "/data-store-protocol/1.0.0"
+const STORE_PROTOCOL = "/store/1.0.0"
 
-// // name getter
-// func (p *FragmentStoreProtocol) Name() protocol.ID {
-// 	return FRAGMENTSTORE_PROTOCOL
-// }
+// name getter
+func (p *StoreProtocol) Name() protocol.ID {
+	return STORE_PROTOCOL
+}
 
-// // handler for incoming fragment store protocol dials
-// func (p *FragmentStoreProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
-// 	return func(s network.Stream) {
-// 		defer s.Close()
+// handler for incoming store protocol dials
+func (p *StoreProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
+	return func(s network.Stream) {
+		defer s.Close()
+		//Mo: your logic here
+	}
+}
 
-// 		reader := bufio.NewReader(s)
-// 		msg, err := reader.ReadString('\n')
-// 		if err != nil && err != io.EOF {
-// 			fmt.Println("Error reading:", err)
-// 			return
-// 		}
-// 		fmt.Println("Received message:", msg)
-
-// 	}
-// }
-
-// // function to send key fragments store requests to other nodes
-// func (p *StreamsMaster) FragmentStoreSend(ctx context.Context, peerID peer.ID, fragment string) error {
-// 	return nil
-// }
+// function to use the store protocol
+func (p *StreamsMaster) StoreSend(ctx context.Context, peerID peer.ID) error {
+	return nil
+}
