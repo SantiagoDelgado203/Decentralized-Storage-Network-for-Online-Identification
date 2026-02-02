@@ -46,7 +46,6 @@ export async function login(username: string,  hash: string){
   return
 }
 
-
 /**for verifiers use (example, facebook requests a verification from a user) (db/request-verification)*/
 export async function requestVerification(userID: string, verifierID: string, criteria: any){
   return

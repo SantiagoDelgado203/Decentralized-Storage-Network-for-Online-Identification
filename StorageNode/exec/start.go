@@ -38,6 +38,7 @@ func NodeStart() (err error) {
 	db, err := core.NewDatabase("mongodb://localhost:27017")
 	if err != nil {
 		panic(err)
+	}
 	core.HandlersInit(h)
 
 	test_d := "Santiago Delgado, 22 years old, bla bla bla"

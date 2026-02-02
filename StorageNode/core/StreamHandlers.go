@@ -12,7 +12,6 @@ package core
 import (
 	"bufio"
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"time"
@@ -47,7 +46,8 @@ func HandlersInit(h host.Host) *StreamsMaster {
 	//include all protocols
 	sm.protocols = []Protocol{
 		&PrintProtocol{},
-		&NewUserProtocol{},
+		&UploadProtocol{},
+		&StoreProtocol{},
 		// &OtherProtocol{},
 	}
 
@@ -116,40 +116,44 @@ func (p *StreamsMaster) PrintSend(ctx context.Context, peerID peer.ID, msg strin
 	return w.Flush()
 }
 
-/*------------------------------------NEW USER PROTOCOL----------------------------------------------*/
-type NewUserProtocol struct{}
+/*------------------------------------UPLOAD PROTOCOL----------------------------------------------*/
+type UploadProtocol struct{}
 
-const NEWUSER_PROTOCOL = "/new-user/1.0.0"
+const UPLOAD_PROTOCOL = "/upload/1.0.0"
 
 // name getter
-func (p *NewUserProtocol) Name() protocol.ID {
-	return NEWUSER_PROTOCOL
+func (p *UploadProtocol) Name() protocol.ID {
+	return UPLOAD_PROTOCOL
 }
 
 // handler for incoming new user protocol dials
-func (p *NewUserProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
+func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 	return func(s network.Stream) {
 		defer s.Close()
 
-		//read payload (plain json string)
-		reader := bufio.NewReader(s)
-		msg, err := reader.ReadString('\n')
-		if err != nil && err != io.EOF {
-			fmt.Println("Error reading:", err)
-			return
-		}
+		//SYED
 
-		//json object for go
-		var data NewUserJSON
+		// read payload (plain json string)
+		// reader := bufio.NewReader(s)
+		// msg, err := reader.ReadString('\n')
+		// if err != nil && err != io.EOF {
+		// 	fmt.Println("Error reading:", err)
+		// 	return
+		// }
 
-		//convert from json string to the object
-		err = json.Unmarshal([]byte(msg), &data)
-		if err != nil {
-			fmt.Println("error:", err)
-			return
-		}
+		// //json object for go
+		// var data Fragment
 
-		fmt.Printf("\nEncrypted data: %s \nKey: %s\n UID: %s\n", data.UserCipher, data.Key, data.UID)
+		// //convert from json string to the object
+		// err = json.Unmarshal([]byte(msg), &data)
+		// if err != nil {
+		// 	fmt.Println("error:", err)
+		// 	return
+		// }
+
+		// data.Hash
+
+		// fmt.Printf("\nEncrypted data: %s \nKey: %s\n UID: %s\n", data.UserCipher, data.Key, data.UID)
 
 		//TODO: split key into fragments.
 
@@ -158,7 +162,31 @@ func (p *NewUserProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 	}
 }
 
-// function to send new user protocol (Not needed?)
-func (p *StreamsMaster) NewUserSend(ctx context.Context, peerID peer.ID) error {
+// function to send upload protocol (Not needed?)
+func (p *StreamsMaster) UploadSend(ctx context.Context, peerID peer.ID) error {
+	return nil
+}
+
+/*------------------------------------STORE  ----------------------------------------------*/
+
+type StoreProtocol struct{}
+
+const STORE_PROTOCOL = "/store/1.0.0"
+
+// name getter
+func (p *StoreProtocol) Name() protocol.ID {
+	return STORE_PROTOCOL
+}
+
+// handler for incoming store protocol dials
+func (p *StoreProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
+	return func(s network.Stream) {
+		defer s.Close()
+		//Mo: your logic here
+	}
+}
+
+// function to use the store protocol
+func (p *StreamsMaster) StoreSend(ctx context.Context, peerID peer.ID) error {
 	return nil
 }

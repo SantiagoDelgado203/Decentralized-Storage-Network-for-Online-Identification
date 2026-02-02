@@ -1,7 +1,5 @@
-<<<<<<< HEAD
 /ip4/127.0.0.1/tcp/11111/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7
 /ip4/10.0.0.183/tcp/11111/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7
-=======
 /ip4/10.0.0.183/tcp/3017/p2p/12D3KooWLsdGetwCmHwNjmf4ZdJR7kV3Kvt7miKQcx7EojA2dCVi
 /ip4/10.0.0.183/tcp/3019/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7
 /ip4/10.0.0.183/tcp/16388/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7
@@ -9,4 +7,5 @@
 /ip4/10.0.0.183/tcp/37647/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7
 /ip4/10.0.0.183/tcp/7489/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7
 /ip4/10.0.0.183/tcp/55563/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7
->>>>>>> 62dd81ad609f2140394f5324808cab1f34d08a92
+/ip4/10.11.133.144/tcp/5064/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7
+/ip4/10.11.133.144/tcp/5072/p2p/12D3KooWLsdGetwCmHwNjmf4ZdJR7kV3Kvt7miKQcx7EojA2dCVi

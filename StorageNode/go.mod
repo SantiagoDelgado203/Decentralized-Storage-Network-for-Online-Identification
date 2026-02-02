@@ -5,7 +5,7 @@ go 1.25.3
 require github.com/libp2p/go-libp2p-kad-dht v0.35.1
 
 require (
-	github.com/golang/snappy v0.0.4 // indirect
+	github.com/golang/snappy v1.0.0 // indirect
 	github.com/montanaflynn/stats v0.7.1 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.2 // indirect
@@ -28,7 +28,7 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674 // indirect
 	github.com/hashicorp/golang-lru v1.0.2 // indirect
-	github.com/hashicorp/vault v1.21.2 // indirect
+	github.com/hashicorp/vault v1.21.2
 	github.com/huin/goupnp v1.3.0 // indirect
 	github.com/ipfs/boxo v0.35.0 // indirect
 	github.com/ipfs/go-cid v0.5.0
