@@ -12,8 +12,7 @@ import { multiaddr } from "@multiformats/multiaddr";
  * 
  * All function regarding node operations
  * May use anotehr file for stream handlers in the future for better organization
- * 
- * 
+ *  
  */
 
 let node: Libp2p | null = null
