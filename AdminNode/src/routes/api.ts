@@ -1,7 +1,10 @@
 import { Router, type Request, type Response } from 'express'
 import { multiaddr } from "@multiformats/multiaddr";
 import { getNode } from '../p2p/node'
-import { request } from 'node:http';
+import { DB_Request } from '../../Models';
+import { createRequest, getProviderById } from '../../Database';
+import { Pool } from 'pg';
+import dotenv from 'dotenv';
 
 /**
  * API'S FILE
@@ -12,6 +15,14 @@ import { request } from 'node:http';
 
 const router = Router()
 
+dotenv.config();
+const pool = new Pool({
+    user: process.env.PG_USER,
+    host: process.env.PG_HOST,
+    database: process.env.PG_DATABASE,
+    password: process.env.PG_PASSWORD,
+    port: parseInt(process.env.PG_PORT || '5432'),
+});
 
 router.post('/net/user-info', async (req: Request, res: Response) => {
 
@@ -56,6 +67,31 @@ router.get('/node-info', (req: Request, res: Response) => {
     peerId: node.peerId.toString(),
     connections: node.getConnections().length,
   })
+})
+
+router.post("/db/request-verification", async (req: Request, res: Response) => {
+
+  //Get the request body
+  const request_body = req.body
+
+  //Create a new request
+  const newRequest = new DB_Request({
+    providerid: request_body.verifierID,
+    userid: request_body.userID,
+    companyname: request_body.company,
+    datarequests: request_body.criteria,
+    status: "Pending"
+  })
+
+  //try to create the request in the database
+  try {
+    await createRequest(pool,newRequest)
+    res.json({
+      reply: "Request created!"
+    })
+  } catch (e) {
+    res.status(500)
+  }
 })
 
 export default router

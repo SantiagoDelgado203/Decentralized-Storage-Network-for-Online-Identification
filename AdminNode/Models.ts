@@ -36,7 +36,7 @@ export class User {
   }
 }
 
-export class Request {
+export class DB_Request {
   requestid?: string;
   providerid?: string;
   userid?: string;

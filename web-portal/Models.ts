@@ -15,3 +15,21 @@ type DOB = {
     month: number,
     day: number
 }
+
+export type Rule = {
+    Field: string,
+    Type: "equal" | "greater" | "less" | "in" 
+    value: any
+}
+
+export type Criteria = {
+    All: Rule[],
+    Any: Rule[]
+}
+
+export type UserInfo = {
+    Name: string,
+    Gender: string,
+    DOB: DOB,
+    Address: string
+}

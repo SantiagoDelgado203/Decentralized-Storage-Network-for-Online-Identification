@@ -9,3 +9,5 @@
 /ip4/10.0.0.183/tcp/55563/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7
 /ip4/10.11.133.144/tcp/5064/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7
 /ip4/10.11.133.144/tcp/5072/p2p/12D3KooWLsdGetwCmHwNjmf4ZdJR7kV3Kvt7miKQcx7EojA2dCVi
+/ip4/10.0.0.183/tcp/54683/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7
+/ip4/10.0.0.183/tcp/29427/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7

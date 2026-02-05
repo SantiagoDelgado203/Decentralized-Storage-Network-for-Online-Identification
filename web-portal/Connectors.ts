@@ -1,4 +1,4 @@
-import { TestUserInfo } from "./Models";
+import { Criteria, TestUserInfo } from "./Models";
 
 const EXPRESS_HOST_ADDRESS = "http://localhost:5000"
 
@@ -47,6 +47,24 @@ export async function login(username: string,  hash: string){
 }
 
 /**for verifiers use (example, facebook requests a verification from a user) (db/request-verification)*/
-export async function requestVerification(userID: string, verifierID: string, criteria: any){
-  return
+export async function requestVerification(userID: string, verifierID: string, company: string, criteria: Criteria){
+
+  const payload = {
+    userID: userID,
+    verifierID: verifierID,
+    company: company,
+    criteria: criteria
+  }
+
+  const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/db/request-verification", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+  
+  const data = await res.json();
+
+  return data
 }
