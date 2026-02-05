@@ -12,8 +12,11 @@ package core
 import (
 	"bufio"
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io"
+	"math/rand"
 	"time"
 
 	"github.com/libp2p/go-libp2p/core/host"
@@ -126,6 +129,10 @@ func (p *UploadProtocol) Name() protocol.ID {
 	return UPLOAD_PROTOCOL
 }
 
+type UploadRequest struct {
+	Data []byte `json:"data"`
+}
+
 // handler for incoming new user protocol dials
 func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 	return func(s network.Stream) {
@@ -140,6 +147,8 @@ func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 		// 	fmt.Println("Error reading:", err)
 		// 	return
 		// }
+		// See what was read
+		//fmt.Println("Received message:", raw)
 
 		// //json object for go
 		// var data Fragment
@@ -150,16 +159,95 @@ func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 		// 	fmt.Println("error:", err)
 		// 	return
 		// }
-
-		// data.Hash
-
-		// fmt.Printf("\nEncrypted data: %s \nKey: %s\n UID: %s\n", data.UserCipher, data.Key, data.UID)
-
+		// 2. Parse the JSON request
 		//TODO: split key into fragments.
-
 		//TODO: generate hashes from user id and labels. then, distribute user cipher and key fragments to other nodes
 
+		// 1. Read Payload
+		reader := bufio.NewReader(s)
+		raw, err := reader.ReadBytes('\n')
+		if err != nil && err != io.EOF {
+			fmt.Println("Read error:", err)
+			return
+		}
+
+		// 2. Parse JSON
+		var req UploadRequest
+		if err := json.Unmarshal(raw, &req); err != nil {
+			fmt.Println("JSON error:", err)
+			return
+		}
+
+		// 3. Encrypt Data
+		cipher, key, err := Encrypt(req.Data)
+		if err != nil {
+			fmt.Println("Encrypt error:", err)
+			return
+		}
+
+		// 4. Generate Hash
+		cid := CidHash(cipher).String()
+
+		// 5. Create Encrypted Data
+		blob := DataBlock{
+			Hash:   cid,
+			Cipher: base64.StdEncoding.EncodeToString(cipher),
+		}
+		// Send to Blob storage network
+		if err := sm.StoreSend(context.Background(), blob); err != nil {
+			fmt.Println("Error handing off DataBlock:", err)
+		}
+
+		// 6. Split Key
+		const total = 5
+		const threshold = 3
+		shares := SplitKey(key, total, threshold)
+
+		for i, share := range shares {
+			fp := Fragment{
+				Hash:      cid,
+				Share:     base64.StdEncoding.EncodeToString(share),
+				X:         i + 1, // Needed to reconstruct key, must store
+				Threshold: threshold,
+				Total:     total,
+			}
+
+			// Send fragments to storage network
+			if err := sm.StoreSend(context.Background(), fp); err != nil {
+				fmt.Printf("Error sending fragment %d: %v\n", i+1, err)
+			}
+		}
+		fmt.Println("Uploaded Data")
 	}
+}
+
+func (sm *StreamsMaster) StoreSend(ctx context.Context, payload interface{}) error {
+	// 1. Check if anyone is online
+	peers := sm.h.Network().Peers()
+	if len(peers) == 0 {
+		return fmt.Errorf("no peers connected to receive data")
+	}
+
+	// 2. Pick a random peer to store this chunk
+	targetPeer := peers[rand.Intn(len(peers))]
+
+	// 3. Dial them on the Store Protocol
+	s, err := sm.h.NewStream(ctx, targetPeer, STORE_PROTOCOL)
+	if err != nil {
+		return err
+	}
+	defer s.Close()
+
+	// 4. Send the JSON
+	data, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+
+	writer := bufio.NewWriter(s)
+	writer.Write(data)
+	writer.WriteString("\n")
+	return writer.Flush()
 }
 
 // function to send upload protocol (Not needed?)
@@ -184,9 +272,4 @@ func (p *StoreProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 		defer s.Close()
 		//Mo: your logic here
 	}
-}
-
-// function to use the store protocol
-func (p *StreamsMaster) StoreSend(ctx context.Context, peerID peer.ID) error {
-	return nil
 }
