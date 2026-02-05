@@ -1,10 +1,11 @@
 "use client"
 import Image from "next/image";
 import Link from "next/link"
-import { requestVerification, sendUserData } from "@/Connectors";
+import { getRequests, requestVerification, sendUserData } from "@/Connectors";
 import { TestUserInfo, Criteria, Rule } from "@/Models";
 
 import { useState } from "react";
+import { json } from "node:stream/consumers";
 
 export default function Home() {
   const [text, setText] = useState("");
@@ -22,15 +23,18 @@ export default function Home() {
     //   Address : "123 Fake Street, WPB, FL, USA"
     // }
     // const res = sendUserData(test)
-    const criteria: Criteria = {
-      All: [
-        {Field: "name", Type: "equal", value: "Santiago"}
-      ],
-      Any: []
-    }
-    console.log("Yo")
-    const res = await requestVerification("9a3fc47b-98b2-4d51-bb5e-a4a641812ebb", "6cbf4598-339d-4b4b-8d63-30c53c20c4ec", "Facebook",criteria)
-    setResponse(res);
+    // const criteria: Criteria = {
+    //   All: [
+    //     {Field: "name", Type: "equal", value: "Santiago"}
+    //   ],
+    //   Any: []
+    // }
+    // console.log("Yo")
+    // const res = await requestVerification("9a3fc47b-98b2-4d51-bb5e-a4a641812ebb", "6cbf4598-339d-4b4b-8d63-30c53c20c4ec", "Facebook",criteria)
+    const res = await getRequests({userID: "9a3fc47b-98b2-4d51-bb5e-a4a641812ebb"})
+    console.log(res)
+    
+    setResponse(JSON.stringify(res[0]));
   };
 
   return (

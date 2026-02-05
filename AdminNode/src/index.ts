@@ -1,6 +1,6 @@
 import app from './app'
 import { startNode } from './p2p/node'
-import { checkDatabase, createRequest, upsertProvider, upsertUser } from '../Database'
+import { checkDatabase, createRequest, getRequests, upsertProvider, upsertUser } from '../Database'
 import '../Models'
 import { Pool } from 'pg';
 import dotenv from 'dotenv';
@@ -63,6 +63,7 @@ async function start() {
   //   status: "Pending"
   // }))
   // console.log(new_user, new_provider, new_request)
+  console.log(await getRequests(pool, {userid: "9a3fc47b-98b2-4d51-bb5e-a4a641812ebb"}))
 }
 
 start().catch(err => {

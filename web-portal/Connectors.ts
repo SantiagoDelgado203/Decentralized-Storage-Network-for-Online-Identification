@@ -64,7 +64,24 @@ export async function requestVerification(userID: string, verifierID: string, co
     body: JSON.stringify(payload),
   });
   
-  const data = await res.json();
+  const reply = await res.json();
 
-  return data
+  return reply
+}
+
+export async function getRequests(ids : {userID?: string, verifierID?: string}){
+  const payload = {
+    userID: ids.userID,
+    verifierID: ids.verifierID,
+  }
+
+  const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/db/get-requests", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload)
+  });
+
+  return await res.json();
 }

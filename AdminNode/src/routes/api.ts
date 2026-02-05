@@ -2,7 +2,7 @@ import { Router, type Request, type Response } from 'express'
 import { multiaddr } from "@multiformats/multiaddr";
 import { getNode } from '../p2p/node'
 import { DB_Request } from '../../Models';
-import { createRequest, getProviderById } from '../../Database';
+import { createRequest, getProviderById, getRequests } from '../../Database';
 import { Pool } from 'pg';
 import dotenv from 'dotenv';
 
@@ -92,6 +92,16 @@ router.post("/db/request-verification", async (req: Request, res: Response) => {
   } catch (e) {
     res.status(500)
   }
+})
+
+router.post("/db/get-requests", async (req: Request, res: Response) => {
+  console.log("Weeeeeee")
+  const request_body = req.body
+
+  const requests = await getRequests(pool, {userid: request_body.userID, providerid: request_body.verifierID})
+
+  res.json(requests)
+
 })
 
 export default router
