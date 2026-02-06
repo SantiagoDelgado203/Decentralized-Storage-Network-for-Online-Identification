@@ -16,7 +16,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"math/rand"
 	"time"
 
 	"github.com/libp2p/go-libp2p/core/host"
@@ -129,39 +128,10 @@ func (p *UploadProtocol) Name() protocol.ID {
 	return UPLOAD_PROTOCOL
 }
 
-type UploadRequest struct {
-	Data []byte `json:"data"`
-}
-
 // handler for incoming new user protocol dials
 func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 	return func(s network.Stream) {
 		defer s.Close()
-
-		//SYED
-
-		// read payload (plain json string)
-		// reader := bufio.NewReader(s)
-		// msg, err := reader.ReadString('\n')
-		// if err != nil && err != io.EOF {
-		// 	fmt.Println("Error reading:", err)
-		// 	return
-		// }
-		// See what was read
-		//fmt.Println("Received message:", raw)
-
-		// //json object for go
-		// var data Fragment
-
-		// //convert from json string to the object
-		// err = json.Unmarshal([]byte(msg), &data)
-		// if err != nil {
-		// 	fmt.Println("error:", err)
-		// 	return
-		// }
-		// 2. Parse the JSON request
-		//TODO: split key into fragments.
-		//TODO: generate hashes from user id and labels. then, distribute user cipher and key fragments to other nodes
 
 		// 1. Read Payload
 		reader := bufio.NewReader(s)
@@ -171,15 +141,8 @@ func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 			return
 		}
 
-		// 2. Parse JSON
-		var req UploadRequest
-		if err := json.Unmarshal(raw, &req); err != nil {
-			fmt.Println("JSON error:", err)
-			return
-		}
-
 		// 3. Encrypt Data
-		cipher, key, err := Encrypt(req.Data)
+		cipher, key, err := Encrypt(raw)
 		if err != nil {
 			fmt.Println("Encrypt error:", err)
 			return
@@ -189,12 +152,12 @@ func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 		cid := CidHash(cipher).String()
 
 		// 5. Create Encrypted Data
-		blob := DataBlock{
+		blob, err := json.Marshal(DataBlock{
 			Hash:   cid,
-			Cipher: base64.StdEncoding.EncodeToString(cipher),
-		}
+			Cipher: string(cipher),
+		})
 		// Send to Blob storage network
-		if err := sm.StoreSend(context.Background(), blob); err != nil {
+		if err := sm.StoreSend(context.Background(), GetRandomPeer(sm.h), blob); err != nil {
 			fmt.Println("Error handing off DataBlock:", err)
 		}
 
@@ -204,50 +167,21 @@ func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 		shares := SplitKey(key, total, threshold)
 
 		for i, share := range shares {
-			fp := Fragment{
+			fp, _ := json.Marshal(Fragment{
 				Hash:      cid,
 				Share:     base64.StdEncoding.EncodeToString(share),
 				X:         i + 1, // Needed to reconstruct key, must store
 				Threshold: threshold,
 				Total:     total,
-			}
+			})
 
 			// Send fragments to storage network
-			if err := sm.StoreSend(context.Background(), fp); err != nil {
+			if err := sm.StoreSend(context.Background(), GetRandomPeer(sm.h), fp); err != nil {
 				fmt.Printf("Error sending fragment %d: %v\n", i+1, err)
 			}
 		}
 		fmt.Println("Uploaded Data")
 	}
-}
-
-func (sm *StreamsMaster) StoreSend(ctx context.Context, payload interface{}) error {
-	// 1. Check if anyone is online
-	peers := sm.h.Network().Peers()
-	if len(peers) == 0 {
-		return fmt.Errorf("no peers connected to receive data")
-	}
-
-	// 2. Pick a random peer to store this chunk
-	targetPeer := peers[rand.Intn(len(peers))]
-
-	// 3. Dial them on the Store Protocol
-	s, err := sm.h.NewStream(ctx, targetPeer, STORE_PROTOCOL)
-	if err != nil {
-		return err
-	}
-	defer s.Close()
-
-	// 4. Send the JSON
-	data, err := json.Marshal(payload)
-	if err != nil {
-		return err
-	}
-
-	writer := bufio.NewWriter(s)
-	writer.Write(data)
-	writer.WriteString("\n")
-	return writer.Flush()
 }
 
 // function to send upload protocol (Not needed?)
@@ -271,5 +205,27 @@ func (p *StoreProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 	return func(s network.Stream) {
 		defer s.Close()
 		//Mo: your logic here
+		fmt.Println("I received the fragment")
 	}
+}
+
+func (sm *StreamsMaster) StoreSend(ctx context.Context, peerID peer.ID, payload []byte) error {
+
+	// 3. Dial them on the Store Protocol
+	s, err := sm.h.NewStream(ctx, peerID, STORE_PROTOCOL)
+	if err != nil {
+		return err
+	}
+	defer s.Close()
+
+	// 4. Send the JSON
+	data, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+
+	writer := bufio.NewWriter(s)
+	writer.Write(data)
+	writer.WriteString("\n")
+	return writer.Flush()
 }

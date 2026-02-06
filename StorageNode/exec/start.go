@@ -15,6 +15,8 @@ The desired node behavior is as follows:
 package exec
 
 import (
+	"bufio"
+	"encoding/json"
 	"fmt"
 	"node/core"
 	"time"
@@ -24,79 +26,42 @@ import (
 func NodeStart() (err error) {
 
 	//Start the node
-	ctx, h, dht, peers := core.NodeCreate(core.ReadPrivateKeyFromFile("ID.json"), "myapp")
+	ctx, h, _, peers := core.NodeCreate(core.ReadPrivateKeyFromFile("ID.json"), "myapp")
 
 	//connects to peers indefinitely
 	go core.ConstantConnection(ctx, h, peers)
 
 	//allow time for connection
-	time.Sleep(5 * time.Second)
+	time.Sleep(10 * time.Second)
+
+	selected_peer := h.Network().Peers()[0]
+	fmt.Println("\n                    Selected peer" + selected_peer)
 
 	//Initialize the stream handlers
-	// sm := core.HandlersInit(h)
+	_ = core.HandlersInit(h)
 
-	db, err := core.NewDatabase("mongodb://localhost:27017")
+	s, err := h.NewStream(ctx, selected_peer, "/upload/1.0.0")
 	if err != nil {
-		panic(err)
-	}
-	core.HandlersInit(h)
-
-	test_d := "Santiago Delgado, 22 years old, bla bla bla"
-
-	fmt.Println("\nPlaintext:", test_d)
-
-	cipher, key, err := core.Encrypt([]byte(test_d))
-	if err != nil {
-		fmt.Println("Encrypt error:", err)
-		return
+		return err
 	}
 
-	fmt.Printf("\nKey: %x", key)
-	fmt.Printf("\nCipher: %x", cipher)
-
-	decipher, err := core.Decrypt(key, cipher)
-	if err != nil {
-		fmt.Println("Decrypt error:", err)
-		return
+	type UploadRequest struct {
+		Data string `json:"data"`
 	}
 
-	fmt.Println("\nDecrypted:", string(decipher))
+	req := UploadRequest{
+		Data: "hello distributed world",
+	}
 
-	test_u := "\nTesting data from user! This will be encrypted, then a hashed to be provided"
-	CidHash := core.CidHash([]byte(test_u))
-	fmt.Println("\nTest: ", test_u, "\nThen, the generated Cid hash: ", CidHash)
-	err = core.DHTProvide(ctx, dht, CidHash)
+	payload, err := json.Marshal(req)
+
+	w := bufio.NewWriter(s)
+	_, err = w.WriteString(string(payload))
 	if err != nil {
 		fmt.Println(err)
 	}
-
-	test_k := "Testing Key"
-	shares := core.SplitKey([]byte(test_k), 5, 3)
-	reconstruct := core.ReconstructKey(shares)
-	fmt.Printf("\nKey: %s\nShares: %x\nReconstructed: %s\n", test_k, shares, reconstruct)
-
-	fmt.Println("\nHashed Shares:")
-
-	for i, share := range shares {
-		hash := core.CidHash(share)
-
-		fmt.Printf("Share %d hash: %s\n", i, hash)
-
-		core.DHTProvide(ctx, dht, hash)
-	}
-
-	example := core.Fragment{
-		// ID:        primitive.NewObjectID(),
-		Hash:      "exmaple",
-		Share:     "example",
-		X:         5,
-		Threshold: 3,
-		Total:     5,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-	}
-
-	db.StoreFragment(example)
+	w.Flush()
+	s.Close()
 
 	select {}
 

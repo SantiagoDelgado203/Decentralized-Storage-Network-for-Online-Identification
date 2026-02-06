@@ -14,6 +14,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
 	"time"
@@ -162,4 +163,13 @@ func ConstantConnection(ctx context.Context, h host.Host, peers []string) {
 			time.Sleep(1 * time.Second)
 		}
 	}
+}
+
+func GetRandomPeer(h host.Host) peer.ID {
+	// Get peers
+	peers := h.Network().Peers()
+	if len(peers) == 0 {
+		fmt.Println("no peers connected to receive data")
+	}
+	return peers[rand.Intn(len(peers))]
 }

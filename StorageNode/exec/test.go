@@ -23,6 +23,8 @@ func TestNode(idseed string) (err error) {
 	//allow time for connection
 	time.Sleep(5 * time.Second)
 
+	_ = core.HandlersInit(h)
+
 	select {}
 
 }

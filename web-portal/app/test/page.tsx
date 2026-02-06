@@ -1,7 +1,7 @@
 "use client"
 import Image from "next/image";
 import Link from "next/link"
-import { sendUserData } from "@/Connectors";
+import { uploadUserData } from "@/Connectors";
 import { TestUserInfo } from "@/Models";
 
 import { useState } from "react";
@@ -20,7 +20,7 @@ export default function Home() {
       },
       Address : "123 Fake Street, WPB, FL, USA"
     }
-    const res = sendUserData(test)
+    const res = uploadUserData(test)
     setResponse(await res);
   };
 
