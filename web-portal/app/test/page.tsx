@@ -1,11 +1,12 @@
 "use client"
 import Image from "next/image";
 import Link from "next/link"
-import { getRequests, requestVerification, sendUserData } from "@/Connectors";
+import { getRequests, requestVerification, resolveRequest, sendUserData, updateRequest } from "@/Connectors";
 import { TestUserInfo, Criteria, Rule } from "@/Models";
 
 import { useState } from "react";
 import { json } from "node:stream/consumers";
+import { resolve } from "node:path";
 
 export default function Home() {
   const [text, setText] = useState("");
@@ -31,7 +32,20 @@ export default function Home() {
     // }
     // console.log("Yo")
     // const res = await requestVerification("9a3fc47b-98b2-4d51-bb5e-a4a641812ebb", "6cbf4598-339d-4b4b-8d63-30c53c20c4ec", "Facebook",criteria)
-    const res = await getRequests({userID: "9a3fc47b-98b2-4d51-bb5e-a4a641812ebb"})
+    // const res = await resolveRequest({requestID:"8f39bfb9-62e0-4721-9bc4-b1185fea1c55", accepted: true})
+    const res = await updateRequest({requestID: "8f39bfb9-62e0-4721-9bc4-b1185fea1c55", criteria: 
+          {
+      "All": [
+        {
+          "Type": "equal",
+          "Field": "name",
+          "value": "Jacob"
+        }
+      ],
+      "Any": []
+    }, 
+    status: "Cancelled"
+    })
     console.log(res)
     
     setResponse(JSON.stringify(res[0]));

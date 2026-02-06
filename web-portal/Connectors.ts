@@ -47,14 +47,7 @@ export async function login(username: string,  hash: string){
 }
 
 /**for verifiers use (example, facebook requests a verification from a user) (db/request-verification)*/
-export async function requestVerification(userID: string, verifierID: string, company: string, criteria: Criteria){
-
-  const payload = {
-    userID: userID,
-    verifierID: verifierID,
-    company: company,
-    criteria: criteria
-  }
+export async function requestVerification(payload : {userID: string, verifierID: string, company: string, criteria: Criteria}){
 
   const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/db/request-verification", {
     method: "POST",
@@ -68,14 +61,38 @@ export async function requestVerification(userID: string, verifierID: string, co
 
   return reply
 }
-
+ /** to get all requests associated with an user or verifier, to diplay them in their dashboards */
 export async function getRequests(ids : {userID?: string, verifierID?: string}){
-  const payload = {
-    userID: ids.userID,
-    verifierID: ids.verifierID,
-  }
 
   const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/db/get-requests", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(ids)
+  });
+
+  return await res.json();
+}
+
+/** to update the status field in a request, used by the user as a reply to a request */
+export async function resolveRequest(payload : {requestID: string, accepted: boolean}){
+
+  const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/db/resolve-requests", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload)
+  });
+
+  return await res.json();
+}
+
+/** to modify an existing request, from a verifier */
+export async function updateRequest(payload : {requestID: string, criteria: Criteria, status: string}){
+  
+  const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/db/update-request", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

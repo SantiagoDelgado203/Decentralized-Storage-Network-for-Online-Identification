@@ -2,7 +2,7 @@ import { Router, type Request, type Response } from 'express'
 import { multiaddr } from "@multiformats/multiaddr";
 import { getNode } from '../p2p/node'
 import { DB_Request } from '../../Models';
-import { createRequest, getProviderById, getRequests } from '../../Database';
+import { createRequest, getProviderById, getRequests, updateRequest } from '../../Database';
 import { Pool } from 'pg';
 import dotenv from 'dotenv';
 
@@ -95,12 +95,48 @@ router.post("/db/request-verification", async (req: Request, res: Response) => {
 })
 
 router.post("/db/get-requests", async (req: Request, res: Response) => {
-  console.log("Weeeeeee")
   const request_body = req.body
 
   const requests = await getRequests(pool, {userid: request_body.userID, providerid: request_body.verifierID})
 
   res.json(requests)
+
+})
+
+router.post("/db/resolve-requests", async (req: Request, res: Response) => {
+  console.log("Hey")
+  const request_body = req.body
+
+  const db_request = await getRequests(pool, {requestid: request_body.requestID})
+
+  let updated_request = new DB_Request(db_request[0])
+
+  if(request_body.accepted){
+    //HERE IS WHERE WE DIAL THE NODE TO START THE VERIFICATION PROCESS
+  }
+  
+  updated_request.status = request_body.accepted ? "Accepted" : "Rejected"
+
+  const rep = await updateRequest(pool, updated_request)
+
+  res.json(rep)
+
+})
+
+
+router.post("/db/update-request", async (req: Request, res: Response) => {
+  const request_body = req.body
+
+  const db_request = await getRequests(pool, {requestid: request_body.requestID})
+  console.log(db_request)
+  let updated_request = new DB_Request(db_request[0])
+
+  updated_request.datarequests = request_body.criteria
+  updated_request.status = request_body.status
+
+  const rep = await updateRequest(pool, updated_request)
+
+  res.json(rep)
 
 })
 

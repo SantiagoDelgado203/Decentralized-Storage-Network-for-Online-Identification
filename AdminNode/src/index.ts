@@ -63,7 +63,7 @@ async function start() {
   //   status: "Pending"
   // }))
   // console.log(new_user, new_provider, new_request)
-  console.log(await getRequests(pool, {userid: "9a3fc47b-98b2-4d51-bb5e-a4a641812ebb"}))
+  // console.log(await getRequests(pool, {userid: "9a3fc47b-98b2-4d51-bb5e-a4a641812ebb"}))
 }
 
 start().catch(err => {
