@@ -1,4 +1,4 @@
-import RequestEntry from "../../Components/RequestEntry"
+import RequestEntry from "../../../Components/RequestEntry"
 
 export default function Dashobard() {
     return (

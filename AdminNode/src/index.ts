@@ -4,6 +4,10 @@ import '../Models'
 import { Pool } from 'pg';
 import dotenv from 'dotenv';
 dotenv.config();
+import { checkDatabase, createRequest, getRequests, upsertProvider, upsertUser } from '../Database'
+import '../Models'
+import { Provider, DB_Request, User } from '../Models';
+import {decryptData, encryptData} from '../SymmetricEncryption'
 
 /*STARTUP FILE
 * By Santiago Delgado
@@ -12,6 +16,7 @@ dotenv.config();
 * This file should have the node's main logic
 */
 
+dotenv.config();
 const pool = new Pool({
     user: process.env.PG_USER,
     host: process.env.PG_HOST,

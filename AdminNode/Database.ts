@@ -1,5 +1,5 @@
 import { Pool } from 'pg';
-import { User, Provider, Request } from './Models'
+import { User, Provider, DB_Request } from './Models'
 
 export async function checkDatabase(pool: Pool) {
    
@@ -38,6 +38,20 @@ export async function upsertUser(pool: Pool, user: User) {
   );
   return rows[0];
 }
+
+export async function getUserById(pool: Pool, userid: string) {
+  const { rows } = await pool.query(
+    `
+    SELECT *
+    FROM users
+    WHERE userid = $1
+    `,
+    [userid]
+  );
+
+  return rows[0] ?? null;
+}
+
 
 export async function deleteUser(pool: Pool, userid: string) {
   await pool.query(
@@ -78,6 +92,20 @@ export async function upsertProvider(pool: Pool, provider: Provider) {
   return rows[0];
 }
 
+export async function getProviderById(pool: Pool, providerid: string) {
+  const { rows } = await pool.query(
+    `
+    SELECT *
+    FROM providers
+    WHERE providerid = $1
+    `,
+    [providerid]
+  );
+
+  return rows[0] ?? null;
+}
+
+
 export async function deleteProvider(pool: Pool, providerid: string) {
   await pool.query(
     `DELETE FROM providers WHERE providerid = $1`,
@@ -85,7 +113,7 @@ export async function deleteProvider(pool: Pool, providerid: string) {
   );
 }
 
-export async function createRequest(pool: Pool, request: Request) {
+export async function createRequest(pool: Pool, request: DB_Request) {
   const { rows } = await pool.query(
     `
     INSERT INTO requests (
@@ -109,7 +137,7 @@ export async function createRequest(pool: Pool, request: Request) {
   return rows[0];
 }
 
-export async function updateRequest(pool: Pool, request: Request) {
+export async function updateRequest(pool: Pool, request: DB_Request) {
   if (!request.requestid) {
     throw new Error('requestid is required for update');
   }
@@ -137,6 +165,47 @@ export async function updateRequest(pool: Pool, request: Request) {
   return rows[0];
 }
 
+type RequestQuery = {
+  requestid?: string;
+  userid?: string;
+  providerid?: string;
+};
+
+export async function getRequests(
+  pool: Pool,
+  query: RequestQuery
+) {
+  const conditions: string[] = [];
+  const values: any[] = [];
+
+  if (query.requestid) {
+    values.push(query.requestid);
+    conditions.push(`requestid = $${values.length}`);
+  }
+
+  if (query.userid) {
+    values.push(query.userid);
+    conditions.push(`userid = $${values.length}`);
+  }
+
+  if (query.providerid) {
+    values.push(query.providerid);
+    conditions.push(`providerid = $${values.length}`);
+  }
+
+  if (conditions.length === 0) {
+    throw new Error('At least one identifier must be provided');
+  }
+
+  const sql = `
+    SELECT *
+    FROM requests
+    WHERE ${conditions.join(' AND ')}
+  `;
+
+  const { rows } = await pool.query(sql, values);
+  return rows;
+}
 
 
 
