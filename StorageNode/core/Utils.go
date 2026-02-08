@@ -76,7 +76,7 @@ func ReadPrivateKeyFromFile(filename string) crypto.PrivKey {
 }
 
 // gets bootstrap nodes from file, returns list of strings
-func readBootstrapPeers() []string {
+func ReadBootstrapPeers() []string {
 	data, err := os.ReadFile(bootstrapFile)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -96,8 +96,8 @@ func readBootstrapPeers() []string {
 }
 
 // writes the node address to the bootstrap list
-func addPeerToBootstrap(addr string) {
-	peers := readBootstrapPeers()
+func AddPeerToBootstrap(addr string) {
+	peers := ReadBootstrapPeers()
 	for _, p := range peers {
 		if p == addr {
 			return
@@ -171,5 +171,14 @@ func GetRandomPeer(h host.Host) peer.ID {
 	if len(peers) == 0 {
 		fmt.Println("no peers connected to receive data")
 	}
-	return peers[rand.Intn(len(peers))]
+
+	admin, err := peer.AddrInfoFromString("/ip4/192.168.126.1/tcp/4001/p2p/12D3KooWA1eWrMTkfawiShux6WrxzFbRdyDsk5NAyL5indcWCtEG")
+	if err != nil {
+		panic("Error getting admin node")
+	}
+	selected := peers[rand.Intn(len(peers))]
+	if selected == admin.ID {
+		return GetRandomPeer(h)
+	}
+	return selected
 }

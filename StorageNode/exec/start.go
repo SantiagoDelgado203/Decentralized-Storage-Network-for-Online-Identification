@@ -15,9 +15,6 @@ The desired node behavior is as follows:
 package exec
 
 import (
-	"bufio"
-	"encoding/json"
-	"fmt"
 	"node/core"
 	"time"
 )
@@ -34,34 +31,8 @@ func NodeStart() (err error) {
 	//allow time for connection
 	time.Sleep(10 * time.Second)
 
-	selected_peer := h.Network().Peers()[0]
-	fmt.Println("\n                    Selected peer" + selected_peer)
-
 	//Initialize the stream handlers
 	_ = core.HandlersInit(h)
-
-	s, err := h.NewStream(ctx, selected_peer, "/upload/1.0.0")
-	if err != nil {
-		return err
-	}
-
-	type UploadRequest struct {
-		Data string `json:"data"`
-	}
-
-	req := UploadRequest{
-		Data: "hello distributed world",
-	}
-
-	payload, err := json.Marshal(req)
-
-	w := bufio.NewWriter(s)
-	_, err = w.WriteString(string(payload))
-	if err != nil {
-		fmt.Println(err)
-	}
-	w.Flush()
-	s.Close()
 
 	select {}
 

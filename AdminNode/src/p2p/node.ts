@@ -36,8 +36,7 @@ export async function startNode(): Promise<Libp2p> {
         privateKey,
         addresses: {
         listen: [
-            "/ip4/0.0.0.0/tcp/4001",
-            "/ip4/0.0.0.0/tcp/4002/ws",
+            "/ip4/192.168.126.1/tcp/4001",
         ]
         },
         transports: [tcp()],

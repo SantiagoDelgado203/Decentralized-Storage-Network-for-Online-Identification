@@ -141,6 +141,8 @@ func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 			return
 		}
 
+		fmt.Printf("\nIncoming data: %s", raw)
+
 		// 3. Encrypt Data
 		cipher, key, err := Encrypt(raw)
 		if err != nil {
@@ -152,10 +154,13 @@ func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 		cid := CidHash(cipher).String()
 
 		// 5. Create Encrypted Data
-		blob, err := json.Marshal(DataBlock{
+		blob := DataBlock{
 			Hash:   cid,
-			Cipher: string(cipher),
-		})
+			Cipher: base64.StdEncoding.EncodeToString(cipher),
+		}
+
+		fmt.Printf("\nGenerated encrypted data: %s", blob.Cipher)
+
 		// Send to Blob storage network
 		if err := sm.StoreSend(context.Background(), GetRandomPeer(sm.h), blob); err != nil {
 			fmt.Println("Error handing off DataBlock:", err)
@@ -167,20 +172,22 @@ func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 		shares := SplitKey(key, total, threshold)
 
 		for i, share := range shares {
-			fp, _ := json.Marshal(Fragment{
+			fp := Fragment{
 				Hash:      cid,
 				Share:     base64.StdEncoding.EncodeToString(share),
 				X:         i + 1, // Needed to reconstruct key, must store
 				Threshold: threshold,
 				Total:     total,
-			})
+			}
+
+			fmt.Printf("\nKey fragment: %s", fp.Share)
 
 			// Send fragments to storage network
 			if err := sm.StoreSend(context.Background(), GetRandomPeer(sm.h), fp); err != nil {
 				fmt.Printf("Error sending fragment %d: %v\n", i+1, err)
 			}
 		}
-		fmt.Println("Uploaded Data")
+		// fmt.Println("Uploaded Data")
 	}
 }
 
@@ -204,12 +211,22 @@ func (p *StoreProtocol) Name() protocol.ID {
 func (p *StoreProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 	return func(s network.Stream) {
 		defer s.Close()
+
+		// 1. Read Payload
+		reader := bufio.NewReader(s)
+		raw, err := reader.ReadBytes('\n')
+		if err != nil && err != io.EOF {
+			fmt.Println("Read error:", err)
+			return
+		}
+
 		//Mo: your logic here
-		fmt.Println("I received the fragment")
+		fmt.Printf("\nI received a data block or key fragment: %s", raw)
+
 	}
 }
 
-func (sm *StreamsMaster) StoreSend(ctx context.Context, peerID peer.ID, payload []byte) error {
+func (sm *StreamsMaster) StoreSend(ctx context.Context, peerID peer.ID, payload interface{}) error {
 
 	// 3. Dial them on the Store Protocol
 	s, err := sm.h.NewStream(ctx, peerID, STORE_PROTOCOL)
