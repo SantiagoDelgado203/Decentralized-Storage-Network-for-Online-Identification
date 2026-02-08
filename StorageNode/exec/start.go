@@ -1,6 +1,6 @@
 /*
 By Santiago Delgado, December 2025
-Updated: January 2026
+Updated: February 2026
 
 start.go
 
@@ -9,7 +9,7 @@ Main execution logic for the storage node.
 The node behavior:
   - Loads configuration from environment variables
   - Starts libp2p node with configured settings
-  - Continuously connects to bootstrap peers
+  - Starts PeerManager for connection health monitoring
   - Sets up stream handlers for custom protocols
 */
 package exec
@@ -18,6 +18,9 @@ import (
 	"fmt"
 	"node/config"
 	"node/core"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
@@ -35,11 +38,11 @@ func NodeStart() error {
 	}
 
 	// Start the node using configuration
-	ctx, h, dht, peers := core.NodeCreate()
+	_, h, kadDHT, peers := core.NodeCreate()
 
-	// Initialize PeerManager for health monitoring
-	pm := core.NewPeerManager(h, dht, peers)
-	pm.Start()
+	// Initialize the PeerManager for connection health monitoring
+	peerManager := core.NewPeerManager(h, kadDHT, peers)
+	peerManager.Start()
 
 	// Allow time for initial connections
 	time.Sleep(5 * time.Second)
@@ -49,6 +52,35 @@ func NodeStart() error {
 
 	fmt.Println("✅ Node is running. Press Ctrl+C to stop.")
 
-	// Block forever (node runs until interrupted)
-	select {}
+	// Start periodic network stats logging
+	go logNetworkStats(peerManager)
+
+	// Handle graceful shutdown
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+
+	<-sigChan
+	fmt.Println("\n⛔ Shutting down...")
+
+	// Stop peer manager
+	peerManager.Stop()
+
+	// Close host
+	if err := h.Close(); err != nil {
+		fmt.Printf("⚠️  Error closing host: %v\n", err)
+	}
+
+	fmt.Println("👋 Goodbye!")
+	return nil
+}
+
+// logNetworkStats periodically logs network statistics
+func logNetworkStats(pm *core.PeerManager) {
+	ticker := time.NewTicker(30 * time.Second)
+	defer ticker.Stop()
+
+	for range ticker.C {
+		stats := pm.GetNetworkStats()
+		fmt.Printf("📊 Network Stats: %s\n", stats.String())
+	}
 }

@@ -1,6 +1,6 @@
 /*
 By Santiago Delgado, December 2025
-Updated: January 2026
+Updated: February 2026
 
 test.go
 
@@ -12,6 +12,9 @@ import (
 	"fmt"
 	"node/config"
 	"node/core"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 )
 
@@ -31,11 +34,11 @@ func TestNode(seed string) error {
 	}
 
 	// Start the node with the deterministic key
-	ctx, h, dht, peers := core.NodeCreateWithPrivKey(priv, cfg.Namespace)
+	_, h, kadDHT, peers := core.NodeCreateWithPrivKey(priv, cfg.Namespace)
 
-	// Initialize PeerManager for health monitoring
-	pm := core.NewPeerManager(h, dht, peers)
-	pm.Start()
+	// Initialize the PeerManager for connection health monitoring
+	peerManager := core.NewPeerManager(h, kadDHT, peers)
+	peerManager.Start()
 
 	// Allow time for initial connections
 	time.Sleep(5 * time.Second)
@@ -45,9 +48,35 @@ func TestNode(seed string) error {
 
 	fmt.Println("✅ Test node is running. Press Ctrl+C to stop.")
 
-	// Keep ctx reference to prevent unused variable warning
-	_ = ctx
+	// Start periodic network stats logging
+	go logTestNetworkStats(peerManager)
 
-	// Block forever (node runs until interrupted)
-	select {}
+	// Handle graceful shutdown
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+
+	<-sigChan
+	fmt.Println("\n⛔ Shutting down test node...")
+
+	// Stop peer manager
+	peerManager.Stop()
+
+	// Close host
+	if err := h.Close(); err != nil {
+		fmt.Printf("⚠️  Error closing host: %v\n", err)
+	}
+
+	fmt.Println("👋 Goodbye!")
+	return nil
+}
+
+// logTestNetworkStats periodically logs network statistics for test nodes
+func logTestNetworkStats(pm *core.PeerManager) {
+	ticker := time.NewTicker(30 * time.Second)
+	defer ticker.Stop()
+
+	for range ticker.C {
+		stats := pm.GetNetworkStats()
+		fmt.Printf("📊 [TEST] Network Stats: %s\n", stats.String())
+	}
 }
