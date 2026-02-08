@@ -16,6 +16,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"strconv"
 	"time"
 
 	"github.com/libp2p/go-libp2p/core/host"
@@ -151,19 +152,19 @@ func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 		}
 
 		// 4. Generate Hash
-		cid := CidHash(cipher).String()
+		cid := CidHash([]byte("1-Santiago-Test")).String()
 
 		// 5. Create Encrypted Data
-		blob := DataBlock{
-			Hash:   cid,
-			Cipher: base64.StdEncoding.EncodeToString(cipher),
+		blob := SimpleData{
+			Hash: cid,
+			Data: base64.StdEncoding.EncodeToString(cipher),
 		}
 
-		fmt.Printf("\nGenerated encrypted data: %s", blob.Cipher)
+		fmt.Printf("\nGenerated encrypted data: %s", blob.Data)
 
 		// Send to Blob storage network
 		if err := sm.StoreSend(context.Background(), GetRandomPeer(sm.h), blob); err != nil {
-			fmt.Println("Error handing off DataBlock:", err)
+			fmt.Println("Error handling off DataBlock:", err)
 		}
 
 		// 6. Split Key
@@ -172,15 +173,13 @@ func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 		shares := SplitKey(key, total, threshold)
 
 		for i, share := range shares {
-			fp := Fragment{
-				Hash:      cid,
-				Share:     base64.StdEncoding.EncodeToString(share),
-				X:         i + 1, // Needed to reconstruct key, must store
-				Threshold: threshold,
-				Total:     total,
+			cid := CidHash([]byte("fragment#" + strconv.Itoa(i))).String()
+			fp := SimpleData{
+				Hash: cid,
+				Data: base64.StdEncoding.EncodeToString(share),
 			}
 
-			fmt.Printf("\nKey fragment: %s", fp.Share)
+			fmt.Printf("\nKey fragment: %s", fp.Data)
 
 			// Send fragments to storage network
 			if err := sm.StoreSend(context.Background(), GetRandomPeer(sm.h), fp); err != nil {
@@ -196,7 +195,7 @@ func (p *StreamsMaster) UploadSend(ctx context.Context, peerID peer.ID) error {
 	return nil
 }
 
-/*------------------------------------STORE  ----------------------------------------------*/
+/*------------------------------------STORE PROTOCOL ----------------------------------------------*/
 
 type StoreProtocol struct{}
 
@@ -212,7 +211,6 @@ func (p *StoreProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 	return func(s network.Stream) {
 		defer s.Close()
 
-		// 1. Read Payload
 		reader := bufio.NewReader(s)
 		raw, err := reader.ReadBytes('\n')
 		if err != nil && err != io.EOF {
@@ -220,8 +218,20 @@ func (p *StoreProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 			return
 		}
 
-		//Mo: your logic here
-		fmt.Printf("\nI received a data block or key fragment: %s", raw)
+		simpleData := SimpleData{}
+		err = json.Unmarshal(raw, &simpleData)
+		if err != nil {
+			panic("Error parsing json to object")
+		}
+
+		fmt.Printf("\nI received a data block or key fragment: %s", simpleData.Data)
+
+		db, err := NewDatabase("mongodb://localhost:27017")
+
+		err = db.StoreSimple(simpleData)
+		if err != nil {
+			fmt.Printf("Error storing data: %s", err)
+		}
 
 	}
 }

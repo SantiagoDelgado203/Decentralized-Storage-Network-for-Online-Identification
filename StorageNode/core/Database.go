@@ -13,6 +13,7 @@ import (
 
 type Database struct {
 	client     *mongo.Client
+	main       *mongo.Collection
 	fragments  *mongo.Collection
 	dataBlocks *mongo.Collection
 	nodes      *mongo.Collection
@@ -36,6 +37,7 @@ func NewDatabase(connectionString string) (*Database, error) {
 
 	return &Database{
 		client:     client,
+		main:       db.Collection("main"),
 		fragments:  db.Collection("fragments"),
 		dataBlocks: db.Collection("data_blocks"),
 		nodes:      db.Collection("nodes"),
@@ -186,4 +188,23 @@ func (db *Database) Close() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 	return db.client.Disconnect(ctx)
+}
+
+//-----------------------------------------------------------------------
+
+func (db *Database) StoreSimple(data SimpleData) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	now := time.Now().UTC()
+	data.CreatedAt = now
+	data.UpdatedAt = now
+
+	_, err := db.main.InsertOne(ctx, data)
+	if err != nil {
+		return fmt.Errorf("failed to store fragment: %v", err)
+	}
+
+	log.Printf("Fragment stored successfully, hash: %s, x: %d", data.Hash)
+	return nil
 }
