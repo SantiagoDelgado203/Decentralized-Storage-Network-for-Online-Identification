@@ -126,7 +126,7 @@ func ConstantConnection(ctx context.Context, h host.Host, peers []string) {
 				return
 			default:
 				conns := h.Network().Conns()
-				fmt.Printf("\r\nActive connections: %d", len(conns))
+				fmt.Printf("\rActive connections: %d", len(conns))
 				time.Sleep(1 * time.Second)
 			}
 		}
