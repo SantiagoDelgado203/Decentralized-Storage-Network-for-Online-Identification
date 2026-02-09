@@ -1,10 +1,11 @@
 import { Router, type Request, type Response } from 'express'
 import { multiaddr } from "@multiformats/multiaddr";
 import { getNode } from '../p2p/node'
-import { DB_Request } from '../../Models';
-import { createRequest, getProviderById, getRequests, updateRequest } from '../../Database';
+import { DB_Request, User } from '../../Models';
+import { createRequest, getProviderById, getRequests, getUserByEmail, updateRequest, upsertUser } from '../../Database';
 import { Pool } from 'pg';
 import dotenv from 'dotenv';
+import * as bcrypt from 'bcryptjs';
 
 /**
  * API'S FILE
@@ -125,6 +126,33 @@ router.post("/db/update-request", async (req: Request, res: Response) => {
 
   res.json(rep)
 
+})
+
+router.post("/db/register", async (req: Request, res: Response) => {
+  const request_body = req.body
+
+  const user_check = await getUserByEmail(pool, request_body.email)
+
+  console.log(user_check)
+
+  if(user_check != null){
+    res.json({
+      reply :"User already exists"
+    })
+    return
+  }
+
+  const hash = await bcrypt.hash(request_body.password, 10);
+  
+  const new_user = new User({userid: "", email:request_body.email, hashedpassword: hash, salt: ""})
+  upsertUser(pool, new_user)
+
+  res.status(200).json({ reply: "User created" });
+
+})
+
+router.post("/db/login", async (req: Request, res: Response) => {
+  const request_body = req.body
 })
 
 export default router
