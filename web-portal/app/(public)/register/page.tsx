@@ -17,7 +17,6 @@ export default function RegisterPage() {
       username,
       email,
       password,
-      salt:"",
     });
 
     setResponse(res.reply)

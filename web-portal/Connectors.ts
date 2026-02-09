@@ -36,7 +36,7 @@ export async function verify(userID: string){
 /*Funtions to create/read/update/delete stuff from the SQL database */
 
 /**create new account (db/register)*/
-export async function register(payload :{username: string, email: string, password: string, salt: string}){
+export async function register(payload :{username: string, email: string, password: string}){
 
   const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/db/register", {
     method: "POST",
@@ -53,7 +53,7 @@ export async function register(payload :{username: string, email: string, passwo
 }
 
 /**check credentials (db/login)*/
-export async function login(payload: {username: string,  hash: string}){
+export async function login(payload: {email: string,  password: string}){
 
   const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/db/login", {
     method: "POST",

@@ -42,7 +42,7 @@ router.post('/net/upload', async (req: Request, res: Response) => {
   //Here probably mark the user as synced or fully registred in the network in the database?
 
   res.json({
-    reply: `User data processed and forwarded to the network`
+    reply: `User data forwarded to the network`
   })
 
 })
@@ -144,7 +144,7 @@ router.post("/db/register", async (req: Request, res: Response) => {
 
   const hash = await bcrypt.hash(request_body.password, 10);
   
-  const new_user = new User({userid: "", email:request_body.email, hashedpassword: hash, salt: ""})
+  const new_user = new User({userid: "", email:request_body.email, hashedpassword: hash})
   upsertUser(pool, new_user)
 
   res.status(200).json({ reply: "User created" });
@@ -153,6 +153,27 @@ router.post("/db/register", async (req: Request, res: Response) => {
 
 router.post("/db/login", async (req: Request, res: Response) => {
   const request_body = req.body
+
+  const user = await getUserByEmail(pool, request_body.email)
+  if(user == null){
+    res.status(404).json({
+      reply: "User not found."
+    })
+    return
+  }
+
+  const check_password = await bcrypt.compare(request_body.password, user.hashedpassword)
+
+  if(check_password){
+    res.status(200).json({
+      reply: "Successfully logged in"
+    })
+  }else{
+    res.status(401).json({
+      reply: "Wrong credentials"
+    })
+  }
+
 })
 
 export default router

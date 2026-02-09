@@ -122,11 +122,11 @@ func ConstantConnection(ctx context.Context, h host.Host, peers []string) {
 		for {
 			select {
 			case <-ctx.Done():
-				fmt.Println("\n⛔ constantConnection stopped by context")
+				fmt.Println("\nconstantConnection stopped by context")
 				return
 			default:
 				conns := h.Network().Conns()
-				fmt.Printf("\r🔌 Active connections: %d", len(conns))
+				fmt.Printf("\r\nActive connections: %d", len(conns))
 				time.Sleep(1 * time.Second)
 			}
 		}
@@ -136,7 +136,7 @@ func ConstantConnection(ctx context.Context, h host.Host, peers []string) {
 	for {
 		select {
 		case <-ctx.Done():
-			fmt.Println("\n⛔ constantConnection stopped by context")
+			fmt.Println("\nconstantConnection stopped by context")
 			return
 		default:
 
