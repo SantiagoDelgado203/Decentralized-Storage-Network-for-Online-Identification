@@ -4,6 +4,7 @@ Reads configuration from environment variables with sensible defaults.
 
 Environment Variables:
   - DSN_PORT: P2P listening port (default: "11111")
+  - DSN_METRICS_PORT: HTTP metrics server port (default: "9090")
   - DSN_NAMESPACE: Custom DHT namespace (default: "dsn")
   - DSN_BOOTSTRAP_PEERS: Comma-separated list of bootstrap multiaddrs
   - DSN_DATA_DIR: Directory for data storage (default: ".")
@@ -19,6 +20,7 @@ import (
 // Config holds all configuration values for the node
 type Config struct {
 	Port              string   // P2P listening port
+	MetricsPort       string   // HTTP metrics server port
 	Namespace         string   // DHT namespace
 	BootstrapPeers    []string // List of bootstrap peer multiaddrs
 	DataDir           string   // Directory for ID.json, Bootstrap.txt, and data
@@ -27,9 +29,10 @@ type Config struct {
 
 // Default configuration values
 const (
-	DefaultPort      = "11111"
-	DefaultNamespace = "dsn"
-	DefaultDataDir   = "."
+	DefaultPort        = "11111"
+	DefaultMetricsPort = "9090"
+	DefaultNamespace   = "dsn"
+	DefaultDataDir     = "."
 )
 
 // Global configuration instance
@@ -43,6 +46,7 @@ func Load() *Config {
 
 	cfg = &Config{
 		Port:              getEnvOrDefault("DSN_PORT", DefaultPort),
+		MetricsPort:       getEnvOrDefault("DSN_METRICS_PORT", DefaultMetricsPort),
 		Namespace:         getEnvOrDefault("DSN_NAMESPACE", DefaultNamespace),
 		BootstrapPeers:    parseCommaSeparated(os.Getenv("DSN_BOOTSTRAP_PEERS")),
 		DataDir:           getEnvOrDefault("DSN_DATA_DIR", DefaultDataDir),

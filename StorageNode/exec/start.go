@@ -10,6 +10,7 @@ The node behavior:
   - Loads configuration from environment variables
   - Starts libp2p node with configured settings
   - Starts PeerManager for connection health monitoring
+  - Starts MetricsServer for HTTP metrics endpoint
   - Sets up stream handlers for custom protocols
 */
 package exec
@@ -30,6 +31,7 @@ func NodeStart() error {
 
 	fmt.Println("🚀 Starting StorageNode...")
 	fmt.Printf("   Port: %s\n", cfg.Port)
+	fmt.Printf("   Metrics Port: %s\n", cfg.MetricsPort)
 	fmt.Printf("   Namespace: %s\n", cfg.Namespace)
 	fmt.Printf("   Data Dir: %s\n", cfg.DataDir)
 
@@ -43,6 +45,12 @@ func NodeStart() error {
 	// Initialize the PeerManager for connection health monitoring
 	peerManager := core.NewPeerManager(h, kadDHT, peers)
 	peerManager.Start()
+
+	// Start metrics server
+	metricsServer := core.NewMetricsServer(h, peerManager, cfg.MetricsPort)
+	if err := metricsServer.Start(); err != nil {
+		fmt.Printf("⚠️  Failed to start metrics server: %v\n", err)
+	}
 
 	// Allow time for initial connections
 	time.Sleep(5 * time.Second)
@@ -61,6 +69,11 @@ func NodeStart() error {
 
 	<-sigChan
 	fmt.Println("\n⛔ Shutting down...")
+
+	// Stop metrics server
+	if err := metricsServer.Stop(); err != nil {
+		fmt.Printf("⚠️  Error stopping metrics server: %v\n", err)
+	}
 
 	// Stop peer manager
 	peerManager.Stop()

@@ -52,14 +52,16 @@ USER storagenode
 
 # Default environment variables
 ENV DSN_PORT=11111
+ENV DSN_METRICS_PORT=9090
 ENV DSN_NAMESPACE=dsn
 ENV DSN_DATA_DIR=/app/data
 # DSN_BOOTSTRAP_PEERS should be set at runtime
 # DSN_ANNOUNCE_ADDRESSES should be set at runtime for Docker
 
-# Expose P2P ports (TCP and QUIC/UDP)
+# Expose P2P ports (TCP and QUIC/UDP) and metrics port
 EXPOSE 11111/tcp
 EXPOSE 11111/udp
+EXPOSE 9090/tcp
 
 # Volume for persistent data (ID.json, Bootstrap.txt)
 VOLUME ["/app/data"]

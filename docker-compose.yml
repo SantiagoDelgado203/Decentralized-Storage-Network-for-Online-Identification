@@ -19,6 +19,7 @@ services:
     container_name: storage-bootstrap
     environment:
       - DSN_PORT=11111
+      - DSN_METRICS_PORT=9090
       - DSN_NAMESPACE=dsn
       - DSN_DATA_DIR=/app/data
     volumes:
@@ -28,8 +29,9 @@ services:
     ports:
       - "11111:11111/tcp"
       - "11111:11111/udp"
+      - "9090:9090"       # Metrics endpoint
     healthcheck:
-      test: ["CMD", "pgrep", "storagenode"]
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:9090/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -44,13 +46,15 @@ services:
       dockerfile: Dockerfile
     environment:
       - DSN_PORT=11111
+      - DSN_METRICS_PORT=9090
       - DSN_NAMESPACE=dsn
       - DSN_DATA_DIR=/app/data
       - DSN_BOOTSTRAP_PEERS=/dns4/storage-bootstrap/tcp/11111/p2p/QmaTPiRLg64y6wwYXybwsQLVUqqzqwpJSNQ8k5T5e6MyAG
     # Each container generates its own unique identity (no shared volume)
     # For persistent identities, use named volumes per node or seed-based IDs
+    # Note: Metrics ports are internal only for worker nodes (not exposed to host)
     healthcheck:
-      test: ["CMD", "pgrep", "storagenode"]
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:9090/health"]
       interval: 30s
       timeout: 10s
       retries: 3
