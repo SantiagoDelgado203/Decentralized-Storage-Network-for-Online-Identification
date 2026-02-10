@@ -33,7 +33,7 @@ router.post('/net/upload', async (req: Request, res: Response) => {
   //dial storage network with new user protocol
   //TODO: replace static node multiaddress to random node from peerlist
   const stream = await node.dialProtocol(
-    multiaddr("/ip4/10.0.0.183/tcp/28528/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7"),
+    multiaddr("/ip4/127.0.0.1/tcp/4001/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7"),
     '/upload/1.0.0'
   )
   stream.send(new TextEncoder().encode(JSON.stringify(payload)))

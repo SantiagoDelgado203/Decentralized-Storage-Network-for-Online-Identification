@@ -205,6 +205,6 @@ func (db *Database) StoreSimple(data SimpleData) error {
 		return fmt.Errorf("failed to store fragment: %v", err)
 	}
 
-	log.Printf("Fragment stored successfully, hash: %s, x: %d", data.Hash)
+	log.Printf("Data stored successfully, hash: %s\n", data.Hash)
 	return nil
 }

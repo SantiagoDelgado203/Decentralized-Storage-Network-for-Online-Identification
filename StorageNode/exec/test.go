@@ -42,8 +42,8 @@ func TestNode(idseed string) (err error) {
 	//Start new node host, specifying constant ID and listening address
 	h, err := libp2p.New(
 		libp2p.Identity(priv),
-		libp2p.ListenAddrStrings("/ip4/10.0.0.183/udp/0/quic-v1"),
-		libp2p.ListenAddrStrings("/ip4/10.0.0.183/tcp/0"),
+		libp2p.ListenAddrStrings("/ip4/127.0.0.1/udp/0/quic-v1"),
+		libp2p.ListenAddrStrings("/ip4/127.0.0.1/tcp/0"),
 		//quic transpot, with tcp+tls as a fallback
 		libp2p.Transport(quic.NewTransport),
 		libp2p.Transport(tcp.NewTCPTransport),

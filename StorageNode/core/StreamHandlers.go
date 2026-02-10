@@ -160,7 +160,7 @@ func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 			Data: base64.StdEncoding.EncodeToString(cipher),
 		}
 
-		fmt.Printf("\nGenerated encrypted data: %s", blob.Data)
+		fmt.Printf("\nGenerated encrypted data: %s\n", blob.Data)
 
 		// Send to Blob storage network
 		if err := sm.StoreSend(context.Background(), GetRandomPeer(sm.h), blob); err != nil {
@@ -179,7 +179,7 @@ func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 				Data: base64.StdEncoding.EncodeToString(share),
 			}
 
-			fmt.Printf("\nKey fragment: %s", fp.Data)
+			fmt.Printf("\nKey fragment: %s\n", fp.Data)
 
 			// Send fragments to storage network
 			if err := sm.StoreSend(context.Background(), GetRandomPeer(sm.h), fp); err != nil {
@@ -224,7 +224,7 @@ func (p *StoreProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 			panic("Error parsing json to object")
 		}
 
-		fmt.Printf("\nI received a data block or key fragment: %s", simpleData.Data)
+		fmt.Printf("\nI received a data block or key fragment: %s\n", simpleData.Data)
 
 		db, err := NewDatabase("mongodb://localhost:27017")
 
