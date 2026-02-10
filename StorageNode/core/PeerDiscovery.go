@@ -3,18 +3,14 @@ By Santiago Delgado, February 2026
 
 PeerDiscovery.go
 
-This file implements automatic peer discovery using DHT random walks
-and connection health monitoring with automatic reconnection.
-
-Task 1: Implement automatic peer discovery using DHT random walks
-Task 2: Add connection health monitoring with automatic reconnection
+This file implements connection health monitoring with automatic reconnection.
+Peer discovery relies on the bootstrap peer list.
 */
 
 package core
 
 import (
 	"context"
-	"crypto/rand"
 	"fmt"
 	"sync"
 	"time"
@@ -26,7 +22,7 @@ import (
 	"github.com/multiformats/go-multiaddr"
 )
 
-// PeerManager handles peer discovery and connection health monitoring
+// PeerManager handles connection health monitoring and automatic reconnection
 type PeerManager struct {
 	host           host.Host
 	dht            *dht.IpfsDHT
@@ -35,15 +31,14 @@ type PeerManager struct {
 	bootstrapPeers []string
 
 	// Connection health tracking
-	peerHealth     map[peer.ID]*PeerHealthInfo
-	healthMu       sync.RWMutex
+	peerHealth map[peer.ID]*PeerHealthInfo
+	healthMu   sync.RWMutex
 
 	// Configuration
-	discoveryInterval     time.Duration
-	healthCheckInterval   time.Duration
-	reconnectInterval     time.Duration
-	maxReconnectAttempts  int
-	minConnections        int
+	healthCheckInterval  time.Duration
+	reconnectInterval    time.Duration
+	maxReconnectAttempts int
+	minConnections       int
 }
 
 // PeerHealthInfo tracks the health status of a peer connection
@@ -70,7 +65,6 @@ const (
 
 // Default configuration values
 const (
-	DefaultDiscoveryInterval    = 30 * time.Second
 	DefaultHealthCheckInterval  = 10 * time.Second
 	DefaultReconnectInterval    = 5 * time.Second
 	DefaultMaxReconnectAttempts = 5
@@ -82,17 +76,16 @@ func NewPeerManager(h host.Host, kadDHT *dht.IpfsDHT, bootstrapPeers []string) *
 	ctx, cancel := context.WithCancel(context.Background())
 
 	pm := &PeerManager{
-		host:                  h,
-		dht:                   kadDHT,
-		ctx:                   ctx,
-		cancel:                cancel,
-		bootstrapPeers:        bootstrapPeers,
-		peerHealth:            make(map[peer.ID]*PeerHealthInfo),
-		discoveryInterval:     DefaultDiscoveryInterval,
-		healthCheckInterval:   DefaultHealthCheckInterval,
-		reconnectInterval:     DefaultReconnectInterval,
-		maxReconnectAttempts:  DefaultMaxReconnectAttempts,
-		minConnections:        DefaultMinConnections,
+		host:                 h,
+		dht:                  kadDHT,
+		ctx:                  ctx,
+		cancel:               cancel,
+		bootstrapPeers:       bootstrapPeers,
+		peerHealth:           make(map[peer.ID]*PeerHealthInfo),
+		healthCheckInterval:  DefaultHealthCheckInterval,
+		reconnectInterval:    DefaultReconnectInterval,
+		maxReconnectAttempts: DefaultMaxReconnectAttempts,
+		minConnections:       DefaultMinConnections,
 	}
 
 	// Set up connection notifier to track peer connections/disconnections
@@ -104,15 +97,12 @@ func NewPeerManager(h host.Host, kadDHT *dht.IpfsDHT, bootstrapPeers []string) *
 	return pm
 }
 
-// Start begins the peer discovery and health monitoring loops
+// Start begins the health monitoring loops
 func (pm *PeerManager) Start() {
 	fmt.Println("🔍 Starting Peer Manager...")
 
 	// Start DHT bootstrap
 	go pm.bootstrapDHT()
-
-	// Start peer discovery loop (random walks)
-	go pm.discoveryLoop()
 
 	// Start connection health monitoring loop
 	go pm.healthMonitorLoop()
@@ -145,136 +135,6 @@ func (pm *PeerManager) bootstrapDHT() {
 	<-pm.dht.RefreshRoutingTable()
 
 	fmt.Printf("✅ DHT bootstrapped. Routing table size: %d\n", pm.dht.RoutingTable().Size())
-}
-
-// discoveryLoop periodically discovers new peers using DHT random walks
-func (pm *PeerManager) discoveryLoop() {
-	ticker := time.NewTicker(pm.discoveryInterval)
-	defer ticker.Stop()
-
-	// Do an initial discovery after a short delay
-	time.Sleep(10 * time.Second)
-	pm.discoverPeers()
-
-	for {
-		select {
-		case <-pm.ctx.Done():
-			fmt.Println("⛔ Peer discovery loop stopped")
-			return
-		case <-ticker.C:
-			pm.discoverPeers()
-		}
-	}
-}
-
-// discoverPeers performs DHT random walks to discover new peers
-func (pm *PeerManager) discoverPeers() {
-	currentConns := len(pm.host.Network().Conns())
-	fmt.Printf("🔍 Discovering peers... (current connections: %d)\n", currentConns)
-
-	// Method 1: Refresh the routing table (triggers DHT walks)
-	<-pm.dht.RefreshRoutingTable()
-
-	// Method 2: Random walk - query DHT for random peer IDs
-	for i := 0; i < 3; i++ {
-		randomPeerID := pm.generateRandomPeerID()
-		if randomPeerID == "" {
-			continue
-		}
-
-		// Use a short timeout for random walks
-		ctx, cancel := context.WithTimeout(pm.ctx, 10*time.Second)
-
-		// FindPeer triggers a DHT lookup which discovers peers along the way
-		_, err := pm.dht.FindPeer(ctx, peer.ID(randomPeerID))
-		cancel()
-
-		// We don't care if we find the random peer - the point is to discover
-		// other peers during the search
-		if err != nil && err.Error() != "routing: not found" {
-			// Only log unexpected errors
-			_ = err // Suppress unused variable warning
-		}
-	}
-
-	// Method 3: Get closest peers to random keys
-	pm.walkToRandomKey()
-
-	// Report discovery results
-	newConns := len(pm.host.Network().Conns())
-	routingTableSize := pm.dht.RoutingTable().Size()
-	fmt.Printf("📊 Discovery complete. Connections: %d → %d, Routing table: %d peers\n",
-		currentConns, newConns, routingTableSize)
-}
-
-// generateRandomPeerID generates a random peer ID for DHT queries
-func (pm *PeerManager) generateRandomPeerID() peer.ID {
-	// Generate 32 random bytes
-	randomBytes := make([]byte, 32)
-	if _, err := rand.Read(randomBytes); err != nil {
-		return ""
-	}
-
-	// Create a peer ID from the random bytes (this won't be a real peer)
-	// but searching for it will help discover real peers
-	return peer.ID(randomBytes)
-}
-
-// walkToRandomKey performs a DHT walk to a random key
-func (pm *PeerManager) walkToRandomKey() {
-	// Generate random key
-	randomKey := make([]byte, 32)
-	if _, err := rand.Read(randomKey); err != nil {
-		return
-	}
-
-	ctx, cancel := context.WithTimeout(pm.ctx, 15*time.Second)
-	defer cancel()
-
-	// GetClosestPeers walks the DHT to find peers closest to a key
-	closestPeers, err := pm.dht.GetClosestPeers(ctx, string(randomKey))
-	if err != nil {
-		return
-	}
-
-	// Process discovered peers
-	discoveredCount := len(closestPeers)
-	for _, discoveredPeerID := range closestPeers {
-		// Try to connect to newly discovered peers
-		if pm.host.Network().Connectedness(discoveredPeerID) != network.Connected {
-			go pm.tryConnectPeer(discoveredPeerID)
-		}
-	}
-
-	if discoveredCount > 0 {
-		fmt.Printf("🔗 Random walk discovered %d peers\n", discoveredCount)
-	}
-}
-
-// tryConnectPeer attempts to connect to a peer
-func (pm *PeerManager) tryConnectPeer(peerID peer.ID) {
-	// Skip if already connected
-	if pm.host.Network().Connectedness(peerID) == network.Connected {
-		return
-	}
-
-	// Get peer addresses from peerstore
-	addrs := pm.host.Peerstore().Addrs(peerID)
-	if len(addrs) == 0 {
-		return
-	}
-
-	ctx, cancel := context.WithTimeout(pm.ctx, 10*time.Second)
-	defer cancel()
-
-	addrInfo := peer.AddrInfo{
-		ID:    peerID,
-		Addrs: addrs,
-	}
-
-	if err := pm.host.Connect(ctx, addrInfo); err != nil {
-		pm.recordFailedConnection(peerID)
-	}
 }
 
 // healthMonitorLoop periodically checks the health of peer connections
