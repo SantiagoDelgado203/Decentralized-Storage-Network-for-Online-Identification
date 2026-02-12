@@ -51,6 +51,7 @@ func HandlersInit(h host.Host) *StreamsMaster {
 		&PrintProtocol{},
 		&UploadProtocol{},
 		&StoreProtocol{},
+		&ResourceProtocol{},
 		// &OtherProtocol{},
 	}
 
@@ -230,7 +231,7 @@ func (p *StoreProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 
 		err = db.StoreSimple(simpleData)
 		if err != nil {
-			fmt.Printf("Error storing data: %s", err)
+			panic(err)
 		}
 
 	}
@@ -255,4 +256,122 @@ func (sm *StreamsMaster) StoreSend(ctx context.Context, peerID peer.ID, payload 
 	writer.Write(data)
 	writer.WriteString("\n")
 	return writer.Flush()
+}
+
+/*------------------------------------RESOURCE PROTOCOL----------------------------------------------*/
+
+type ResourceProtocol struct{}
+
+const RESOURCE_PROTOCOL = "/resource/1.0.0"
+
+// name getter
+func (p *ResourceProtocol) Name() protocol.ID {
+	return RESOURCE_PROTOCOL
+}
+
+// handler for incoming store protocol dials
+func (p *ResourceProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
+	return func(s network.Stream) {
+		defer s.Close()
+
+		reader := bufio.NewReader(s)
+		raw, err := reader.ReadBytes('\n')
+		if err != nil && err != io.EOF {
+			fmt.Println("Read error:", err)
+			return
+		}
+
+		resource_request := ResourceRequest{}
+		err = json.Unmarshal(raw, &resource_request)
+		if err != nil {
+			panic(err)
+		}
+
+		res_hash := resource_request.Hash
+
+		db, err := NewDatabase("mongodb://localhost:27017")
+		if err != nil {
+			panic(err)
+		}
+		resource, err := db.RetrieveSimpleData(res_hash)
+		if err != nil {
+			panic(err)
+		}
+
+		json_resource, err := json.Marshal(resource)
+
+		writer := bufio.NewWriter(s)
+		writer.Write(json_resource)
+		writer.WriteString("\n")
+		writer.Flush()
+		s.CloseWrite()
+
+	}
+}
+
+func (sm *StreamsMaster) ResourceSend(ctx context.Context, peerID peer.ID, request ResourceRequest) (data any, err error) {
+	// 3. Dial them on the Store Protocol
+	fmt.Println("Test 0")
+	s, err := sm.h.NewStream(ctx, peerID, RESOURCE_PROTOCOL)
+	if err != nil {
+		fmt.Print(err)
+		return nil, err
+	}
+	defer s.Close()
+	fmt.Println("Test 1")
+
+	// 4. Send the JSON
+	payload, err := json.Marshal(request)
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println("Test 2")
+	writer := bufio.NewWriter(s)
+	writer.Write(payload)
+	writer.WriteString("\n") // <-- REQUIRED
+	writer.Flush()           // <-- REQUIRED
+	s.CloseWrite()
+
+	fmt.Println("Test 3")
+	reader := bufio.NewReader(s)
+	resp, err := reader.ReadString('\n')
+	if err != nil {
+		fmt.Println("Error reading response:", err)
+		return
+	}
+	fmt.Println("Test 4")
+
+	fmt.Printf("Resource we got: %s\n", resp)
+
+	return resp, nil
+
+}
+
+/*------------------------------------VERIFICATION PROTOCOL----------------------------------------------*/
+
+type VerificationProtocol struct{}
+
+const VERIFICATION_PROTOCOL = "/verification/1.0.0"
+
+// name getter
+func (p *VerificationProtocol) Name() protocol.ID {
+	return VERIFICATION_PROTOCOL
+}
+
+// handler for incoming store protocol dials
+func (p *VerificationProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
+	return func(s network.Stream) {
+		defer s.Close()
+
+		// reader := bufio.NewReader(s)
+		// raw, err := reader.ReadBytes('\n')
+		// if err != nil && err != io.EOF {
+		// 	fmt.Println("Read error:", err)
+		// 	return
+		// }
+	}
+}
+
+func (sm *StreamsMaster) VerificationSend(ctx context.Context, peerID peer.ID) {
+	return
 }

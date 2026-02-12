@@ -105,7 +105,13 @@ func TestNode(idseed string) (err error) {
 	//allow time for connection
 	time.Sleep(5 * time.Second)
 
-	_ = core.HandlersInit(h)
+	sm := core.HandlersInit(h)
+
+	request := core.ResourceRequest{
+		Hash: "bafkreiaao5wnf7fd3ad7dlfo654biir5xsqr7lbyoooklkdbc577jk4me4",
+	}
+
+	sm.ResourceSend(ctx, h.Network().Peers()[0], request)
 
 	select {}
 

@@ -202,9 +202,31 @@ func (db *Database) StoreSimple(data SimpleData) error {
 
 	_, err := db.main.InsertOne(ctx, data)
 	if err != nil {
-		return fmt.Errorf("failed to store fragment: %v", err)
+		return fmt.Errorf("failed to store data: %v", err)
 	}
 
 	log.Printf("Data stored successfully, hash: %s\n", data.Hash)
 	return nil
+}
+
+func (db *Database) RetrieveSimpleData(hash string) ([]SimpleData, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	cursor, err := db.main.Find(ctx, bson.M{"hash": hash})
+	if err != nil {
+		return nil, fmt.Errorf("failed to query data: %v", err)
+	}
+	defer cursor.Close(ctx)
+
+	var data []SimpleData
+	if err := cursor.All(ctx, &data); err != nil {
+		return nil, fmt.Errorf("failed to decode data: %v", err)
+	}
+
+	if len(data) == 0 {
+		return nil, fmt.Errorf("no data found for hash: %s", hash)
+	}
+
+	return data, nil
 }

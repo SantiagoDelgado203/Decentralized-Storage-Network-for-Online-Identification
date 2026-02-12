@@ -29,10 +29,15 @@ func NodeStart() (err error) {
 	go core.ConstantConnection(ctx, h, peers)
 
 	//allow time for connection
-	time.Sleep(10 * time.Second)
+	time.Sleep(5 * time.Second)
 
 	//Initialize the stream handlers
 	_ = core.HandlersInit(h)
+
+	// db, err := core.NewDatabase("mongodb://localhost:27017")
+	// result, err := db.RetrieveSimpleData("bafkreiaao5wnf7fd3ad7dlfo654biir5xsqr7lbyoooklkdbc577jk4me4")
+
+	// fmt.Println(result[0].Data)
 
 	select {}
 
