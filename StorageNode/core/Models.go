@@ -48,3 +48,7 @@ type SimpleData struct {
 type ResourceRequest struct {
 	Hash string `bson:"hash" json:"hash"`
 }
+
+type VerificationRequest struct {
+	UserID string `json:"userid"`
+}

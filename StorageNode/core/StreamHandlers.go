@@ -298,7 +298,7 @@ func (p *ResourceProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 			panic(err)
 		}
 
-		json_resource, err := json.Marshal(resource)
+		json_resource, err := json.Marshal(resource[0])
 
 		writer := bufio.NewWriter(s)
 		writer.Write(json_resource)
@@ -343,7 +343,16 @@ func (sm *StreamsMaster) ResourceSend(ctx context.Context, peerID peer.ID, reque
 
 	fmt.Printf("Resource we got: %s\n", resp)
 
-	return resp, nil
+	res_json := SimpleData{}
+
+	err = json.Unmarshal([]byte(resp), &res_json)
+	if err != nil {
+		fmt.Println("error unmarshaling", err)
+	}
+
+	fmt.Println("Resource property: ", res_json.Data)
+
+	return res_json, nil
 
 }
 
@@ -363,12 +372,6 @@ func (p *VerificationProtocol) Handler(sm *StreamsMaster) network.StreamHandler 
 	return func(s network.Stream) {
 		defer s.Close()
 
-		// reader := bufio.NewReader(s)
-		// raw, err := reader.ReadBytes('\n')
-		// if err != nil && err != io.EOF {
-		// 	fmt.Println("Read error:", err)
-		// 	return
-		// }
 	}
 }
 
