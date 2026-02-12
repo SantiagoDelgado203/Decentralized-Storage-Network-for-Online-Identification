@@ -6,7 +6,7 @@ const EXPRESS_HOST_ADDRESS = "http://localhost:5000"
 /*------------------------------------NET ENDPOINT-----------------------------------------*/
 /**Funtions to forwards stuff to the network */
 
-export async function sendUserData(user_info: TestUserInfo)
+export async function uploadUserData(user_info: TestUserInfo)
 {
   //package to be sent
   const payload = {
@@ -15,7 +15,7 @@ export async function sendUserData(user_info: TestUserInfo)
     //user information in json string format
     user_data: user_info,
   }
-    const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/net/user-info", {
+    const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/net/upload", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -36,13 +36,37 @@ export async function verify(userID: string){
 /*Funtions to create/read/update/delete stuff from the SQL database */
 
 /**create new account (db/register)*/
-export async function register(username: string, hash: string, salt: string ){
+export async function register(payload :{username: string, email: string, password: string}){
 
-  return
+  const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/db/register", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+  
+  const reply = await res.json();
+
+  return reply
+  
 }
 
 /**check credentials (db/login)*/
-export async function login(username: string,  hash: string){
+export async function login(payload: {email: string,  password: string}){
+
+  const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/db/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+  
+  const reply = await res.json();
+
+  return reply
+
   return
 }
 

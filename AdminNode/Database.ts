@@ -52,6 +52,20 @@ export async function getUserById(pool: Pool, userid: string) {
   return rows[0] ?? null;
 }
 
+export async function getUserByEmail(pool: Pool, email: string) {
+  const { rows } = await pool.query(
+    `
+    SELECT *
+    FROM users
+    WHERE email = $1
+    `,
+    [email]
+  );
+
+  return rows[0] ?? null;
+}
+
+
 
 export async function deleteUser(pool: Pool, userid: string) {
   await pool.query(

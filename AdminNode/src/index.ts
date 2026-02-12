@@ -1,9 +1,11 @@
 import app from './app'
 import { startNode } from './p2p/node'
-import { checkDatabase, createRequest, getRequests, upsertProvider, upsertUser } from '../Database'
 import '../Models'
 import { Pool } from 'pg';
 import dotenv from 'dotenv';
+dotenv.config();
+import { checkDatabase, createRequest, getRequests, upsertProvider, upsertUser } from '../Database'
+import '../Models'
 import { Provider, DB_Request, User } from '../Models';
 import {decryptData, encryptData} from '../SymmetricEncryption'
 
@@ -28,42 +30,9 @@ async function start() {
   await startNode()
 
   app.listen(PORT, () => {
-    console.log(`API running at http://localhost:${PORT}`)
-
-    // const input = "Hello Admin";
-    // const key = Buffer.from("12345678901234567890123456789012"); 
-
-    // const encrypted = encryptData(input, key);
-
-    // console.log("Encrypted output:", encrypted);
-
-    // try {
-    //     const result = decryptData(encrypted, key);
-    //     console.log("Decrypted output:", result);
-    // } catch (err) {
-    //     console.error("Decryption failed:", err);
-    // }
-
+    console.log(`API running at http://localhost:${PORT}`)    
   })
-  // checkDatabase(pool)
-  // const new_user = await upsertUser(pool, new User({
-  //   email: "santiago@test.com", 
-  //   hashedpassword: "secure password 123", 
-  //   salt: "123123"}))
-  // const new_provider = await upsertProvider(pool, new Provider({
-  //   registeredname: "Facebook", 
-  //   hashedpassword: "Password123", 
-  //   salt: "Salt"
-  // }))
-  // const new_request = await createRequest(pool, new Request({
-  //   providerid: new_provider.providerid,
-  //   userid: new_user.userid,
-  //   companyname: new_provider.registeredname,
-  //   datarequests: '{"test":"Hello World!"}',
-  //   status: "Pending"
-  // }))
-  // console.log(new_user, new_provider, new_request)
-  // console.log(await getRequests(pool, {userid: "9a3fc47b-98b2-4d51-bb5e-a4a641812ebb"}))
+
 }
 
 start().catch(err => {
