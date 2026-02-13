@@ -1,3 +1,13 @@
+import { createLibp2p, type Libp2p } from 'libp2p'
+//import { PeerId } from '@libp2p/interface'
+import { tcp } from "@libp2p/tcp";
+import { tls } from '@libp2p/tls';
+import { yamux } from "@chainsafe/libp2p-yamux";
+import { privateKeyFromRaw } from '@libp2p/crypto/keys'
+import { peerIdFromPrivateKey } from '@libp2p/peer-id'
+
+import { multiaddr } from "@multiformats/multiaddr";
+
 /**
  * LIBP2P NODE FILE
  * By Santiago Delgado
@@ -5,73 +15,70 @@
  * 
  * All function regarding node operations
  * May use anotehr file for stream handlers in the future for better organization
- * 
- * 
+ *  
  */
 
-import { createLibp2p, type Libp2p } from 'libp2p'
-import { tcp } from '@libp2p/tcp'
-import { tls } from '@libp2p/tls'
-import { yamux } from '@chainsafe/libp2p-yamux'
-import { multiaddr } from '@multiformats/multiaddr'
-import { getConfig } from '../config.js'
 
 let node: Libp2p | null = null
 
 export async function startNode(): Promise<Libp2p> {
-  if (node) return node
+    if (node) return node
 
-  const config = getConfig()
+    const base64Key = process.env.LIBP2P_PRIVKEY
 
-  node = await createLibp2p({
-    addresses: {
-      listen: [
-        `/ip4/0.0.0.0/tcp/${config.p2pPort}`,
-        `/ip4/0.0.0.0/tcp/${config.p2pWsPort}/ws`,
-      ]
-    },
-    transports: [tcp()],
-    connectionEncrypters: [tls()],
-    streamMuxers: [yamux()],
-  })
-
-  // Print protocol handler
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  node.handle('/print/1.0.0', async (data: any) => {
-    const stream = data.stream
-    console.log('📥 Incoming stream on /print/1.0.0')
-
-    try {
-      // Read data from the stream source
-      for await (const chunk of stream.source) {
-        const message = new TextDecoder().decode(chunk.subarray())
-        console.log('Message received:', message)
-      }
-    } catch (err) {
-      console.error('Stream error:', err)
-    } finally {
-      await stream.close()
+    if (!base64Key) {
+    throw new Error('LIBP2P_PRIVATE_KEY not set')
     }
-  })
+
+    const rawKey = Buffer.from(base64Key, 'base64')
+    const privateKey = privateKeyFromRaw(rawKey)
+    // const peerId = await peerIdFromPrivateKey(privateKey)
+    
+    node = await createLibp2p({
+        privateKey,
+        addresses: {
+        listen: [
+            "/ip4/192.168.126.1/tcp/4001",
+        ]
+        },
+        transports: [tcp()],
+        connectionEncrypters: [tls()],
+        streamMuxers: [yamux()],
+    });
+
+    //print protocol
+    node.handle("/print/1.0.0", ( stream ) => {
+        console.log("📥 Incoming stream on /print/1.0.0");
+
+        stream.addEventListener('message', evt => {
+        console.log(evt.data)
+        stream.send(evt.data)
+        })
+
+        // close the incoming writable end when the remote writable end closes
+        stream.addEventListener('remoteCloseWrite', () => {
+            stream.close()
+        })
+    });
 
   await node.start()
   
   console.log('✅ libp2p node started:', node.peerId.toString())
   console.log('🌐 Listening on:', node.getMultiaddrs().map(String))
 
-  // Connect to bootstrap peers if configured
-  if (config.bootstrapPeers.length > 0) {
-    console.log('📋 Connecting to bootstrap peers...')
-    for (const peerAddr of config.bootstrapPeers) {
-      try {
-        const ma = multiaddr(peerAddr)
-        await node.dial(ma)
-        console.log(`   ✓ Connected to ${peerAddr.substring(0, 50)}...`)
-      } catch (err) {
-        console.log(`   ⚠️ Failed to connect to ${peerAddr.substring(0, 50)}...`)
-      }
-    }
-  }
+  // // Connect to bootstrap peers if configured
+  // if (config.bootstrapPeers.length > 0) {
+  //   console.log('📋 Connecting to bootstrap peers...')
+  //   for (const peerAddr of config.bootstrapPeers) {
+  //     try {
+  //       const ma = multiaddr(peerAddr)
+  //       await node.dial(ma)
+  //       console.log(`   ✓ Connected to ${peerAddr.substring(0, 50)}...`)
+  //     } catch (err) {
+  //       console.log(`   ⚠️ Failed to connect to ${peerAddr.substring(0, 50)}...`)
+  //     }
+  //   }
+  // }
 
   return node
 }

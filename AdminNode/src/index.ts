@@ -1,3 +1,31 @@
+import app from './app'
+import { startNode } from './p2p/node'
+import '../Models'
+import { Pool } from 'pg';
+import dotenv from 'dotenv';
+dotenv.config();
+import { checkDatabase, createRequest, getRequests, upsertProvider, upsertUser } from '../Database'
+import '../Models'
+import { Provider, DB_Request, User } from '../Models';
+import {decryptData, encryptData} from '../SymmetricEncryption'
+
+/*STARTUP FILE
+* By Santiago Delgado
+* 
+* This file is the one that will execute
+* This file should have the node's main logic
+*/
+
+dotenv.config();
+const pool = new Pool({
+    user: process.env.PG_USER,
+    host: process.env.PG_HOST,
+    database: process.env.PG_DATABASE,
+    password: process.env.PG_PASSWORD,
+    port: parseInt(process.env.PG_PORT || '5432'),
+});
+
+const PORT = 5000
 /**
  * STARTUP FILE
  * By Santiago Delgado
@@ -6,9 +34,6 @@
  * Main entry point for AdminNode
  * Starts the libp2p node and Express API server
  */
-
-import app from './app.js'
-import { startNode } from './p2p/node.js'
 import { getConfig } from './config.js'
 
 async function start() {

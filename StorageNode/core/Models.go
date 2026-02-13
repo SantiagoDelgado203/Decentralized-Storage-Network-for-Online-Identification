@@ -36,3 +36,11 @@ type NodeMetadata struct {
 	StorageUsed int64              `bson:"storage_used" json:"storage_used"` // bytes
 	LastPing    time.Time          `bson:"last_ping" json:"last_ping"`
 }
+
+type SimpleData struct {
+	ID        primitive.ObjectID `bson:"_id,omitempty" json:"id"`
+	Hash      string             `bson:"hash" json:"hash"`
+	Data      string             `bson:"cipher" json:"data"`
+	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
+	UpdatedAt time.Time          `bson:"updated_at" json:"updated_at"`
+}

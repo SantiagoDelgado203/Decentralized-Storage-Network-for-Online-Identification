@@ -16,6 +16,9 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
+
+	"fmt"
+	// "github.com/libp2p/go-libp2p-record"
 )
 
 // TestNode starts a test node with a deterministic peer ID from a seed

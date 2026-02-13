@@ -12,8 +12,11 @@ package core
 import (
 	"bufio"
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"io"
+	"strconv"
 	"time"
 
 	"github.com/libp2p/go-libp2p/core/host"
@@ -131,34 +134,59 @@ func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 	return func(s network.Stream) {
 		defer s.Close()
 
-		//SYED
+		// 1. Read Payload
+		reader := bufio.NewReader(s)
+		raw, err := reader.ReadBytes('\n')
+		if err != nil && err != io.EOF {
+			fmt.Println("Read error:", err)
+			return
+		}
 
-		// read payload (plain json string)
-		// reader := bufio.NewReader(s)
-		// msg, err := reader.ReadString('\n')
-		// if err != nil && err != io.EOF {
-		// 	fmt.Println("Error reading:", err)
-		// 	return
-		// }
+		fmt.Printf("\nIncoming data: %s", raw)
 
-		// //json object for go
-		// var data Fragment
+		// 3. Encrypt Data
+		cipher, key, err := Encrypt(raw)
+		if err != nil {
+			fmt.Println("Encrypt error:", err)
+			return
+		}
 
-		// //convert from json string to the object
-		// err = json.Unmarshal([]byte(msg), &data)
-		// if err != nil {
-		// 	fmt.Println("error:", err)
-		// 	return
-		// }
+		// 4. Generate Hash
+		cid := CidHash([]byte("1-Santiago-Test")).String()
 
-		// data.Hash
+		// 5. Create Encrypted Data
+		blob := SimpleData{
+			Hash: cid,
+			Data: base64.StdEncoding.EncodeToString(cipher),
+		}
 
-		// fmt.Printf("\nEncrypted data: %s \nKey: %s\n UID: %s\n", data.UserCipher, data.Key, data.UID)
+		fmt.Printf("\nGenerated encrypted data: %s\n", blob.Data)
 
-		//TODO: split key into fragments.
+		// Send to Blob storage network
+		if err := sm.StoreSend(context.Background(), GetRandomPeer(sm.h), blob); err != nil {
+			fmt.Println("Error handling off DataBlock:", err)
+		}
 
-		//TODO: generate hashes from user id and labels. then, distribute user cipher and key fragments to other nodes
+		// 6. Split Key
+		const total = 5
+		const threshold = 3
+		shares := SplitKey(key, total, threshold)
 
+		for i, share := range shares {
+			cid := CidHash([]byte("fragment#" + strconv.Itoa(i))).String()
+			fp := SimpleData{
+				Hash: cid,
+				Data: base64.StdEncoding.EncodeToString(share),
+			}
+
+			fmt.Printf("\nKey fragment: %s\n", fp.Data)
+
+			// Send fragments to storage network
+			if err := sm.StoreSend(context.Background(), GetRandomPeer(sm.h), fp); err != nil {
+				fmt.Printf("Error sending fragment %d: %v\n", i+1, err)
+			}
+		}
+		// fmt.Println("Uploaded Data")
 	}
 }
 
@@ -167,7 +195,7 @@ func (p *StreamsMaster) UploadSend(ctx context.Context, peerID peer.ID) error {
 	return nil
 }
 
-/*------------------------------------STORE  ----------------------------------------------*/
+/*------------------------------------STORE PROTOCOL ----------------------------------------------*/
 
 type StoreProtocol struct{}
 
@@ -182,11 +210,49 @@ func (p *StoreProtocol) Name() protocol.ID {
 func (p *StoreProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 	return func(s network.Stream) {
 		defer s.Close()
-		//Mo: your logic here
+
+		reader := bufio.NewReader(s)
+		raw, err := reader.ReadBytes('\n')
+		if err != nil && err != io.EOF {
+			fmt.Println("Read error:", err)
+			return
+		}
+
+		simpleData := SimpleData{}
+		err = json.Unmarshal(raw, &simpleData)
+		if err != nil {
+			panic("Error parsing json to object")
+		}
+
+		fmt.Printf("\nI received a data block or key fragment: %s\n", simpleData.Data)
+
+		db, err := NewDatabase("mongodb://localhost:27017")
+
+		err = db.StoreSimple(simpleData)
+		if err != nil {
+			fmt.Printf("Error storing data: %s", err)
+		}
+
 	}
 }
 
-// function to use the store protocol
-func (p *StreamsMaster) StoreSend(ctx context.Context, peerID peer.ID) error {
-	return nil
+func (sm *StreamsMaster) StoreSend(ctx context.Context, peerID peer.ID, payload interface{}) error {
+
+	// 3. Dial them on the Store Protocol
+	s, err := sm.h.NewStream(ctx, peerID, STORE_PROTOCOL)
+	if err != nil {
+		return err
+	}
+	defer s.Close()
+
+	// 4. Send the JSON
+	data, err := json.Marshal(payload)
+	if err != nil {
+		return err
+	}
+
+	writer := bufio.NewWriter(s)
+	writer.Write(data)
+	writer.WriteString("\n")
+	return writer.Flush()
 }

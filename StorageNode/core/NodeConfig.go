@@ -40,24 +40,25 @@ func NodeCreate() (context.Context, host.Host, *dht.IpfsDHT, []string) {
 // NodeCreateWithPrivKey starts the p2p node with a provided private key
 // Used for test nodes with deterministic peer IDs
 func NodeCreateWithPrivKey(priv crypto.PrivKey, customNamespace string) (context.Context, host.Host, *dht.IpfsDHT, []string) {
-	cfg := config.Get()
+	// cfg := config.Get()
 
 	// Create context
 	ctx := context.Background()
 
-	port := cfg.Port
+	// port := cfg.Port
 
-	// Build listen addresses
-	listenAddrs := []string{
-		fmt.Sprintf("/ip4/0.0.0.0/udp/%s/quic-v1", port),
-		fmt.Sprintf("/ip4/0.0.0.0/tcp/%s", port),
-	}
+	// // Build listen addresses
+	// listenAddrs := []string{
+	// 	fmt.Sprintf("/ip4/0.0.0.0/udp/%s/quic-v1", port),
+	// 	fmt.Sprintf("/ip4/0.0.0.0/tcp/%s", port),
+	// }
 
 	// Build libp2p options
 	opts := []libp2p.Option{
 		libp2p.Identity(priv),
-		libp2p.ListenAddrStrings(listenAddrs...),
-		// QUIC transport with TCP+TLS as fallback
+		libp2p.ListenAddrStrings("/ip4/127.0.0.1/udp/4001/quic-v1"),
+		libp2p.ListenAddrStrings("/ip4/127.0.0.1/tcp/4001"),
+		//quic transpot, with tcp+tls as a fallback
 		libp2p.Transport(quic.NewTransport),
 		libp2p.Transport(tcp.NewTCPTransport),
 		libp2p.Security(tls.ID, tls.New),
@@ -80,6 +81,8 @@ func NodeCreateWithPrivKey(priv crypto.PrivKey, customNamespace string) (context
 			}))
 		}
 	}
+	//get bootstrap peers from file
+	bootstrapPeers := ReadBootstrapPeers()
 
 	// Start new node host
 	h, err := libp2p.New(opts...)
@@ -117,7 +120,7 @@ func NodeCreateWithPrivKey(priv crypto.PrivKey, customNamespace string) (context
 	// Add self to bootstrap file (for local development)
 	if len(h.Addrs()) > 0 {
 		selfAddr := fmt.Sprintf("%s/p2p/%s", h.Addrs()[0].String(), h.ID().String())
-		addPeerToBootstrap(selfAddr)
+		AddPeerToBootstrap(selfAddr)
 	}
 
 	return ctx, h, kadDHT, bootstrapPeers

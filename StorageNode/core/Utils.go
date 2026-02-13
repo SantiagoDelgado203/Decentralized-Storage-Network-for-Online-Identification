@@ -2,7 +2,7 @@
 By Santiago Delgado, December 2025
 Updated: January 2026
 
-Utils.go
+# Utils.go
 
 This file defines utility functions used throughout the node.
 Updated to use configuration module for file paths.
@@ -16,6 +16,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
 	"time"
@@ -100,7 +101,7 @@ func readBootstrapPeers() []string {
 }
 
 // addPeerToBootstrap adds a peer address to the bootstrap file if not already present
-func addPeerToBootstrap(addr string) {
+func AddPeerToBootstrap(addr string) {
 	cfg := config.Get()
 	bootstrapFile := cfg.BootstrapFilePath()
 
@@ -183,4 +184,22 @@ func ConstantConnection(ctx context.Context, h host.Host, peers []string) {
 			time.Sleep(1 * time.Second)
 		}
 	}
+}
+
+func GetRandomPeer(h host.Host) peer.ID {
+	// Get peers
+	peers := h.Network().Peers()
+	if len(peers) == 0 {
+		fmt.Println("no peers connected to receive data")
+	}
+
+	admin, err := peer.AddrInfoFromString("/ip4/192.168.126.1/tcp/4001/p2p/12D3KooWA1eWrMTkfawiShux6WrxzFbRdyDsk5NAyL5indcWCtEG")
+	if err != nil {
+		panic("Error getting admin node")
+	}
+	selected := peers[rand.Intn(len(peers))]
+	if selected == admin.ID {
+		return GetRandomPeer(h)
+	}
+	return selected
 }
