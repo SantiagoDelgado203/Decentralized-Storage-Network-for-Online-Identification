@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from 'express'
 import { multiaddr } from "@multiformats/multiaddr";
-import { getNode } from '../p2p/node'
+import { getNode, getConnectionInfo } from '../p2p/node'
 import { DB_Request, User } from '../../Models';
 import { createRequest, getProviderById, getRequests, getUserByEmail, updateRequest, upsertUser } from '../../Database';
 import { Pool } from 'pg';
@@ -37,8 +37,8 @@ router.get('/test', async (req, res) => {
 
 router.post('/net/upload', async (req: Request, res: Response) => {
 
-    const node = getNode()
-    const in_payload = req.body
+  const node = getNode()
+  const payload = req.body
 
   //dial storage network with new user protocol
   //TODO: replace static node multiaddress to random node from peerlist
@@ -56,7 +56,6 @@ router.post('/net/upload', async (req: Request, res: Response) => {
   })
 
 })
-
 
 
 // Legacy test endpoint (for backwards compatibility)
