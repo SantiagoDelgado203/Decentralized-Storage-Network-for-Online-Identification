@@ -33,3 +33,8 @@ export type UserInfo = {
     DOB: DOB,
     Address: string
 }
+
+export type UploadRequest = {
+    UserID: string,
+    Data: UserInfo
+}

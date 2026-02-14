@@ -1,4 +1,4 @@
-import { Criteria, TestUserInfo } from "./Models";
+import { Criteria, TestUserInfo, UploadRequest } from "./Models";
 
 const EXPRESS_HOST_ADDRESS = "http://localhost:5000"
 
@@ -6,25 +6,18 @@ const EXPRESS_HOST_ADDRESS = "http://localhost:5000"
 /*------------------------------------NET ENDPOINT-----------------------------------------*/
 /**Funtions to forwards stuff to the network */
 
-export async function uploadUserData(user_info: TestUserInfo)
+export async function uploadUserData(payload: UploadRequest)
 {
-  //package to be sent
-  const payload = {
-    //user identifier
-    UID: "1",
-    //user information in json string format
-    user_data: user_info,
-  }
-    const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/net/upload", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
+  const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/net/upload", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
 
-    const data = await res.json();
-    return data.reply
+  const data = await res.json();
+  return data.reply
 }
 
 // for user use (example, user has accepted verification)

@@ -50,5 +50,22 @@ type ResourceRequest struct {
 }
 
 type VerificationRequest struct {
-	UserID string `json:"userid"`
+	UserID   string   `json:"userid"`
+	Criteria Criteria `json:"criteria"`
+}
+
+type Rule struct {
+	Field string
+	Type  string
+	Value any
+}
+
+type Criteria struct {
+	All []Rule
+	Any []Rule
+}
+
+type UploadRequest struct {
+	UserID string         `json:"userid"`
+	Data   map[string]any `json:"data"`
 }

@@ -57,7 +57,7 @@ func TestNode(idseed string) (err error) {
 	bootstrapPeers := core.ReadBootstrapPeers()
 
 	//create DHT
-	_, err = dht.New(
+	dht, err := dht.New(
 		ctx,
 		h,
 		//IMPORTANT! Use ModeAutoServer. Will function as Server by defaul, allowing to receive and send requests/responses
@@ -102,16 +102,27 @@ func TestNode(idseed string) (err error) {
 	//connects to peers indefinitely
 	go core.ConstantConnection(ctx, h, bootstrapPeers)
 
+	sm := core.HandlersInit(ctx, h, dht)
 	//allow time for connection
 	time.Sleep(5 * time.Second)
 
-	sm := core.HandlersInit(h)
+	// request := core.ResourceRequest{
+	// 	Hash: "bafkreiaao5wnf7fd3ad7dlfo654biir5xsqr7lbyoooklkdbc577jk4me4",
+	// }
 
-	request := core.ResourceRequest{
-		Hash: "bafkreiaao5wnf7fd3ad7dlfo654biir5xsqr7lbyoooklkdbc577jk4me4",
+	// sm.ResourceSend(ctx, h.Network().Peers()[0], request)
+
+	time.Sleep(15 * time.Second)
+
+	verification := core.VerificationRequest{
+		UserID: "9a3fc47b-98b2-4d51-bb5e-a4a641812ebb",
+		Criteria: core.Criteria{
+			All: nil,
+			Any: nil,
+		},
 	}
 
-	sm.ResourceSend(ctx, h.Network().Peers()[0], request)
+	sm.VerificationSend(ctx, h.Network().Peers()[0], verification)
 
 	select {}
 

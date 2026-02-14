@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { uploadUserData } from "@/Connectors";
-import { TestUserInfo } from "@/Models";
+import { TestUserInfo, UploadRequest, UserInfo } from "@/Models";
 
 export default function Home() {
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
+  const [gender, setGender] = useState("")
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");
   const [day, setDay] = useState("");
@@ -14,8 +15,9 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
 
   const sendUserData = async () => {
-    const payload: TestUserInfo = {
+    const user_info: UserInfo = {
       Name: name,
+      Gender: gender,
       Address: address,
       DOB: {
         year: Number(year),
@@ -23,6 +25,11 @@ export default function Home() {
         day: Number(day),
       },
     };
+
+    const payload: UploadRequest = {
+      UserID: "9a3fc47b-98b2-4d51-bb5e-a4a641812ebb",
+      Data: user_info
+    }
 
     try {
       setLoading(true);
@@ -56,6 +63,26 @@ export default function Home() {
               onChange={(e) => setName(e.target.value)}
               placeholder="Santiago Delgado"
             />
+          </div>
+
+          {/* Gender */}
+          <div>
+            <label className="block text-sm text-neutral-400 mb-1">
+              Gender
+            </label>
+            <select
+              className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-2 text-neutral-100
+                        focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30"
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+            >
+              <option value="" disabled>
+                Select gender
+              </option>
+              <option value="M">Male</option>
+              <option value="F">Female</option>
+              <option value="X">Nonbinary</option>
+            </select>
           </div>
 
           {/* Address */}

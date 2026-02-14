@@ -23,7 +23,7 @@ import (
 func NodeStart() (err error) {
 
 	//Start the node
-	ctx, h, _, peers := core.NodeCreate(core.ReadPrivateKeyFromFile("ID.json"), "myapp")
+	ctx, h, dht, peers := core.NodeCreate(core.ReadPrivateKeyFromFile("ID.json"), "myapp")
 
 	//connects to peers indefinitely
 	go core.ConstantConnection(ctx, h, peers)
@@ -32,7 +32,7 @@ func NodeStart() (err error) {
 	time.Sleep(5 * time.Second)
 
 	//Initialize the stream handlers
-	_ = core.HandlersInit(h)
+	_ = core.HandlersInit(ctx, h, dht)
 
 	// db, err := core.NewDatabase("mongodb://localhost:27017")
 	// result, err := db.RetrieveSimpleData("bafkreiaao5wnf7fd3ad7dlfo654biir5xsqr7lbyoooklkdbc577jk4me4")

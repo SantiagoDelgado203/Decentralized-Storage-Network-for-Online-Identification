@@ -16,9 +16,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"strconv"
 	"time"
 
+	"github.com/ipfs/go-cid"
+	dht "github.com/libp2p/go-libp2p-kad-dht"
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/network"
 	"github.com/libp2p/go-libp2p/core/peer"
@@ -36,14 +37,18 @@ type Protocol interface {
 // main object to use protocols
 type StreamsMaster struct {
 	h         host.Host
+	dht       *dht.IpfsDHT
+	ctx       context.Context
 	protocols []Protocol
 }
 
 // Function to initialize stream master and set all handlers
-func HandlersInit(h host.Host) *StreamsMaster {
+func HandlersInit(ctx context.Context, h host.Host, dht *dht.IpfsDHT) *StreamsMaster {
 	//create new stream master
 	sm := &StreamsMaster{
-		h: h,
+		h:   h,
+		dht: dht,
+		ctx: ctx,
 	}
 
 	//include all protocols
@@ -52,6 +57,7 @@ func HandlersInit(h host.Host) *StreamsMaster {
 		&UploadProtocol{},
 		&StoreProtocol{},
 		&ResourceProtocol{},
+		&VerificationProtocol{},
 		// &OtherProtocol{},
 	}
 
@@ -135,7 +141,6 @@ func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 	return func(s network.Stream) {
 		defer s.Close()
 
-		// 1. Read Payload
 		reader := bufio.NewReader(s)
 		raw, err := reader.ReadBytes('\n')
 		if err != nil && err != io.EOF {
@@ -145,17 +150,25 @@ func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 
 		fmt.Printf("\nIncoming data: %s", raw)
 
-		// 3. Encrypt Data
-		cipher, key, err := Encrypt(raw)
+		uploaded := UploadRequest{}
+
+		err = json.Unmarshal(raw, &uploaded)
+		if err != nil {
+			fmt.Println("Error unmarshaling upload")
+		}
+
+		data, err := json.Marshal(uploaded.Data)
+
+		cipher, key, err := Encrypt([]byte(data))
 		if err != nil {
 			fmt.Println("Encrypt error:", err)
 			return
 		}
 
-		// 4. Generate Hash
-		cid := CidHash([]byte("1-Santiago-Test")).String()
+		fmt.Println("Generated key: ", key)
 
-		// 5. Create Encrypted Data
+		cid := DataHash(uploaded.UserID).String()
+
 		blob := SimpleData{
 			Hash: cid,
 			Data: base64.StdEncoding.EncodeToString(cipher),
@@ -163,18 +176,16 @@ func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 
 		fmt.Printf("\nGenerated encrypted data: %s\n", blob.Data)
 
-		// Send to Blob storage network
 		if err := sm.StoreSend(context.Background(), GetRandomPeer(sm.h), blob); err != nil {
 			fmt.Println("Error handling off DataBlock:", err)
 		}
 
-		// 6. Split Key
 		const total = 5
 		const threshold = 3
 		shares := SplitKey(key, total, threshold)
 
 		for i, share := range shares {
-			cid := CidHash([]byte("fragment#" + strconv.Itoa(i))).String()
+			cid := FragmentHash(uploaded.UserID, i).String()
 			fp := SimpleData{
 				Hash: cid,
 				Data: base64.StdEncoding.EncodeToString(share),
@@ -187,7 +198,7 @@ func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 				fmt.Printf("Error sending fragment %d: %v\n", i+1, err)
 			}
 		}
-		// fmt.Println("Uploaded Data")
+		fmt.Println("Uploaded Data")
 	}
 }
 
@@ -234,19 +245,23 @@ func (p *StoreProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 			panic(err)
 		}
 
+		cid, err := cid.Decode(simpleData.Hash)
+		err = DHTProvide(sm.ctx, sm.dht, cid)
+		if err != nil {
+			panic(err)
+		}
+
 	}
 }
 
 func (sm *StreamsMaster) StoreSend(ctx context.Context, peerID peer.ID, payload interface{}) error {
 
-	// 3. Dial them on the Store Protocol
 	s, err := sm.h.NewStream(ctx, peerID, STORE_PROTOCOL)
 	if err != nil {
 		return err
 	}
 	defer s.Close()
 
-	// 4. Send the JSON
 	data, err := json.Marshal(payload)
 	if err != nil {
 		return err
@@ -309,37 +324,30 @@ func (p *ResourceProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 	}
 }
 
-func (sm *StreamsMaster) ResourceSend(ctx context.Context, peerID peer.ID, request ResourceRequest) (data any, err error) {
-	// 3. Dial them on the Store Protocol
-	fmt.Println("Test 0")
+func (sm *StreamsMaster) ResourceSend(ctx context.Context, peerID peer.ID, request ResourceRequest) (data SimpleData, err error) {
 	s, err := sm.h.NewStream(ctx, peerID, RESOURCE_PROTOCOL)
 	if err != nil {
 		fmt.Print(err)
-		return nil, err
+		return SimpleData{}, err
 	}
 	defer s.Close()
-	fmt.Println("Test 1")
 
-	// 4. Send the JSON
 	payload, err := json.Marshal(request)
 	if err != nil {
-		return nil, err
+		return SimpleData{}, err
 	}
-	fmt.Println("Test 2")
 	writer := bufio.NewWriter(s)
 	writer.Write(payload)
-	writer.WriteString("\n") // <-- REQUIRED
-	writer.Flush()           // <-- REQUIRED
+	writer.WriteString("\n")
+	writer.Flush()
 	s.CloseWrite()
 
-	fmt.Println("Test 3")
 	reader := bufio.NewReader(s)
 	resp, err := reader.ReadString('\n')
 	if err != nil {
 		fmt.Println("Error reading response:", err)
 		return
 	}
-	fmt.Println("Test 4")
 
 	fmt.Printf("Resource we got: %s\n", resp)
 
@@ -349,8 +357,6 @@ func (sm *StreamsMaster) ResourceSend(ctx context.Context, peerID peer.ID, reque
 	if err != nil {
 		fmt.Println("error unmarshaling", err)
 	}
-
-	fmt.Println("Resource property: ", res_json.Data)
 
 	return res_json, nil
 
@@ -372,9 +378,136 @@ func (p *VerificationProtocol) Handler(sm *StreamsMaster) network.StreamHandler 
 	return func(s network.Stream) {
 		defer s.Close()
 
+		//get raw input (should be a marshaled VerificationRequest)
+		reader := bufio.NewReader(s)
+		raw, err := reader.ReadBytes('\n')
+		if err != nil && err != io.EOF {
+			fmt.Println("Read error:", err)
+			return
+		}
+		//unmarshal it to an object
+		verification_request := VerificationRequest{}
+		err = json.Unmarshal(raw, &verification_request)
+		if err != nil {
+			fmt.Println(err)
+			panic("")
+		}
+		fmt.Println("Verification request: ", verification_request)
+		//get id and set parameters (in the future these will be gotten from .env or something like that)
+		user_id := verification_request.UserID
+		const SHARES_NUMBER = 5      //example quantity of fragments
+		const REQUIRED_FRAGMENTS = 3 //threshold
+
+		//generate hash for user encrypted data and fragmets
+		data_hash := DataHash(user_id)
+		fragments_hash := []cid.Cid{}
+		for i := range SHARES_NUMBER {
+			fragments_hash = append(fragments_hash, FragmentHash(user_id, i))
+		}
+		fmt.Println("datahash: ", data_hash)
+		fmt.Println("fragments hash: ", fragments_hash)
+		//try to find providers for the encrypted data
+		data_providers, err := DHTGetProviders(sm.ctx, sm.dht, data_hash)
+		if len(data_providers) == 0 {
+			panic("NO ENCRYPTED DATA PROVIDERS FOUND")
+		}
+		fmt.Println("data providers: ", data_providers)
+		//if providers found, then ask for it until found
+		//MAYBE: for the future, use go routines for parallel execution. might be faster!
+		var user_data SimpleData
+
+		for _, provider := range data_providers {
+			fetch, err := sm.ResourceSend(sm.ctx, provider.ID, ResourceRequest{Hash: data_hash.String()})
+			if err == nil {
+				user_data = fetch
+				break
+
+			}
+		}
+
+		if user_data == (SimpleData{}) {
+			panic("USER DATA NOT FOUND")
+		}
+
+		//look for key fragments providers
+		key_fragments_providers := [][]peer.AddrInfo{}
+
+		for _, hash := range fragments_hash {
+			fetch, err := DHTGetProviders(sm.ctx, sm.dht, hash)
+			if err == nil {
+				key_fragments_providers = append(key_fragments_providers, fetch)
+			}
+		}
+
+		if len(key_fragments_providers) == 0 {
+			panic("NO KEY FRAGMENTS PROVIDERS FOUND")
+		}
+
+		//ask for the fragments to the providers
+		var key_fragments []SimpleData
+
+		for i, fragment := range key_fragments_providers {
+			for _, provider := range fragment {
+				fetch, err := sm.ResourceSend(sm.ctx, provider.ID, ResourceRequest{Hash: fragments_hash[i].String()})
+				if err == nil {
+					key_fragments = append(key_fragments, fetch)
+					break
+				}
+			}
+		}
+
+		if len(key_fragments) == REQUIRED_FRAGMENTS {
+			panic("NOT ENOUGH FRAGMENTS FOR KEY RECOVERY")
+		}
+
+		//if enough fragments, get the fragments values
+		var fragments_values []string
+		for _, fragment := range key_fragments {
+			fragments_values = append(fragments_values, fragment.Data)
+		}
+
+		//recover the key from fragments
+		var shares [][]byte
+		for _, share := range fragments_values {
+			str, _ := base64.StdEncoding.DecodeString(share)
+			shares = append(shares, str)
+		}
+		key := ReconstructKey(shares)
+		fmt.Println("Reconstructed key:", []byte(key))
+		//decrypt data
+		cipher, err := base64.StdEncoding.DecodeString(user_data.Data)
+		decrypted_data, err := Decrypt([]byte(key), cipher)
+		if err != nil {
+			fmt.Println("Something went wrong with decryption: ", err)
+			panic("")
+		}
+
+		fmt.Println(string(decrypted_data))
+
+		fmt.Println("So far so good!!")
+
+		//TODO: check if the shit you just wrote works. Then, unmarshal it to json and start the actual verification
+
 	}
 }
 
-func (sm *StreamsMaster) VerificationSend(ctx context.Context, peerID peer.ID) {
-	return
+// May be not needed. Admin Node is the only one that should be sending verification requests
+func (sm *StreamsMaster) VerificationSend(ctx context.Context, peerID peer.ID, request VerificationRequest) error {
+	s, err := sm.h.NewStream(ctx, peerID, VERIFICATION_PROTOCOL)
+	if err != nil {
+		fmt.Print(err)
+		return err
+	}
+	defer s.Close()
+
+	payload, err := json.Marshal(request)
+	if err != nil {
+		return err
+	}
+	writer := bufio.NewWriter(s)
+	writer.Write(payload)
+	writer.WriteString("\n")
+	writer.Flush()
+	s.CloseWrite()
+	return nil
 }
