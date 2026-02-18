@@ -3,12 +3,24 @@
 # =============================================================================
 # Usage:
 #   docker-compose up -d              # Start all services
-#   docker-compose up -d --scale storage-node=3   # Start with 3 worker nodes
 #   docker-compose logs -f            # View logs
 #   docker-compose down               # Stop all services
 # =============================================================================
 
 services:
+  # ===========================================================================
+  # MongoDB - Storage for key fragments and user data
+  # ===========================================================================
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+    networks:
+      - dsn-network
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    restart: unless-stopped
   # ===========================================================================
   # Bootstrap Node - The first node that others connect to
   # ===========================================================================
@@ -36,19 +48,68 @@ services:
     restart: unless-stopped
 
   # ===========================================================================
-  # Storage Worker Nodes - Connect to bootstrap, can be scaled
+  # Storage Worker Nodes - Static peer IDs using DSN_NODE_SEED
   # ===========================================================================
-  storage-node:
+  storage-node-1:
     build:
       context: ./StorageNode
       dockerfile: Dockerfile
+    container_name: storage-node-1
     environment:
       - DSN_PORT=11111
       - DSN_NAMESPACE=dsn
       - DSN_DATA_DIR=/app/data
       - DSN_BOOTSTRAP_PEERS=/dns4/storage-bootstrap/tcp/11111/p2p/QmaTPiRLg64y6wwYXybwsQLVUqqzqwpJSNQ8k5T5e6MyAG
-    # Each container generates its own unique identity (no shared volume)
-    # For persistent identities, use named volumes per node or seed-based IDs
+      - DSN_NODE_SEED=storage-node-1
+      - MONGO_URI=mongodb://mongodb:27017
+    healthcheck:
+      test: ["CMD", "pgrep", "storagenode"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - dsn-network
+    depends_on:
+      storage-bootstrap:
+        condition: service_healthy
+    restart: unless-stopped
+
+  storage-node-2:
+    build:
+      context: ./StorageNode
+      dockerfile: Dockerfile
+    container_name: storage-node-2
+    environment:
+      - DSN_PORT=11111
+      - DSN_NAMESPACE=dsn
+      - DSN_DATA_DIR=/app/data
+      - DSN_BOOTSTRAP_PEERS=/dns4/storage-bootstrap/tcp/11111/p2p/QmaTPiRLg64y6wwYXybwsQLVUqqzqwpJSNQ8k5T5e6MyAG
+      - DSN_NODE_SEED=storage-node-2
+      - MONGO_URI=mongodb://mongodb:27017
+    healthcheck:
+      test: ["CMD", "pgrep", "storagenode"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - dsn-network
+    depends_on:
+      storage-bootstrap:
+        condition: service_healthy
+    restart: unless-stopped
+
+  storage-node-3:
+    build:
+      context: ./StorageNode
+      dockerfile: Dockerfile
+    container_name: storage-node-3
+    environment:
+      - DSN_PORT=11111
+      - DSN_NAMESPACE=dsn
+      - DSN_DATA_DIR=/app/data
+      - DSN_BOOTSTRAP_PEERS=/dns4/storage-bootstrap/tcp/11111/p2p/QmaTPiRLg64y6wwYXybwsQLVUqqzqwpJSNQ8k5T5e6MyAG
+      - DSN_NODE_SEED=storage-node-3
+      - MONGO_URI=mongodb://mongodb:27017
     healthcheck:
       test: ["CMD", "pgrep", "storagenode"]
       interval: 30s
@@ -119,5 +180,7 @@ networks:
     driver: bridge
 
 # =============================================================================
-# Volumes (bootstrap identity is mounted read-only from ./bootstrap-identity)
+# Volumes
 # =============================================================================
+volumes:
+  mongodb_data:

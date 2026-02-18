@@ -16,6 +16,7 @@ import (
 	"path/filepath"
 
 	"node/config"
+	"node/core"
 
 	"github.com/libp2p/go-libp2p/core/crypto"
 	"github.com/libp2p/go-libp2p/core/peer"
@@ -84,12 +85,24 @@ func ensureIdentity(cfg *config.Config) error {
 		return nil
 	}
 
-	fmt.Println("   Generating new identity...")
+	var priv crypto.PrivKey
+	var pub crypto.PubKey
+	var err error
 
-	// Generate new RSA keypair (2048 bits for compatibility)
-	priv, pub, err := crypto.GenerateKeyPairWithReader(crypto.RSA, 2048, rand.Reader)
-	if err != nil {
-		return fmt.Errorf("failed to generate keypair: %w", err)
+	// Use seed for deterministic peer ID if provided via DSN_NODE_SEED
+	if seed := os.Getenv("DSN_NODE_SEED"); seed != "" {
+		fmt.Printf("   Generating deterministic identity from seed: %s\n", seed)
+		priv, err = core.PrivKeyFromSeed(seed)
+		if err != nil {
+			return fmt.Errorf("failed to generate key from seed: %w", err)
+		}
+		pub = priv.GetPublic()
+	} else {
+		fmt.Println("   Generating new random identity...")
+		priv, pub, err = crypto.GenerateKeyPairWithReader(crypto.RSA, 2048, rand.Reader)
+		if err != nil {
+			return fmt.Errorf("failed to generate keypair: %w", err)
+		}
 	}
 
 	// Marshal keys to bytes

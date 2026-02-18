@@ -16,6 +16,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"os"
 	"strconv"
 	"time"
 
@@ -226,7 +227,11 @@ func (p *StoreProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 
 		fmt.Printf("\nI received a data block or key fragment: %s\n", simpleData.Data)
 
-		db, err := NewDatabase("mongodb://localhost:27017")
+		mongoURI := os.Getenv("MONGO_URI")
+		if mongoURI == "" {
+			mongoURI = "mongodb://localhost:27017"
+		}
+		db, err := NewDatabase(mongoURI)
 
 		err = db.StoreSimple(simpleData)
 		if err != nil {
