@@ -18,7 +18,7 @@ import * as bcrypt from 'bcryptjs';
 
 const router = Router()
 
-dotenv.config();
+dotenv.config({ quiet: true });
 const pool = new Pool({
     user: process.env.PG_USER,
     host: process.env.PG_HOST,

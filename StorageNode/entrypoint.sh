@@ -9,7 +9,7 @@ ID_FILE="$DATA_DIR/ID.json"
 
 # Auto-initialize if identity doesn't exist
 if [ ! -f "$ID_FILE" ]; then
-    echo "🔧 No identity found, initializing..."
+    echo "No identity found, initializing..."
     /app/storagenode init
 fi
 

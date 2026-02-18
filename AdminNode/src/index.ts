@@ -3,7 +3,7 @@ import { startNode } from './p2p/node'
 import '../Models'
 import { Pool } from 'pg';
 import dotenv from 'dotenv';
-dotenv.config();
+dotenv.config({ quiet: true });
 import { checkDatabase, createRequest, getRequests, upsertProvider, upsertUser } from '../Database'
 import '../Models'
 import { Provider, DB_Request, User } from '../Models';

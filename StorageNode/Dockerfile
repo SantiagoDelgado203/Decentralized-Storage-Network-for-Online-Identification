@@ -39,8 +39,9 @@ WORKDIR /app
 # Copy binary from builder
 COPY --from=builder /build/storagenode /app/storagenode
 
-# Copy entrypoint script
+# Copy entrypoint script and fix line endings (Windows CRLF -> Unix LF)
 COPY entrypoint.sh /app/entrypoint.sh
+RUN sed -i 's/\r$//' /app/entrypoint.sh
 
 # Create data directory and set permissions
 RUN mkdir -p /app/data && \

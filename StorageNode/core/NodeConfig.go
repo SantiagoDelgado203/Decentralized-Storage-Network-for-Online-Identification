@@ -40,7 +40,7 @@ func NodeCreate() (context.Context, host.Host, *dht.IpfsDHT, []string) {
 // NodeCreateWithPrivKey starts the p2p node with a provided private key
 // Used for test nodes with deterministic peer IDs
 func NodeCreateWithPrivKey(priv crypto.PrivKey, customNamespace string) (context.Context, host.Host, *dht.IpfsDHT, []string) {
-	// cfg := config.Get()
+	cfg := config.Get()
 
 	// Create context
 	ctx := context.Background()
@@ -81,9 +81,6 @@ func NodeCreateWithPrivKey(priv crypto.PrivKey, customNamespace string) (context
 			}))
 		}
 	}
-	//get bootstrap peers from file
-	bootstrapPeers := ReadBootstrapPeers()
-
 	// Start new node host
 	h, err := libp2p.New(opts...)
 	if err != nil {
@@ -207,7 +204,7 @@ func NodeCreateWithConfig(port string, customNamespace string) (context.Context,
 	// Add self to bootstrap file (for local development)
 	if len(h.Addrs()) > 0 {
 		selfAddr := fmt.Sprintf("%s/p2p/%s", h.Addrs()[0].String(), h.ID().String())
-		addPeerToBootstrap(selfAddr)
+		AddPeerToBootstrap(selfAddr)
 	}
 
 	return ctx, h, kadDHT, bootstrapPeers

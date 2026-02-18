@@ -40,6 +40,10 @@ RUN npm ci --omit=dev && npm cache clean --force
 # Copy source code (using tsx to run TypeScript directly)
 COPY --from=builder /build/src ./src
 COPY --from=builder /build/tsconfig.json ./
+# Copy root-level TypeScript files that src/index.ts imports
+COPY --from=builder /build/Models.ts ./
+COPY --from=builder /build/Database.ts ./
+COPY --from=builder /build/SymmetricEncryption.ts ./
 
 # Install tsx for running TypeScript
 RUN npm install tsx

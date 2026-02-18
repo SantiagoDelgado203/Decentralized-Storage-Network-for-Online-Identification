@@ -3,10 +3,11 @@ import { createLibp2p, type Libp2p } from 'libp2p'
 import { tcp } from "@libp2p/tcp";
 import { tls } from '@libp2p/tls';
 import { yamux } from "@chainsafe/libp2p-yamux";
-import { privateKeyFromRaw } from '@libp2p/crypto/keys'
+import { generateKeyPair, privateKeyFromRaw } from '@libp2p/crypto/keys'
 import { peerIdFromPrivateKey } from '@libp2p/peer-id'
 
 import { multiaddr } from "@multiformats/multiaddr";
+import { getConfig } from '../config.js'
 
 /**
  * LIBP2P NODE FILE
@@ -24,21 +25,18 @@ let node: Libp2p | null = null
 export async function startNode(): Promise<Libp2p> {
     if (node) return node
 
-    const base64Key = process.env.LIBP2P_PRIVKEY
-
-    if (!base64Key) {
-    throw new Error('LIBP2P_PRIVATE_KEY not set')
-    }
-
-    const rawKey = Buffer.from(base64Key, 'base64')
-    const privateKey = privateKeyFromRaw(rawKey)
-    // const peerId = await peerIdFromPrivateKey(privateKey)
+    const config = getConfig()
+    
+    // Generate a new key pair for the node (auto-generated identity for Docker)
+    // If LIBP2P_PRIVKEY is set, could be used for persistent identity in future
+    const privateKey = await generateKeyPair('Ed25519')
+    console.log('🔑 Generated new Ed25519 key pair for AdminNode')
     
     node = await createLibp2p({
         privateKey,
         addresses: {
         listen: [
-            "/ip4/192.168.126.1/tcp/4001",
+            `/ip4/0.0.0.0/tcp/${config.p2pPort}`,
         ]
         },
         transports: [tcp()],
