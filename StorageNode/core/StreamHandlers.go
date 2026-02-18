@@ -486,8 +486,26 @@ func (p *VerificationProtocol) Handler(sm *StreamsMaster) network.StreamHandler 
 
 		fmt.Println("So far so good!!")
 
-		//TODO: check if the shit you just wrote works. Then, unmarshal it to json and start the actual verification
+		criteria := verification_request.Criteria
 
+		var data map[string]any
+
+		err = json.Unmarshal(decrypted_data, &data)
+		if err != nil {
+			fmt.Println("Error unmarshaling data: ", err)
+		}
+
+		verified := VerifyCriteria(data, criteria)
+
+		fmt.Println("Result: ", verified)
+	
+		
+
+		writer := bufio.NewWriter(s)
+		writer.Write(////////////////////)
+		writer.WriteString("\n")
+		writer.Flush()
+		s.CloseWrite()
 	}
 }
 

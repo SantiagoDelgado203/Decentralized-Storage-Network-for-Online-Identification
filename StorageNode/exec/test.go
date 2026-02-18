@@ -117,7 +117,13 @@ func TestNode(idseed string) (err error) {
 	verification := core.VerificationRequest{
 		UserID: "9a3fc47b-98b2-4d51-bb5e-a4a641812ebb",
 		Criteria: core.Criteria{
-			All: nil,
+			All: []core.Rule{
+				{
+					Field: "Name",
+					Type:  "equal",
+					Value: "Santiago",
+				},
+			},
 			Any: nil,
 		},
 	}

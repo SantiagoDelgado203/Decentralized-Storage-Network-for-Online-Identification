@@ -49,3 +49,6 @@
 /ip4/127.0.0.1/tcp/17464/p2p/12D3KooWLsdGetwCmHwNjmf4ZdJR7kV3Kvt7miKQcx7EojA2dCVi
 /ip4/127.0.0.1/tcp/6320/p2p/12D3KooWLsdGetwCmHwNjmf4ZdJR7kV3Kvt7miKQcx7EojA2dCVi
 /ip4/127.0.0.1/tcp/64580/p2p/12D3KooWLsdGetwCmHwNjmf4ZdJR7kV3Kvt7miKQcx7EojA2dCVi
+/ip4/127.0.0.1/tcp/57124/p2p/12D3KooWLsdGetwCmHwNjmf4ZdJR7kV3Kvt7miKQcx7EojA2dCVi
+/ip4/127.0.0.1/tcp/9893/p2p/12D3KooWLsdGetwCmHwNjmf4ZdJR7kV3Kvt7miKQcx7EojA2dCVi
+/ip4/127.0.0.1/tcp/10003/p2p/12D3KooWLsdGetwCmHwNjmf4ZdJR7kV3Kvt7miKQcx7EojA2dCVi
