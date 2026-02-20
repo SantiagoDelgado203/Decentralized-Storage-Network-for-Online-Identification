@@ -1,151 +1,71 @@
-export default function DashboardPage() {
-  const stats = [
-    { label: "Active Nodes", value: "5", sub: "+1 this week" },
-    { label: "Shards Stored", value: "1,284", sub: "last 24h: 96" },
-    { label: "Retrievals", value: "312", sub: "success: 98.7%" },
-    { label: "Avg Latency", value: "142ms", sub: "p95: 320ms" },
+export default function UserDashboard() {
+  const pending = [
+    { id: "REQ-1021", from: "Verifier A", request: "Over 18?", time: "Today 10:24 AM" },
+    { id: "REQ-1022", from: "Verifier B", request: "FAU Student?", time: "Yesterday 6:10 PM" },
   ];
 
-  const recentActivity = [
-    { title: "Shard batch uploaded", time: "2 min ago",detail: "CID: bafy...91a2 • 12 shards" },
-    { title: "Node joined network", time: "18 min ago", detail: "peer: 12D3KooW...X3f" },
-    { title: "Reconstruction request", time: "1 hr ago", detail: "k=3 of n=5 • verified" },
-    { title: "Health check passed", time: "3 hr ago", detail: "all nodes reachable" },
+  const history = [
+    { id: "REQ-0991", request: "Over 21?", result: "Approved", time: "Last week" },
+    { id: "REQ-0977", request: "Address verified?", result: "Denied", time: "2 weeks ago" },
   ];
-
-  const nodes = [
-    { name: "storage-node-1", status: "Healthy", region: "US-East", uptime: "2d 11h" },
-    { name: "storage-node-2", status: "Healthy", region: "US-East", uptime: "1d 04h" },
-    { name: "storage-node-3", status: "Degraded", region: "US-East", uptime: "9h 18m" },
-    { name: "storage-node-4", status: "Healthy", region: "US-East", uptime: "3d 02h" },
-    { name: "storage-node-5", status: "Healthy", region: "US-East", uptime: "7h 55m" },
-  ];
-
-  const badgeClass = (status: string) => {
-    if (status === "Healthy") return "bg-emerald-100 text-emerald-700 border-emerald-200";
-    if (status === "Degraded") return "bg-amber-100 text-amber-700 border-amber-200";
-    return "bg-slate-100 text-slate-700 border-slate-200";
-  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      <div className="mx-auto max-w-6xl px-4 py-10">
-        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
-          <div>
-            <h1 className="text-3xl font-semibold tracking-tight text-slate-900">Network Overview</h1>
-            <p className="mt-1 text-slate-600">Decentralized identity storage • encrypted shards • DHT discovery</p>
-          </div>
+    <div className="mx-auto max-w-6xl px-6 py-10">
+      <h1 className="text-3xl font-semibold text-slate-900">Dashboard</h1>
+      <p className="mt-2 text-slate-600">Review your verification requests and account status.</p>
 
-          <div className="mt-4 flex gap-3 md:mt-0">
-            <button className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50">
-              Export Report
-            </button>
-            <button className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-slate-800">
-              New Upload
-            </button>
+      <div className="mt-8 grid gap-6 md:grid-cols-3">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <h2 className="text-lg font-semibold text-slate-900">Profile</h2>
+          <div className="mt-3 space-y-1 text-sm text-slate-700">
+            <div><span className="text-slate-500">User:</span> Demo User</div>
+            <div><span className="text-slate-500">Status:</span> Active</div>
+            <div><span className="text-slate-500">Last Verification:</span> 2026-02-10</div>
           </div>
         </div>
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((s) => (
-            <div key={s.label} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="text-sm text-slate-600">{s.label}</div>
-              <div className="mt-2 text-3xl font-semibold text-slate-900">{s.value}</div>
-              <div className="mt-2 text-xs text-slate-500">{s.sub}</div>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-8 grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="flex items-center justify-between">
-              <h2 className="text-base font-semibold text-slate-900">Storage Trend</h2>
-              <div className="text-xs text-slate-500">Last 7 days</div>
-            </div>
-
-            <div className="mt-5 h-56 rounded-xl border border-dashed border-slate-300 bg-slate-50/60 p-4">
-              <div className="flex h-full w-full items-center justify-center rounded-lg bg-gradient-to-br from-slate-100 to-white text-sm text-slate-500">
-                Chart Placeholder (UI only)
-              </div>
-            </div>
-
-            <div className="mt-5 grid gap-3 sm:grid-cols-3">
-              <div className="rounded-xl bg-slate-50 p-4">
-                <div className="text-xs text-slate-500">Replication</div>
-                <div className="mt-1 text-lg font-semibold text-slate-900">n=5</div>
-              </div>
-              <div className="rounded-xl bg-slate-50 p-4">
-                <div className="text-xs text-slate-500">Threshold</div>
-                <div className="mt-1 text-lg font-semibold text-slate-900">k=3</div>
-              </div>
-              <div className="rounded-xl bg-slate-50 p-4">
-                <div className="text-xs text-slate-500">Encryption</div>
-                <div className="mt-1 text-lg font-semibold text-slate-900">AES-GCM</div>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="text-base font-semibold text-slate-900">Recent 
-Activity</h2>
-            <div className="mt-4 space-y-4">
-              {recentActivity.map((a) => (
-                <div key={a.title} className="rounded-xl border border-slate-200 p-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="text-sm font-medium text-slate-900">{a.title}</div>
-                    <div className="text-xs text-slate-500">{a.time}</div>
-                  </div>
-                  <div className="mt-2 text-xs text-slate-600">{a.detail}</div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:col-span-2">
+          <h2 className="text-lg font-semibold text-slate-900">Pending Requests</h2>
+          <div className="mt-4 space-y-3">
+            {pending.map((p) => (
+              <div key={p.id} className="flex items-center justify-between rounded-xl border border-slate-200 p-4">
+                <div>
+                  <div className="font-medium text-slate-900">{p.request}</div>
+                  <div className="text-sm text-slate-600">{p.from} • {p.time} • {p.id}</div>
                 </div>
-              ))}
-            </div>
+                <div className="flex gap-2">
+                  <button className="rounded-xl border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50">
+                    Deny
+                  </button>
+                  <button className="rounded-xl bg-slate-900 px-3 py-2 text-sm text-white hover:bg-slate-800">
+                    Accept
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
+          <p className="mt-3 text-xs text-slate-500">
+            *Buttons are UI-only for the demo (no functionality yet).
+          </p>
         </div>
 
-        <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <h2 className="text-base font-semibold text-slate-900">Nodes</h2>
-            <div className="flex gap-2">
-              <div className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600">Search (UI)</div>
-              <button className="rounded-xl bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800">
-                Add Node
-              </button>
-            </div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:col-span-3">
+          <h2 className="text-lg font-semibold text-slate-900">History</h2>
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            {history.map((h) => (
+              <div key={h.id} className="rounded-xl border border-slate-200 p-4">
+                <div className="flex items-center justify-between">
+                  <div className="font-medium text-slate-900">{h.request}</div>
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700">
+                    {h.result}
+                  </span>
+                </div>
+                <div className="mt-1 text-sm text-slate-600">{h.time} • {h.id}</div>
+              </div>
+            ))}
           </div>
-
-          <div className="mt-5 overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="text-xs text-slate-500">
-                <tr className="border-b border-slate-200">
-                  <th className="py-3 pr-4">Name</th>
-                  <th className="py-3 pr-4">Status</th>
-                  <th className="py-3 pr-4">Region</th>
-                  <th className="py-3 pr-4">Uptime</th>
-                </tr>
-              </thead>
-              <tbody>
-                {nodes.map((n) => (
-                  <tr key={n.name} className="border-b border-slate-100">
-                    <td className="py-4 pr-4 font-medium text-slate-900">{n.name}</td>
-                    <td className="py-4 pr-4">
-                      <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-medium ${badgeClass(n.status)}`}>
-                        {n.status}
-                      </span>
-                    </td>
-                    <td className="py-4 pr-4 text-slate-600">{n.region}</td>
-                    <td className="py-4 pr-4 text-slate-600">{n.uptime}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="mt-4 text-xs text-slate-500">* Demo content only 
-— no live data connected.</div>
         </div>
       </div>
     </div>
   );
 }
-
-

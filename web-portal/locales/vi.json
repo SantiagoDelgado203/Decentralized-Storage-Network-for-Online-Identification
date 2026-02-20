@@ -1,0 +1,66 @@
+{
+  "nav": {
+    "about": "Giới thiệu",
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "dashboard": "Bảng điều khiển",
+    "networkDashboard": "Bảng điều khiển mạng"
+  },
+  "home": {
+    "heroTitle": "Mạng Xác Minh Phi Tập Trung",
+    "heroDesc": "Xác minh một lần, mã hóa và phân tán, và thực thi chính sách trên các nút phi tập trung.",
+    "readDocs": "Xem tài liệu",
+    "joinNetwork": "Tham gia mạng",
+    "overviewTitle": "Tổng quan",
+    "overviewBody1": "DIDN cung cấp quy trình xác minh bảo vệ quyền riêng tư: dữ liệu được xác minh một lần và tái sử dụng an toàn.",
+    "overviewBody2": "Các mảnh (shard) được mã hóa được phân tán trên nhiều nút để tăng độ bền và giảm điểm lỗi đơn.",
+    "guaranteesTitle": "Cam kết thiết kế",
+    "guarantees": [
+      "Mã hóa đầu-cuối và kiểm soát truy cập",
+      "Lưu trữ phi tập trung các bằng chứng xác minh",
+      "Khả năng kiểm toán và truy vết",
+      "Tăng độ bền nhờ phân tán"
+    ],
+    "authorityTitle": "Cơ quan đáng tin cậy",
+    "authorityBody1": "Một cơ quan đáng tin cậy xác minh thuộc tính người dùng một lần (ví dụ: tuổi, trạng thái sinh viên).",
+    "authorityBody2": "Kết quả được ký và có thể tái sử dụng mà không lộ dữ liệu cá nhân gốc.",
+    "storageTitle": "Lưu trữ & mã hóa",
+    "storageBody1": "Các bằng chứng xác minh của người dùng được mã hóa và chia thành shard để lưu trữ phân tán.",
+    "storageBody2": "Khôi phục theo ngưỡng và kiểm tra toàn vẹn giúp duy trì quyền riêng tư và độ tin cậy.",
+    "requestsTitle": "Yêu cầu xác minh",
+    "requestCardTitle": "Yêu cầu",
+    "requestCardBody": "Bên xác minh yêu cầu chứng minh một thuộc tính cụ thể mà không cần toàn bộ dữ liệu định danh.",
+    "executionCardTitle": "Thực thi",
+    "executionCardBody": "Các nút kiểm tra quy tắc và bằng chứng mật mã dựa trên các bằng chứng đã lưu trữ.",
+    "responseCardTitle": "Phản hồi",
+    "responseCardBody": "Bên xác minh nhận kết quả có/không (hoặc bằng chứng phù hợp chính sách), không nhận dữ liệu nền.",
+    "trustTitle": "Mô hình tin cậy",
+    "trustBody1": "Cơ quan chỉ được tin cậy cho bước xác minh ban đầu, không phải để truy cập dữ liệu liên tục.",
+    "trustBody2": "Các nút phi tập trung thực thi chính sách, giảm điểm lỗi đơn và tăng tính minh bạch."
+  },
+  "about": {
+    "title": "Giới thiệu DIDN",
+    "body": "DIDN là một dự án môn học nhằm khám phá cơ chế xác minh bảo vệ quyền riêng tư bằng lưu trữ phi tập trung và mật mã ngưỡng. Mục tiêu của chúng tôi là để dữ liệu người dùng được xác minh một lần bởi một cơ quan đáng tin cậy, sau đó được mã hóa và phân tán sang các nút độc lập, để các lần kiểm tra sau chỉ trả về bằng chứng/kết quả phù hợp chính sách mà không làm lộ dữ liệu cá nhân gốc.",
+    "whyTitle": "Vì sao chúng tôi xây dựng",
+    "bullets": [
+      "Giảm xác minh danh tính lặp lại và việc lộ dữ liệu không cần thiết",
+      "Giảm tối đa mức độ tin cậy cần thiết sau bước xác minh ban đầu",
+      "Giữ quyền lưu giữ dữ liệu phi tập trung và có thể kiểm toán"
+    ]
+  },
+  "auth": {
+    "loginTitle": "Đăng nhập",
+    "loginSubtitle": "Chào mừng bạn quay lại cổng DIDN.",
+    "registerTitle": "Đăng ký",
+    "registerSubtitle": "Tạo tài khoản để tham gia mạng lưới.",
+    "name": "Họ tên",
+    "email": "Email",
+    "password": "Mật khẩu",
+    "signIn": "Đăng nhập",
+    "createAccount": "Tạo tài khoản",
+    "noAccount": "Chưa có tài khoản?",
+    "createOne": "Tạo ngay",
+    "haveAccount": "Đã có tài khoản?",
+    "goLogin": "Đăng nhập"
+  }
+}

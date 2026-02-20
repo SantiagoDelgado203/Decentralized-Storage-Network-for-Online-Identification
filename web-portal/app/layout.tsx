@@ -1,5 +1,4 @@
 import "./globals.css";
-
 export const metadata = {
   title: "DIDN Web Portal",
   description: "Decentralized Storage Network for Online Identification",
@@ -11,8 +10,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className="min-h-screen">{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body>
+       {children}
+     </body>
     </html>
   );
 }
