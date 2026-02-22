@@ -40,20 +40,24 @@ router.post('/net/upload', async (req: Request, res: Response) => {
   const node = getNode()
   const payload = req.body
 
-  //dial storage network with new user protocol
-  //TODO: replace static node multiaddress to random node from peerlist
-  const stream = await node.dialProtocol(
-    multiaddr("/ip4/127.0.0.1/tcp/4001/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7"),
-    '/upload/1.0.0'
-  )
-  stream.send(new TextEncoder().encode(JSON.stringify(payload)))
-  stream.close()
+  // Get bootstrap peer from env (set in docker-compose)
+  const bootstrapPeer = process.env.DSN_BOOTSTRAP_PEERS || "/ip4/127.0.0.1/tcp/11111/p2p/QmaTPiRLg64y6wwYXybwsQLVUqqzqwpJSNQ8k5T5e6MyAG"
 
-  //Here probably mark the user as synced or fully registred in the network in the database?
+  try {
+    const stream = await node.dialProtocol(
+      multiaddr(bootstrapPeer),
+      '/upload/1.0.0'
+    )
+    stream.send(new TextEncoder().encode(JSON.stringify(payload)))
+    stream.close()
 
-  res.json({
-    reply: `User data forwarded to the network`
-  })
+    res.json({
+      reply: `User data forwarded to the network`
+    })
+  } catch (err) {
+    console.error('Failed to dial storage node:', err)
+    res.status(500).json({ error: 'Failed to connect to storage network' })
+  }
 
 })
 
