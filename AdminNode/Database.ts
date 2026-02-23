@@ -23,7 +23,7 @@ export async function upsertUser(pool: Pool, user: User) {
       WHERE userid = $4
       RETURNING *
       `,
-      [user.email, user.hashedpassword, user.salt, user.userid]
+      [user.email, user.hashedpassword, user, user.userid]
     );
     return rows[0];
   }
@@ -34,7 +34,7 @@ export async function upsertUser(pool: Pool, user: User) {
     VALUES ($1, $2, $3)
     RETURNING *
     `,
-    [user.email, user.hashedpassword, user.salt]
+    [user.email, user.hashedpassword, user]
   );
   return rows[0];
 }
@@ -88,7 +88,7 @@ export async function upsertProvider(pool: Pool, provider: Provider) {
       [
         provider.registeredname,
         provider.hashedpassword,
-        provider.salt,
+        provider,
         provider.providerid
       ]
     );
@@ -101,7 +101,7 @@ export async function upsertProvider(pool: Pool, provider: Provider) {
     VALUES ($1, $2, $3)
     RETURNING *
     `,
-    [provider.registeredname, provider.hashedpassword, provider.salt]
+    [provider.registeredname, provider.hashedpassword, provider]
   );
   return rows[0];
 }

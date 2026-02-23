@@ -47,13 +47,12 @@ import (
 	"github.com/ipfs/go-cid"
 	dht "github.com/libp2p/go-libp2p-kad-dht"
 	"github.com/libp2p/go-libp2p/core/peer"
-	"github.com/multiformats/go-multihash"
 )
 
 /*
-Generates CID from given key and then executes dht.Provide()
+executes dht.Provide()
 
-Node will claim to provide whatever the content is behind the CID generated from key.
+Node will claim to provide whatever the content is behind the CID
 */
 func DHTProvide(ctx context.Context, dht *dht.IpfsDHT, cid cid.Cid) (err error) {
 
@@ -68,18 +67,14 @@ func DHTProvide(ctx context.Context, dht *dht.IpfsDHT, cid cid.Cid) (err error) 
 }
 
 /*
-Generates CID from given key and then executes dht.FindProviders()
+executes dht.FindProviders()
 
 The node will either receive a list of available providers or an error.
 */
-func DHTGetProviders(ctx context.Context, dht *dht.IpfsDHT, key string) (providers_list []peer.AddrInfo, err error) {
+func DHTGetProviders(ctx context.Context, dht *dht.IpfsDHT, cid cid.Cid) (providers_list []peer.AddrInfo, err error) {
 
-	//generate the ContentID from the key
-	mh, _ := multihash.Sum([]byte(key), multihash.SHA2_256, -1)
-	c := cid.NewCidV1(cid.Raw, mh)
-
-	fmt.Printf("🔍 Looking for providers of %s... \n", key)
-	providers, err := dht.FindProviders(ctx, c)
+	fmt.Printf("🔍 Looking for providers of %s... \n", cid)
+	providers, err := dht.FindProviders(ctx, cid)
 	//Return error in case of failure
 	if err != nil {
 		return nil, err

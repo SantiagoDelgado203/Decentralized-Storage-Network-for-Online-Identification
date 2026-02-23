@@ -5,6 +5,7 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"fmt"
+	"strconv"
 
 	"github.com/hashicorp/vault/shamir"
 	"github.com/ipfs/go-cid"
@@ -73,7 +74,7 @@ func Encrypt(plaintext []byte) ([]byte, []byte, error) {
 	return ciphertext, key, nil
 }
 
-func Decrypt(key, ciphertext []byte) ([]byte, error) {
+func Decrypt(key []byte, ciphertext []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
@@ -97,4 +98,19 @@ func Decrypt(key, ciphertext []byte) ([]byte, error) {
 	}
 
 	return plaintext, nil
+}
+
+func DataHash(userid string) (hash cid.Cid) {
+	//in here we can modify how hashes are created for the enrypted data
+	result := userid + "_user"
+
+	return CidHash([]byte(result))
+}
+
+func FragmentHash(userid string, label int) (hash cid.Cid) {
+	//here we can modify how hashes are created for fragments
+	label_int := strconv.Itoa(label)
+	result := userid + "_fragment#" + label_int
+
+	return CidHash([]byte(result))
 }

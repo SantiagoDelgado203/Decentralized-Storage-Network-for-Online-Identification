@@ -15,24 +15,45 @@ The desired node behavior is as follows:
 package exec
 
 import (
+	"fmt"
 	"node/core"
 	"time"
+
+	"github.com/ipfs/go-cid"
 )
 
 // main execution
 func NodeStart() (err error) {
 
 	//Start the node
-	ctx, h, _, peers := core.NodeCreate(core.ReadPrivateKeyFromFile("ID.json"), "myapp")
+	ctx, h, dht, peers := core.NodeCreate(core.ReadPrivateKeyFromFile("ID.json"), "myapp")
 
 	//connects to peers indefinitely
 	go core.ConstantConnection(ctx, h, peers)
 
 	//allow time for connection
-	time.Sleep(10 * time.Second)
+	time.Sleep(5 * time.Second)
 
 	//Initialize the stream handlers
-	_ = core.HandlersInit(h)
+	_ = core.HandlersInit(ctx, h, dht)
+
+	db, err := core.NewDatabase("mongodb://localhost:27017")
+	hashes, err := db.RetrieveAllHashes()
+	if err != nil {
+		panic("error retrieving hashes from DB")
+	}
+
+	for _, hash := range hashes {
+		cid, err := cid.Parse(hash)
+		err = core.DHTProvide(ctx, dht, cid)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+
+	// result, err := db.RetrieveSimpleData("bafkreiaao5wnf7fd3ad7dlfo654biir5xsqr7lbyoooklkdbc577jk4me4")
+
+	// fmt.Println(result[0].Data)
 
 	select {}
 
