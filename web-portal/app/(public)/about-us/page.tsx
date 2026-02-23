@@ -1,4 +1,3 @@
-// app/about-us/page.tsx
 import React from "react";
 
 const AboutUs = () => {
