@@ -385,6 +385,8 @@ func (p *VerificationProtocol) Handler(sm *StreamsMaster) network.StreamHandler 
 			fmt.Println("Read error:", err)
 			return
 		}
+		s.CloseRead()
+
 		//unmarshal it to an object
 		verification_request := VerificationRequest{}
 		err = json.Unmarshal(raw, &verification_request)
@@ -404,14 +406,11 @@ func (p *VerificationProtocol) Handler(sm *StreamsMaster) network.StreamHandler 
 		for i := range SHARES_NUMBER {
 			fragments_hash = append(fragments_hash, FragmentHash(user_id, i))
 		}
-		fmt.Println("datahash: ", data_hash)
-		fmt.Println("fragments hash: ", fragments_hash)
 		//try to find providers for the encrypted data
 		data_providers, err := DHTGetProviders(sm.ctx, sm.dht, data_hash)
 		if len(data_providers) == 0 {
 			panic("NO ENCRYPTED DATA PROVIDERS FOUND")
 		}
-		fmt.Println("data providers: ", data_providers)
 		//if providers found, then ask for it until found
 		//MAYBE: for the future, use go routines for parallel execution. might be faster!
 		var user_data SimpleData
@@ -473,7 +472,6 @@ func (p *VerificationProtocol) Handler(sm *StreamsMaster) network.StreamHandler 
 			shares = append(shares, str)
 		}
 		key := ReconstructKey(shares)
-		fmt.Println("Reconstructed key:", []byte(key))
 		//decrypt data
 		cipher, err := base64.StdEncoding.DecodeString(user_data.Data)
 		decrypted_data, err := Decrypt([]byte(key), cipher)
@@ -484,8 +482,6 @@ func (p *VerificationProtocol) Handler(sm *StreamsMaster) network.StreamHandler 
 
 		fmt.Println(string(decrypted_data))
 
-		fmt.Println("So far so good!!")
-
 		criteria := verification_request.Criteria
 
 		var data map[string]any
@@ -495,14 +491,24 @@ func (p *VerificationProtocol) Handler(sm *StreamsMaster) network.StreamHandler 
 			fmt.Println("Error unmarshaling data: ", err)
 		}
 
-		verified := VerifyCriteria(data, criteria)
+		agent := &VerificationAgent{}
+
+		verified := agent.Verify(data, criteria)
 
 		fmt.Println("Result: ", verified)
-	
-		
+
+		var res = map[string]any{
+			"response": "Success",
+			"result":   verified,
+		}
+
+		json_res, err := json.Marshal(res)
+		if err != nil {
+			fmt.Println("Error marshaling json response")
+		}
 
 		writer := bufio.NewWriter(s)
-		writer.Write(////////////////////)
+		writer.Write(json_res)
 		writer.WriteString("\n")
 		writer.Flush()
 		s.CloseWrite()

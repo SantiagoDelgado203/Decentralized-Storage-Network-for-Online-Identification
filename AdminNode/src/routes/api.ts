@@ -6,6 +6,8 @@ import { createRequest, getProviderById, getRequests, getUserByEmail, updateRequ
 import { Pool } from 'pg';
 import dotenv from 'dotenv';
 import * as bcrypt from 'bcryptjs';
+import {pipe} from "it-pipe"
+import { Uint8ArrayList } from 'uint8arraylist'
 
 /**
  * API'S FILE
@@ -36,7 +38,10 @@ router.post('/net/upload', async (req: Request, res: Response) => {
     multiaddr("/ip4/127.0.0.1/tcp/4001/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7"),
     '/upload/1.0.0'
   )
+  console.log(stream)
+  console.log(Object.keys(stream))
   stream.send(new TextEncoder().encode(JSON.stringify(payload)))
+  
   stream.close()
 
   //Here probably mark the user as synced or fully registred in the network in the database?
@@ -44,6 +49,56 @@ router.post('/net/upload', async (req: Request, res: Response) => {
   res.json({
     reply: `User data forwarded to the network`
   })
+
+})
+
+router.post('/net/verify', async (req: Request, res: Response) => {
+
+  const node = getNode()
+  const payload = req.body
+  console.log(payload)
+  const reqs = await getRequests(pool, {requestid: payload.requestid})
+  var db_request = reqs[0]
+
+  //dial storage network with new user protocol
+  //TODO: replace static node multiaddress to random node from peerlist
+  const stream = await node.dialProtocol(
+    multiaddr("/ip4/127.0.0.1/tcp/4001/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7"),
+    '/verification/1.0.0'
+  )
+
+  stream.send(new TextEncoder().encode(JSON.stringify(payload) + "\n"))
+
+  let responseData = ''
+
+  for await (const chunk of stream) {
+    const uint8 =
+      'subarray' in chunk
+        ? chunk.subarray()
+        : chunk
+
+    responseData += new TextDecoder().decode(uint8)
+  }
+
+  await stream.close()
+  
+  console.log(responseData)
+
+  var response = JSON.parse(responseData)
+
+  if (response.result){
+    db_request.status = "Verified Successfully: Yes"
+  } else {
+    db_request.status = "Verified Successfully: No"
+  }
+
+  await updateRequest(pool, db_request)
+
+  res.status(200).json({
+    reply: response.result,
+  })
+
+  
 
 })
 
@@ -88,6 +143,8 @@ router.post("/db/get-requests", async (req: Request, res: Response) => {
   const requests = await getRequests(pool, {userid: request_body.userID, providerid: request_body.verifierID})
 
   res.json(requests)
+
+
 
 })
 

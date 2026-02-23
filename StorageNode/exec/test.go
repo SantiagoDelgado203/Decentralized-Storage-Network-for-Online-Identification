@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/ipfs/go-cid"
 	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/libp2p/go-libp2p/core/protocol"
@@ -102,9 +103,23 @@ func TestNode(idseed string) (err error) {
 	//connects to peers indefinitely
 	go core.ConstantConnection(ctx, h, bootstrapPeers)
 
-	sm := core.HandlersInit(ctx, h, dht)
+	core.HandlersInit(ctx, h, dht)
 	//allow time for connection
 	time.Sleep(5 * time.Second)
+
+	db, err := core.NewDatabase("mongodb://localhost:27017")
+	hashes, err := db.RetrieveAllHashes()
+	if err != nil {
+		panic("error retrieving hashes from DB")
+	}
+
+	for _, hash := range hashes {
+		cid, err := cid.Parse(hash)
+		err = core.DHTProvide(ctx, dht, cid)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
 
 	// request := core.ResourceRequest{
 	// 	Hash: "bafkreiaao5wnf7fd3ad7dlfo654biir5xsqr7lbyoooklkdbc577jk4me4",
@@ -112,23 +127,23 @@ func TestNode(idseed string) (err error) {
 
 	// sm.ResourceSend(ctx, h.Network().Peers()[0], request)
 
-	time.Sleep(15 * time.Second)
+	// time.Sleep(15 * time.Second)
 
-	verification := core.VerificationRequest{
-		UserID: "9a3fc47b-98b2-4d51-bb5e-a4a641812ebb",
-		Criteria: core.Criteria{
-			All: []core.Rule{
-				{
-					Field: "Name",
-					Type:  "equal",
-					Value: "Santiago",
-				},
-			},
-			Any: nil,
-		},
-	}
+	// verification := core.VerificationRequest{
+	// 	UserID: "9a3fc47b-98b2-4d51-bb5e-a4a641812ebb",
+	// 	Criteria: core.Criteria{
+	// 		All: []core.Rule{
+	// 			{
+	// 				Field: "Name",
+	// 				Type:  "equal",
+	// 				Value: "Santiago",
+	// 			},
+	// 		},
+	// 		Any: nil,
+	// 	},
+	// }
 
-	sm.VerificationSend(ctx, h.Network().Peers()[0], verification)
+	// sm.VerificationSend(ctx, h.Network().Peers()[0], verification)
 
 	select {}
 

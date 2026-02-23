@@ -21,9 +21,22 @@ export async function uploadUserData(payload: UploadRequest)
 }
 
 // for user use (example, user has accepted verification)
-export async function verify(userID: string){
-  return
+export async function verify(payload: {requestid: string, userID: string, criteria: Criteria}){
+  const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/net/verify", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  alert(JSON.stringify(payload))
+
+  const data = await res.json();
+  return data.reply
+  
 }
+
 
 /*------------------------------------DB ENDPOINT-----------------------------------------*/
 /*Funtions to create/read/update/delete stuff from the SQL database */
@@ -119,3 +132,4 @@ export async function updateRequest(payload : {requestID: string, criteria: Crit
 
   return await res.json();
 }
+

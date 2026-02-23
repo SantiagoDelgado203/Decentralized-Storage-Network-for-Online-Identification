@@ -15,8 +15,11 @@ The desired node behavior is as follows:
 package exec
 
 import (
+	"fmt"
 	"node/core"
 	"time"
+
+	"github.com/ipfs/go-cid"
 )
 
 // main execution
@@ -34,7 +37,20 @@ func NodeStart() (err error) {
 	//Initialize the stream handlers
 	_ = core.HandlersInit(ctx, h, dht)
 
-	// db, err := core.NewDatabase("mongodb://localhost:27017")
+	db, err := core.NewDatabase("mongodb://localhost:27017")
+	hashes, err := db.RetrieveAllHashes()
+	if err != nil {
+		panic("error retrieving hashes from DB")
+	}
+
+	for _, hash := range hashes {
+		cid, err := cid.Parse(hash)
+		err = core.DHTProvide(ctx, dht, cid)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+
 	// result, err := db.RetrieveSimpleData("bafkreiaao5wnf7fd3ad7dlfo654biir5xsqr7lbyoooklkdbc577jk4me4")
 
 	// fmt.Println(result[0].Data)
