@@ -30,8 +30,6 @@ export async function verify(payload: {requestid: string, userID: string, criter
     body: JSON.stringify(payload),
   });
 
-  alert(JSON.stringify(payload))
-
   const data = await res.json();
   return data.reply
   

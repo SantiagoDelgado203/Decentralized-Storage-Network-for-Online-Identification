@@ -12,11 +12,8 @@ import (
 )
 
 type Database struct {
-	client     *mongo.Client
-	main       *mongo.Collection
-	fragments  *mongo.Collection
-	dataBlocks *mongo.Collection
-	nodes      *mongo.Collection
+	client *mongo.Client
+	main   *mongo.Collection
 }
 
 // NewDatabase creates a new MongoDB client and initializes collections.
@@ -36,11 +33,8 @@ func NewDatabase(connectionString string) (*Database, error) {
 	db := client.Database("didn_storage")
 
 	return &Database{
-		client:     client,
-		main:       db.Collection("main"),
-		fragments:  db.Collection("fragments"),
-		dataBlocks: db.Collection("data_blocks"),
-		nodes:      db.Collection("nodes"),
+		client: client,
+		main:   db.Collection("main"),
 	}, nil
 }
 
