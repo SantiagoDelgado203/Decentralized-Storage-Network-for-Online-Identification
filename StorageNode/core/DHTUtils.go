@@ -73,7 +73,7 @@ The node will either receive a list of available providers or an error.
 */
 func DHTGetProviders(ctx context.Context, dht *dht.IpfsDHT, cid cid.Cid) (providers_list []peer.AddrInfo, err error) {
 
-	fmt.Printf("🔍 Looking for providers of %s... \n", cid)
+	fmt.Printf("\nLooking for providers of %s... \n", cid)
 	providers, err := dht.FindProviders(ctx, cid)
 	//Return error in case of failure
 	if err != nil {

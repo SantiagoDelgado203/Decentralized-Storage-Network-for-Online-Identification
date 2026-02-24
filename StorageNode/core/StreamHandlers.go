@@ -148,7 +148,7 @@ func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 			return
 		}
 
-		fmt.Printf("\nIncoming data: %s", raw)
+		// fmt.Printf("\nIncoming data: %s", raw)
 
 		uploaded := UploadRequest{}
 
@@ -165,7 +165,7 @@ func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 			return
 		}
 
-		fmt.Println("Generated key: ", key)
+		// fmt.Println("Generated key: ", key)
 
 		cid := DataHash(uploaded.UserID).String()
 
@@ -174,7 +174,7 @@ func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 			Data: base64.StdEncoding.EncodeToString(cipher),
 		}
 
-		fmt.Printf("\nGenerated encrypted data: %s\n", blob.Data)
+		// fmt.Printf("\nGenerated encrypted data: %s\n", blob.Data)
 
 		if err := sm.StoreSend(context.Background(), GetRandomPeer(sm.h), blob); err != nil {
 			fmt.Println("Error handling off DataBlock:", err)
@@ -191,14 +191,14 @@ func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 				Data: base64.StdEncoding.EncodeToString(share),
 			}
 
-			fmt.Printf("\nKey fragment: %s\n", fp.Data)
+			// fmt.Printf("\nKey fragment: %s\n", fp.Data)
 
 			// Send fragments to storage network
 			if err := sm.StoreSend(context.Background(), GetRandomPeer(sm.h), fp); err != nil {
 				fmt.Printf("Error sending fragment %d: %v\n", i+1, err)
 			}
 		}
-		fmt.Println("Uploaded Data")
+		fmt.Println("Data uploaded.")
 	}
 }
 
@@ -349,7 +349,7 @@ func (sm *StreamsMaster) ResourceSend(ctx context.Context, peerID peer.ID, reque
 		return
 	}
 
-	fmt.Printf("Resource we got: %s\n", resp)
+	// fmt.Printf("Resource we got: %s\n", resp)
 
 	res_json := SimpleData{}
 
@@ -394,7 +394,7 @@ func (p *VerificationProtocol) Handler(sm *StreamsMaster) network.StreamHandler 
 			fmt.Println(err)
 			panic("")
 		}
-		fmt.Println("Verification request: ", verification_request)
+		fmt.Println("\nVerification request: ", verification_request)
 		//get id and set parameters (in the future these will be gotten from .env or something like that)
 		user_id := verification_request.UserID
 		const SHARES_NUMBER = 5      //example quantity of fragments
@@ -480,7 +480,7 @@ func (p *VerificationProtocol) Handler(sm *StreamsMaster) network.StreamHandler 
 			panic("")
 		}
 
-		fmt.Println(string(decrypted_data))
+		// fmt.Println(string(decrypted_data))
 
 		criteria := verification_request.Criteria
 
@@ -495,7 +495,7 @@ func (p *VerificationProtocol) Handler(sm *StreamsMaster) network.StreamHandler 
 
 		verified := agent.Verify(data, criteria)
 
-		fmt.Println("Result: ", verified)
+		fmt.Println("\nResult: ", verified)
 
 		var res = map[string]any{
 			"response": "Success",

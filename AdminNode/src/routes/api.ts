@@ -38,8 +38,6 @@ router.post('/net/upload', async (req: Request, res: Response) => {
     multiaddr("/ip4/127.0.0.1/tcp/4001/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7"),
     '/upload/1.0.0'
   )
-  console.log(stream)
-  console.log(Object.keys(stream))
   stream.send(new TextEncoder().encode(JSON.stringify(payload)))
   
   stream.close()
@@ -56,7 +54,6 @@ router.post('/net/verify', async (req: Request, res: Response) => {
 
   const node = getNode()
   const payload = req.body
-  console.log(payload)
   const reqs = await getRequests(pool, {requestid: payload.requestid})
   var db_request = reqs[0]
 
@@ -82,7 +79,6 @@ router.post('/net/verify', async (req: Request, res: Response) => {
 
   await stream.close()
   
-  console.log(responseData)
 
   var response = JSON.parse(responseData)
 
@@ -149,7 +145,6 @@ router.post("/db/get-requests", async (req: Request, res: Response) => {
 })
 
 router.post("/db/resolve-requests", async (req: Request, res: Response) => {
-  console.log("Hey")
   const request_body = req.body
 
   const db_request = await getRequests(pool, {requestid: request_body.requestID})
@@ -173,7 +168,6 @@ router.post("/db/update-request", async (req: Request, res: Response) => {
   const request_body = req.body
 
   const db_request = await getRequests(pool, {requestid: request_body.requestID})
-  console.log(db_request)
   let updated_request = new DB_Request(db_request[0])
 
   updated_request.datarequests = request_body.criteria
@@ -189,8 +183,6 @@ router.post("/db/register", async (req: Request, res: Response) => {
   const request_body = req.body
 
   const user_check = await getUserByEmail(pool, request_body.email)
-
-  console.log(user_check)
 
   if(user_check != null){
     res.json({
