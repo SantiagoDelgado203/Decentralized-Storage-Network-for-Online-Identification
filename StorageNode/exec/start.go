@@ -16,33 +16,49 @@ package exec
 
 import (
 	"fmt"
-	"node/config"
 	"node/core"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/ipfs/go-cid"
 )
 
 // NodeStart is the main execution function for the node
 func NodeStart() error {
 	cfg := config.Get()
 
-	fmt.Println("🚀 Starting StorageNode...")
-	fmt.Printf("   Port: %s\n", cfg.Port)
-	fmt.Printf("   Namespace: %s\n", cfg.Namespace)
-	fmt.Printf("   Data Dir: %s\n", cfg.DataDir)
+	//Start the node
+	ctx, h, dht, peers := core.NodeCreate(core.ReadPrivateKeyFromFile("ID.json"), "myapp")
 
 	if cfg.HasBootstrapPeers() {
 		fmt.Printf("   Bootstrap Peers: %d configured\n", len(cfg.BootstrapPeers))
 	}
 
-	// Start the node using configuration
-	_, h, kadDHT, peers := core.NodeCreate()
+	//allow time for connection
+	time.Sleep(5 * time.Second)
 
-	// Initialize the PeerManager for automatic peer discovery and health monitoring
-	peerManager := core.NewPeerManager(h, kadDHT, peers)
-	peerManager.Start()
+	//Initialize the stream handlers
+	_ = core.HandlersInit(ctx, h, dht)
+
+	db, err := core.NewDatabase("mongodb://localhost:27017")
+	hashes, err := db.RetrieveAllHashes()
+	if err != nil {
+		panic("error retrieving hashes from DB")
+	}
+
+	for _, hash := range hashes {
+		cid, err := cid.Parse(hash)
+		err = core.DHTProvide(ctx, dht, cid)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+
+	// result, err := db.RetrieveSimpleData("bafkreiaao5wnf7fd3ad7dlfo654biir5xsqr7lbyoooklkdbc577jk4me4")
+
+	// fmt.Println(result[0].Data)
 
 	// Allow time for initial connections and discovery
 	time.Sleep(5 * time.Second)

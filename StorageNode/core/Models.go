@@ -44,3 +44,28 @@ type SimpleData struct {
 	CreatedAt time.Time          `bson:"created_at" json:"created_at"`
 	UpdatedAt time.Time          `bson:"updated_at" json:"updated_at"`
 }
+
+type ResourceRequest struct {
+	Hash string `bson:"hash" json:"hash"`
+}
+
+type VerificationRequest struct {
+	UserID   string   `json:"userid"`
+	Criteria Criteria `json:"criteria"`
+}
+
+type Rule struct {
+	Field string
+	Type  string
+	Value any
+}
+
+type Criteria struct {
+	All []Rule
+	Any []Rule
+}
+
+type UploadRequest struct {
+	UserID string         `json:"userid"`
+	Data   map[string]any `json:"data"`
+}

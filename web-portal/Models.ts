@@ -18,8 +18,8 @@ type DOB = {
 
 export type Rule = {
     Field: string,
-    Type: "equal" | "greater" | "less" | "in" 
-    value: any
+    Type: "equals" | "minimum" 
+    Value: any
 }
 
 export type Criteria = {
@@ -32,4 +32,9 @@ export type UserInfo = {
     Gender: string,
     DOB: DOB,
     Address: string
+}
+
+export type UploadRequest = {
+    UserID: string,
+    Data: UserInfo
 }
