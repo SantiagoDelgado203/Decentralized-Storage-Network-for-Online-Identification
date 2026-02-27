@@ -11,6 +11,24 @@
 
 services:
   # ===========================================================================
+  # MongoDB - Storage for key fragments and encrypted data
+  # ===========================================================================
+  mongodb:
+    image: mongo:7
+    networks:
+      - dsn-overlay
+    volumes:
+      - mongodb_data:/data/db
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+
+  # ===========================================================================
   # Bootstrap Node - Single instance, stable identity
   # ===========================================================================
   storage-bootstrap:
@@ -19,6 +37,7 @@ services:
       - DSN_PORT=11111
       - DSN_NAMESPACE=dsn
       - DSN_DATA_DIR=/app/data
+      - MONGO_URI=mongodb://mongodb:27017
     volumes:
       - bootstrap-data:/app/data
     networks:
@@ -58,6 +77,7 @@ services:
       - DSN_NAMESPACE=dsn
       - DSN_DATA_DIR=/app/data
       - DSN_BOOTSTRAP_PEERS=/dns4/storage-bootstrap/tcp/11111/p2p/QmaTPiRLg64y6wwYXybwsQLVUqqzqwpJSNQ8k5T5e6MyAG
+      - MONGO_URI=mongodb://mongodb:27017
     volumes:
       - storage-node-data:/app/data
     networks:
@@ -153,4 +173,6 @@ volumes:
   bootstrap-data:
     driver: local
   storage-node-data:
+    driver: local
+  mongodb_data:
     driver: local

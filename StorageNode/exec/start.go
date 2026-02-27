@@ -16,6 +16,7 @@ package exec
 
 import (
 	"fmt"
+	"node/config"
 	"node/core"
 	"os"
 	"os/signal"
@@ -29,42 +30,47 @@ import (
 func NodeStart() error {
 	cfg := config.Get()
 
-	//Start the node
-	ctx, h, dht, peers := core.NodeCreate(core.ReadPrivateKeyFromFile("ID.json"), "myapp")
+	// Start the node
+	ctx, h, dht, peers := core.NodeCreate()
 
 	if cfg.HasBootstrapPeers() {
 		fmt.Printf("   Bootstrap Peers: %d configured\n", len(cfg.BootstrapPeers))
 	}
 
-	//allow time for connection
+	// Allow time for connection
 	time.Sleep(5 * time.Second)
 
-	//Initialize the stream handlers
+	// Initialize the stream handlers
 	_ = core.HandlersInit(ctx, h, dht)
 
 	db, err := core.NewDatabase("mongodb://localhost:27017")
-	hashes, err := db.RetrieveAllHashes()
 	if err != nil {
-		panic("error retrieving hashes from DB")
-	}
-
-	for _, hash := range hashes {
-		cid, err := cid.Parse(hash)
-		err = core.DHTProvide(ctx, dht, cid)
+		fmt.Printf("⚠️  Warning: Could not connect to MongoDB: %v\n", err)
+	} else {
+		hashes, err := db.RetrieveAllHashes()
 		if err != nil {
-			fmt.Println(err)
+			fmt.Printf("⚠️  Warning: Error retrieving hashes from DB: %v\n", err)
+		} else {
+			for _, hash := range hashes {
+				c, err := cid.Parse(hash)
+				if err != nil {
+					fmt.Printf("⚠️  Warning: Error parsing CID %s: %v\n", hash, err)
+					continue
+				}
+				err = core.DHTProvide(ctx, dht, c)
+				if err != nil {
+					fmt.Println(err)
+				}
+			}
 		}
 	}
-
-	// result, err := db.RetrieveSimpleData("bafkreiaao5wnf7fd3ad7dlfo654biir5xsqr7lbyoooklkdbc577jk4me4")
-
-	// fmt.Println(result[0].Data)
 
 	// Allow time for initial connections and discovery
 	time.Sleep(5 * time.Second)
 
-	// Initialize stream handlers
-	core.HandlersInit(h)
+	// Start peer manager for connection health monitoring
+	peerManager := core.NewPeerManager(h, dht, peers)
+	peerManager.Start()
 
 	fmt.Println("✅ Node is running. Press Ctrl+C to stop.")
 
