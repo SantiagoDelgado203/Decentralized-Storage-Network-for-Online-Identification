@@ -53,13 +53,13 @@ export default function RootLayout({
 
             {/* Navigation */}
             <nav className="hidden md:flex gap-15 mr-10">
-              <Link href="/history" className="hover:text-green-400 transition">
+              <Link href="user/history" className="hover:text-green-400 transition">
                 History
               </Link>
               <Link href="/help" className="hover:text-green-400 transition">
                 Help
               </Link>
-              <Link href="/profile" className="hover:text-green-400 transition">
+              <Link href="user/profile" className="hover:text-green-400 transition">
                 Profile
               </Link>
             </nav>

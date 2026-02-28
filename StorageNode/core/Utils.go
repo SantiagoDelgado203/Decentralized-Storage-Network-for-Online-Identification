@@ -14,6 +14,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
 	"time"
@@ -75,7 +76,7 @@ func ReadPrivateKeyFromFile(filename string) crypto.PrivKey {
 }
 
 // gets bootstrap nodes from file, returns list of strings
-func readBootstrapPeers() []string {
+func ReadBootstrapPeers() []string {
 	data, err := os.ReadFile(bootstrapFile)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -95,8 +96,8 @@ func readBootstrapPeers() []string {
 }
 
 // writes the node address to the bootstrap list
-func addPeerToBootstrap(addr string) {
-	peers := readBootstrapPeers()
+func AddPeerToBootstrap(addr string) {
+	peers := ReadBootstrapPeers()
 	for _, p := range peers {
 		if p == addr {
 			return
@@ -121,11 +122,11 @@ func ConstantConnection(ctx context.Context, h host.Host, peers []string) {
 		for {
 			select {
 			case <-ctx.Done():
-				fmt.Println("\n⛔ constantConnection stopped by context")
+				fmt.Println("\nconstantConnection stopped by context")
 				return
 			default:
 				conns := h.Network().Conns()
-				fmt.Printf("\r🔌 Active connections: %d", len(conns))
+				fmt.Printf("\rActive connections: %d", len(conns))
 				time.Sleep(1 * time.Second)
 			}
 		}
@@ -135,7 +136,7 @@ func ConstantConnection(ctx context.Context, h host.Host, peers []string) {
 	for {
 		select {
 		case <-ctx.Done():
-			fmt.Println("\n⛔ constantConnection stopped by context")
+			fmt.Println("\nconstantConnection stopped by context")
 			return
 		default:
 
@@ -162,4 +163,22 @@ func ConstantConnection(ctx context.Context, h host.Host, peers []string) {
 			time.Sleep(1 * time.Second)
 		}
 	}
+}
+
+func GetRandomPeer(h host.Host) peer.ID {
+	// Get peers
+	peers := h.Network().Peers()
+	if len(peers) == 0 {
+		fmt.Println("no peers connected to receive data")
+	}
+
+	admin, err := peer.AddrInfoFromString("/ip4/192.168.126.1/tcp/4001/p2p/12D3KooWA1eWrMTkfawiShux6WrxzFbRdyDsk5NAyL5indcWCtEG")
+	if err != nil {
+		panic("Error getting admin node")
+	}
+	selected := peers[rand.Intn(len(peers))]
+	if selected == admin.ID {
+		return GetRandomPeer(h)
+	}
+	return selected
 }

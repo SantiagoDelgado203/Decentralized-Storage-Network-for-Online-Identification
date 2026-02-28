@@ -19,6 +19,7 @@
     "@libp2p/tls": "^3.0.9",
     "@libp2p/websockets": "^10.1.2",
     "@types/pg": "^8.16.0",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",

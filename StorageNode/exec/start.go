@@ -18,6 +18,8 @@ import (
 	"fmt"
 	"node/core"
 	"time"
+
+	"github.com/ipfs/go-cid"
 )
 
 // main execution
@@ -33,69 +35,25 @@ func NodeStart() (err error) {
 	time.Sleep(5 * time.Second)
 
 	//Initialize the stream handlers
-	// sm := core.HandlersInit(h)
+	_ = core.HandlersInit(ctx, h, dht)
 
 	db, err := core.NewDatabase("mongodb://localhost:27017")
+	hashes, err := db.RetrieveAllHashes()
 	if err != nil {
-		panic(err)
-	core.HandlersInit(h)
-
-	test_d := "Santiago Delgado, 22 years old, bla bla bla"
-
-	fmt.Println("\nPlaintext:", test_d)
-
-	cipher, key, err := core.Encrypt([]byte(test_d))
-	if err != nil {
-		fmt.Println("Encrypt error:", err)
-		return
+		panic("error retrieving hashes from DB")
 	}
 
-	fmt.Printf("\nKey: %x", key)
-	fmt.Printf("\nCipher: %x", cipher)
-
-	decipher, err := core.Decrypt(key, cipher)
-	if err != nil {
-		fmt.Println("Decrypt error:", err)
-		return
+	for _, hash := range hashes {
+		cid, err := cid.Parse(hash)
+		err = core.DHTProvide(ctx, dht, cid)
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 
-	fmt.Println("\nDecrypted:", string(decipher))
+	// result, err := db.RetrieveSimpleData("bafkreiaao5wnf7fd3ad7dlfo654biir5xsqr7lbyoooklkdbc577jk4me4")
 
-	test_u := "\nTesting data from user! This will be encrypted, then a hashed to be provided"
-	CidHash := core.CidHash([]byte(test_u))
-	fmt.Println("\nTest: ", test_u, "\nThen, the generated Cid hash: ", CidHash)
-	err = core.DHTProvide(ctx, dht, CidHash)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	test_k := "Testing Key"
-	shares := core.SplitKey([]byte(test_k), 5, 3)
-	reconstruct := core.ReconstructKey(shares)
-	fmt.Printf("\nKey: %s\nShares: %x\nReconstructed: %s\n", test_k, shares, reconstruct)
-
-	fmt.Println("\nHashed Shares:")
-
-	for i, share := range shares {
-		hash := core.CidHash(share)
-
-		fmt.Printf("Share %d hash: %s\n", i, hash)
-
-		core.DHTProvide(ctx, dht, hash)
-	}
-
-	example := core.Fragment{
-		// ID:        primitive.NewObjectID(),
-		Hash:      "exmaple",
-		Share:     "example",
-		X:         5,
-		Threshold: 3,
-		Total:     5,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-	}
-
-	db.StoreFragment(example)
+	// fmt.Println(result[0].Data)
 
 	select {}
 
