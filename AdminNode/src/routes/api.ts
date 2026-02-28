@@ -2,12 +2,12 @@ import { Router, type Request, type Response } from 'express'
 import { multiaddr } from "@multiformats/multiaddr";
 import { getNode } from '../p2p/node'
 import { DB_Request, User } from '../../Models';
-import { createRequest, getProviderById, getRequests, getUserByEmail, updateRequest, upsertUser } from '../../Database';
+import { createRequest, getProviderById, getRequests, getUserByEmail, getUserById, updateRequest, upsertUser } from '../../Database';
 import { Pool } from 'pg';
 import dotenv from 'dotenv';
 import * as bcrypt from 'bcryptjs';
-import {pipe} from "it-pipe"
-import { Uint8ArrayList } from 'uint8arraylist'
+import jwt from "jsonwebtoken";
+import authMiddleware from '../../AuthMiddleware';
 
 /**
  * API'S FILE
@@ -25,6 +25,18 @@ const pool = new Pool({
     database: process.env.PG_DATABASE,
     password: process.env.PG_PASSWORD,
     port: parseInt(process.env.PG_PORT || '5432'),
+});
+
+router.get("/me", authMiddleware, async (req: any, res: Response) => {
+  const user = await getUserById(pool, req.user.id);
+  if(user != null){
+    res.json({
+      userid: user.userid,
+      email: user.email
+    });
+  }else{
+    res.status(401).json(null)
+  }
 });
 
 router.post('/net/upload', async (req: Request, res: Response) => {
@@ -141,29 +153,8 @@ router.post("/db/get-requests", async (req: Request, res: Response) => {
   const requests = await getRequests(pool, {userid: request_body.userID, providerid: request_body.verifierID})
 
   res.json(requests)
-
-
-
 })
 
-router.post("/db/resolve-requests", async (req: Request, res: Response) => {
-  const request_body = req.body
-
-  const db_request = await getRequests(pool, {requestid: request_body.requestID})
-
-  let updated_request = new DB_Request(db_request[0])
-
-  if(request_body.accepted){
-    //HERE IS WHERE WE DIAL THE NODE TO START THE VERIFICATION PROCESS
-  }
-  
-  updated_request.status = request_body.accepted ? "Accepted" : "Rejected"
-
-  const rep = await updateRequest(pool, updated_request)
-
-  res.json(rep)
-
-})
 
 
 router.post("/db/update-request", async (req: Request, res: Response) => {
@@ -196,7 +187,7 @@ router.post("/db/register", async (req: Request, res: Response) => {
   const hash = await bcrypt.hash(request_body.password, 10);
   
   const new_user = new User({userid: "", email:request_body.email, hashedpassword: hash})
-  upsertUser(pool, new_user)
+  await upsertUser(pool, new_user)
 
   res.status(200).json({ reply: "User created" });
 
@@ -207,24 +198,48 @@ router.post("/db/login", async (req: Request, res: Response) => {
 
   const user = await getUserByEmail(pool, request_body.email)
   if(user == null){
-    res.status(404).json({
-      reply: "User not found."
+    res.status(401).json({
+      reply: "Invalid credentials."
     })
     return
   }
 
   const check_password = await bcrypt.compare(request_body.password, user.hashedpassword)
+  
+  const token = jwt.sign(
+    { id: user.userid },
+    process.env.JWT_SECRET!,
+    { expiresIn: "1d" }
+  );
 
   if(check_password){
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
     res.status(200).json({
       reply: "Successfully logged in"
     })
   }else{
     res.status(401).json({
-      reply: "Wrong credentials"
+      reply: "Invalid credentials"
     })
   }
 
 })
+
+router.post("/db/logout", (req: Request, res: Response) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: false, // true in production (HTTPS)
+    sameSite: "lax",
+  });
+
+  res.status(200).json({ reply: "Logged out successfully" });
+});
 
 export default router

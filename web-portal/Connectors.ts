@@ -56,11 +56,12 @@ export async function register(payload :{username: string, email: string, passwo
   
 }
 
-/**check credentials (db/login)*/
+/**check credentials and create JWT (db/login)*/
 export async function login(payload: {email: string,  password: string}){
 
   const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/db/login", {
     method: "POST",
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
     },
@@ -70,8 +71,17 @@ export async function login(payload: {email: string,  password: string}){
   const reply = await res.json();
 
   return reply
+}
 
-  return
+export async function logout(){
+  const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/db/logout", {
+    method: "POST",
+    credentials: "include",
+  });
+  
+  const reply = await res.json();
+
+  return reply
 }
 
 /**for verifiers use (example, facebook requests a verification from a user) (db/request-verification)*/
@@ -120,7 +130,7 @@ export async function resolveRequest(payload : {requestID: string, accepted: boo
 /** to modify an existing request, from a verifier */
 export async function updateRequest(payload : {requestID: string, criteria: Criteria, status: string}){
   
-  const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/db/update-request", {
+  const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/db/logout", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
