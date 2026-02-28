@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { uploadUserData, verify } from "@/Connectors";
-import { TestUserInfo, UploadRequest, UserInfo } from "@/Models";
+import { uploadUserData } from "@/Connectors";
+import { UploadRequest, UserInfo } from "@/Models";
 
 export default function Upload() {
   const [name, setName] = useState("");

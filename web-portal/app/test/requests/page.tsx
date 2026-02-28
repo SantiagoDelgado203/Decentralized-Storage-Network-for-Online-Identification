@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { getRequests, verify, resolveRequest } from "@/Connectors";
-import { Criteria } from "@/Models";
 
 
 export default function RequestsView() {

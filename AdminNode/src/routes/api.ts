@@ -38,6 +38,8 @@ router.post('/net/upload', async (req: Request, res: Response) => {
     multiaddr("/ip4/127.0.0.1/tcp/4001/p2p/QmSgsmq9ty6khBSjvM7fBCynimYUPFnWKkSJNb1uvGTFZ7"),
     '/upload/1.0.0'
   )
+  console.log(stream)
+  console.log(Object.keys(stream))
   stream.send(new TextEncoder().encode(JSON.stringify(payload)))
   
   stream.close()

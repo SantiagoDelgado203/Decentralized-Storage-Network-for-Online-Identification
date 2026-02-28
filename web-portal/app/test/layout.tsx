@@ -68,7 +68,7 @@ export default function RootLayout({
 
         {/* Footer */}
         <footer className=" dark:bg-[#0a0a0a]">
-          Lorem ipsum
+          
         </footer>
       </body>
     </html>
