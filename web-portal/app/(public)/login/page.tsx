@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function LoginSelectionPage() {
   return (
-    <div className="min-h-[calc(100vh-80px)] bg-gradient-to-b from-slate-50 to-white px-6 py-12">
+    <div className="min-h-[calc(100vh-80px)] bg-background px-6 py-12">
       <div className="mx-auto max-w-5xl">
         {/* Header */}
         <div className="text-center">
@@ -19,7 +19,7 @@ export default function LoginSelectionPage() {
           {/* User */}
           <Link
             href="/login/user"
-            className="group rounded-3xl bg-white p-7 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md"
+            className="group rounded-3xl bg-background p-7 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md"
           >
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -61,7 +61,7 @@ export default function LoginSelectionPage() {
           {/* Provider */}
           <Link
             href="/login/verifier" // 如果你实际是 /login/verifier，就改这里
-            className="group rounded-3xl bg-white p-7 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md"
+            className="group rounded-3xl bg-background p-7 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md"
           >
             <div className="flex items-start justify-between gap-4">
               <div>

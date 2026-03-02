@@ -48,8 +48,8 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <header className="border-b bg-white">
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="border-b border-gray-300 dark:border-gray-700 bg-background">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <Link href={withLang("/")} className="text-lg font-semibold tracking-tight">
             {t.brand}
