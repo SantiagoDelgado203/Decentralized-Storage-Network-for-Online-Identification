@@ -1,17 +1,17 @@
 export class Provider {
   providerid?: string;
-  providerEmail: string;
+  email: string;
   registeredname: string;
   hashedpassword: string;
 
   constructor(params: {
     providerid?: string;
-    providerEmail: string;
+    email: string;
     registeredname: string;
     hashedpassword: string;
   }) {
     this.providerid = params.providerid || "";
-    this.providerEmail = params.providerEmail;
+    this.email = params.email;
     this.registeredname = params.registeredname;
     this.hashedpassword = params.hashedpassword;
   }

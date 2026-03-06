@@ -51,6 +51,7 @@ export async function  getUserById(pool: Pool, userid: string) {
   return rows[0] ?? null;
 }
 
+
 export async function getUserByEmail(pool: Pool, email: string) {
   const { rows } = await pool.query(
     `
@@ -64,7 +65,18 @@ export async function getUserByEmail(pool: Pool, email: string) {
   return rows[0] ?? null;
 }
 
+export async function getProviderByEmail(pool: Pool, email: string) {
+  const { rows } = await pool.query(
+    `
+    SELECT *
+    FROM providers
+    WHERE email = $1
+    `,
+    [email]
+  );
 
+  return rows[0] ?? null;
+}
 
 export async function deleteUser(pool: Pool, userid: string) {
   await pool.query(
@@ -95,11 +107,11 @@ export async function upsertProvider(pool: Pool, provider: Provider) {
 
   const { rows } = await pool.query(
     `
-    INSERT INTO providers (registeredname, hashedpassword)
+    INSERT INTO providers (email, registeredname, hashedpassword)
     VALUES ($1, $2, $3)
     RETURNING *
     `,
-    [provider.registeredname, provider.hashedpassword, provider]
+    [provider.email, provider.registeredname, provider.hashedpassword]
   );
   return rows[0];
 }
