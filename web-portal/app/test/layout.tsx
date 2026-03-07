@@ -1,7 +1,5 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import "../globals.css";
-
 
 export default function RootLayout({
   children,
@@ -51,6 +49,6 @@ export default function RootLayout({
         <footer className=" dark:bg-[#0a0a0a]">
           
         </footer>
-    </>
+  </>
   );
 }
