@@ -24,3 +24,28 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+/* ---------- Readability defaults (Week2 UI fix) ---------- */
+
+/* Make long text easier to read */
+main {
+  color: var(--foreground);
+}
+
+/* Paragraphs: slightly softer than headings, but not pale */
+p {
+  color: color-mix(in srgb, var(--foreground) 92%, var(--background));
+  line-height: 1.65;
+}
+li {
+  color: color-mix(in srgb, var(--foreground) 92%, var(--background));
+}
+/* Headings: full foreground */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--foreground);
+  line-height: 1.2;
+}
+
+/* Small text: still readable */
+small, .muted {
+  color: color-mix(in srgb, var(--foreground) 70%, var(--background));
+}

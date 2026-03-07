@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { login } from "../../../Connectors";
+import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -70,6 +71,7 @@ export default function LoginPage() {
   }
 
   return (
+    <>
     <div className="flex items-center justify-center my-10">
       <form
         onSubmit={handleSubmit}
@@ -92,19 +94,95 @@ export default function LoginPage() {
           />
         </div>
 
-        {/* Password */}
-        <div className="flex flex-col gap-2">
-          <label htmlFor="password" className="text-sm">
-            Password
-          </label>
-          <input
-            id="password"
-            type="password"
-            placeholder="••••••••"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="rounded-md border border-gray-700 bg-transparent px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
+        {/* Cards */}
+        <div className="mt-10 grid gap-6 md:grid-cols-2">
+          {/* User */}
+          <Link
+            href="/login/user"
+            className="group rounded-3xl bg-background p-7 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-semibold text-slate-900">
+                  Login as User
+                </h2>
+                <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                  For individuals accessing the portal to request services and
+                  manage verification history.
+                </p>
+              </div>
+
+              <span className="shrink-0 rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">
+                USER
+              </span>
+            </div>
+
+            <ul className="mt-5 space-y-2 text-sm text-slate-600">
+              <li className="flex gap-2">
+                <span className="mt-[2px] h-2 w-2 rounded-full bg-green-500" />
+                View dashboard & requests
+              </li>
+              <li className="flex gap-2">
+                <span className="mt-[2px] h-2 w-2 rounded-full bg-green-500" />
+                Track verification results
+              </li>
+              <li className="flex gap-2">
+                <span className="mt-[2px] h-2 w-2 rounded-full bg-green-500" />
+                Manage identity profile
+              </li>
+            </ul>
+
+            <div className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-green-700">
+              Continue
+              <span className="transition group-hover:translate-x-0.5">→</span>
+            </div>
+          </Link>
+
+          {/* Provider */}
+          <Link
+            href="/login/verifier" // 如果你实际是 /login/verifier，就改这里
+            className="group rounded-3xl bg-background p-7 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <h2 className="text-2xl font-semibold text-slate-900">
+                    Login as Service Provider
+                  </h2>
+                  
+                </div>
+
+                <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                  For organizations responding to verification requests and
+                  managing service operations.
+                </p>
+              </div>
+
+              <span className="shrink-0 rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
+                PROVIDER
+              </span>
+            </div>
+
+            <ul className="mt-5 space-y-2 text-sm text-slate-600">
+              <li className="flex gap-2">
+                <span className="mt-[2px] h-2 w-2 rounded-full bg-blue-500" />
+                Review incoming requests
+              </li>
+              <li className="flex gap-2">
+                <span className="mt-[2px] h-2 w-2 rounded-full bg-blue-500" />
+                Manage provider account
+              </li>
+              <li className="flex gap-2">
+                <span className="mt-[2px] h-2 w-2 rounded-full bg-blue-500" />
+                Process & respond securely
+              </li>
+            </ul>
+
+            <div className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-blue-700">
+              Continue
+              <span className="transition group-hover:translate-x-0.5">→</span>
+            </div>
+          </Link>
         </div>
 
         {/* Button */}
@@ -121,6 +199,17 @@ export default function LoginPage() {
           </pre>
         )}
       </form>
-    </div>
+        {/* Footer helper */}
+      </div>
+      <div className="mt-8 text-center text-sm text-slate-600">
+        Don&apos;t have an account?{" "}
+        <Link
+          href="/register"
+          className="font-semibold text-green-700 hover:underline"
+        >
+          Register
+        </Link>
+      </div>
+      </>
   );
 }

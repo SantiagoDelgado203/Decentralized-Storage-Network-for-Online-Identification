@@ -1,0 +1,61 @@
+{
+  "nav": {
+    "about": "关于我们",
+    "login": "登录",
+    "register": "注册",
+    "dashboard": "仪表盘",
+    "networkDashboard": "网络仪表盘"
+  },
+  "home": {
+    "heroTitle": "去中心化验证网络",
+    "heroDesc": "一次验证，加密分发，并在去中心化节点上执行策略。",
+    "readDocs": "阅读文档",
+    "joinNetwork": "加入网络",
+    "overviewTitle": "概览",
+    "overviewBody1": "DIDN 提供隐私保护的验证流程：数据只需验证一次，后续可安全复用。",
+    "overviewBody2": "加密分片分布在多个节点上，提高系统韧性并减少单点故障。",
+    "guaranteesTitle": "设计保障",
+    "guarantees": [
+      "加密与访问控制",
+      "验证产物去中心化存储",
+      "可审计与可追踪",
+      "分布式带来的高韧性"
+    ],
+    "authorityTitle": "可信机构",
+    "authorityBody1": "可信机构对用户属性进行一次性验证（例如年龄、学生身份）。",
+    "authorityBody2": "验证结果可被签名并复用，而不暴露原始个人数据。",
+    "storageTitle": "存储与加密",
+    "storageBody1": "验证产物会被加密并切分为分片，进行分布式存储。",
+    "storageBody2": "门限重构与完整性校验帮助维持隐私与可靠性。",
+    "requestsTitle": "验证请求",
+    "requestCardTitle": "请求",
+    "requestCardBody": "验证者只请求某个属性的证明，而不是用户的完整身份信息。",
+    "executionCardTitle": "执行",
+    "executionCardBody": "节点根据策略和密码学证明对存储的验证产物进行校验。",
+    "responseCardTitle": "响应",
+    "responseCardBody": "验证者获得的是“是/否”（或符合策略的证明），而不是底层数据。",
+    "trustTitle": "信任模型",
+    "trustBody1": "可信机构只负责首次验证步骤，不负责后续持续访问。",
+    "trustBody2": "去中心化节点执行策略，减少单点故障并提升透明度。"
+  },
+  "about": {
+    "title": "关于 DIDN",
+    "body": "DIDN 是一个课程项目，探索如何使用去中心化存储与门限（阈值）密码学实现隐私保护的验证。我们的目标是：让用户数据只由可信机构验证一次，随后加密并分发到独立节点中保存；在后续验证过程中，只返回符合策略的证明/结果，而不暴露原始个人数据。",
+    "whyTitle": "为什么要做它",
+    "bullets": [
+      "减少重复身份验证与不必要的数据暴露",
+      "在首次验证后把信任需求降到最低",
+      "让数据托管去中心化且可审计"
+    ]
+  },
+"auth": {
+  "loginTitle": "登录",
+  "loginSubtitle": "欢迎回到 DIDN Portal。",
+  "email": "邮箱",
+  "password": "密码",
+ "username": "用户名",
+  "signIn": "登录",
+  "noAccount": "还没有账号？",
+  "createOne": "去注册"
+}
+}

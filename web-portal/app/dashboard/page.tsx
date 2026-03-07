@@ -1,0 +1,71 @@
+export default function UserDashboard() {
+  const pending = [
+    { id: "REQ-1021", from: "Verifier A", request: "Over 18?", time: "Today 10:24 AM" },
+    { id: "REQ-1022", from: "Verifier B", request: "FAU Student?", time: "Yesterday 6:10 PM" },
+  ];
+
+  const history = [
+    { id: "REQ-0991", request: "Over 21?", result: "Approved", time: "Last week" },
+    { id: "REQ-0977", request: "Address verified?", result: "Denied", time: "2 weeks ago" },
+  ];
+
+  return (
+    <div className="mx-auto max-w-6xl px-6 py-10">
+      <h1 className="text-3xl font-semibold text-slate-900">Dashboard</h1>
+      <p className="mt-2 text-slate-600">Review your verification requests and account status.</p>
+
+      <div className="mt-8 grid gap-6 md:grid-cols-3">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <h2 className="text-lg font-semibold text-slate-900">Profile</h2>
+          <div className="mt-3 space-y-1 text-sm text-slate-700">
+            <div><span className="text-slate-500">User:</span> Demo User</div>
+            <div><span className="text-slate-500">Status:</span> Active</div>
+            <div><span className="text-slate-500">Last Verification:</span> 2026-02-10</div>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:col-span-2">
+          <h2 className="text-lg font-semibold text-slate-900">Pending Requests</h2>
+          <div className="mt-4 space-y-3">
+            {pending.map((p) => (
+              <div key={p.id} className="flex items-center justify-between rounded-xl border border-slate-200 p-4">
+                <div>
+                  <div className="font-medium text-slate-900">{p.request}</div>
+                  <div className="text-sm text-slate-600">{p.from} • {p.time} • {p.id}</div>
+                </div>
+                <div className="flex gap-2">
+                  <button className="rounded-xl border border-slate-300 px-3 py-2 text-sm hover:bg-slate-50">
+                    Deny
+                  </button>
+                  <button className="rounded-xl bg-slate-900 px-3 py-2 text-sm text-white hover:bg-slate-800">
+                    Accept
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-xs text-slate-500">
+            *Buttons are UI-only for the demo (no functionality yet).
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:col-span-3">
+          <h2 className="text-lg font-semibold text-slate-900">History</h2>
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            {history.map((h) => (
+              <div key={h.id} className="rounded-xl border border-slate-200 p-4">
+                <div className="flex items-center justify-between">
+                  <div className="font-medium text-slate-900">{h.request}</div>
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700">
+                    {h.result}
+                  </span>
+                </div>
+                <div className="mt-1 text-sm text-slate-600">{h.time} • {h.id}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

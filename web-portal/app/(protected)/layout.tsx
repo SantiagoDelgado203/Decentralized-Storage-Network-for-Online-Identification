@@ -5,8 +5,15 @@ import { useContext, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
 import { logout } from "@/Connectors";
+import type { Metadata } from "next";
+import "../globals.css";
 
-export default function RootLayout({
+export const metadata: Metadata = {
+  title: "DIDN Web Portal",
+  description: "Protected pages",
+};
+
+export default function ProtectedLayout({
   children,
 }: {
   children: React.ReactNode;

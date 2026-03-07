@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { register_user, register_provider } from "../../../Connectors";
+import Link from "next/link";
 
 export default function RegisterPage() {
   const [userEmail, setUserEmail] = useState("");
