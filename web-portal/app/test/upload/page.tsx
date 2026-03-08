@@ -65,10 +65,7 @@ export default function Upload() {
               placeholder="9a3fc47b-98b2-4d51-bb5e-a4a641812ebb"
             />
           </div>
-        </div>
 
-
-        <div className="space-y-5">
           {/* Name */}
           <div>
             <label className="block text-sm text-neutral-400 mb-1">
