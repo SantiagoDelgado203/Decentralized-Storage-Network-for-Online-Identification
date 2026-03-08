@@ -48,13 +48,51 @@
       "Keep custody decentralized and auditable"
     ]
   },
-"auth": {
-  "loginTitle": "Login",
-  "loginSubtitle": "Welcome back to DIDN Portal.",
-  "email": "Email",
-  "password": "Password",
-  "signIn": "Log In",
-  "noAccount": "No account?",
-  "createOne": "Create one"
-}
+  "auth": {
+    "loginTitle": "Login",
+    "loginSubtitle": "Welcome back to DIDN Portal.",
+    "email": "Email",
+    "password": "Password",
+    "signIn": "Log In",
+    "noAccount": "No account?",
+    "createOne": "Create one"
+  },
+  "loginSelection": {
+    "title": "Sign in",
+    "subtitle": "Choose the account type you want to log in with.",
+    "userTitle": "Login as User",
+    "userDesc": "For individuals accessing the portal to request services and manage verification history.",
+    "userBullet1": "View dashboard & requests",
+    "userBullet2": "Track verification results",
+    "userBullet3": "Manage identity profile",
+    "providerTitle": "Login as Service Provider",
+    "providerDesc": "For organizations responding to verification requests and managing service operations.",
+    "providerBullet1": "Review incoming requests",
+    "providerBullet2": "Manage provider account",
+    "providerBullet3": "Process & respond securely",
+    "tagUser": "USER",
+    "tagProvider": "PROVIDER",
+    "continue": "Continue",
+    "footer": "Don't have an account?",
+    "register": "Register"
+  },
+  "registerSelection": {
+    "title": "Create your account",
+    "subtitle": "Choose the account type that matches how you’ll use the DIDN Portal.",
+    "userTitle": "Register as User",
+    "userDesc": "For individuals who want to request services, manage identity, and submit verification requests.",
+    "userBullet1": "Access the dashboard and request services",
+    "userBullet2": "Track verification status & history",
+    "userBullet3": "Secure identity storage workflow",
+    "providerTitle": "Register as Service Provider",
+    "providerDesc": "For organizations who provide services, respond to user requests, and perform verification.",
+    "providerBullet1": "Receive and process verification requests",
+    "providerBullet2": "Manage provider profile & service info",
+    "providerBullet3": "View request queue & responses",
+    "tagUser": "USER",
+    "tagProvider": "PROVIDER",
+    "continue": "Continue",
+    "footer": "Already have an account?",
+    "login": "Login"
+  }
 }

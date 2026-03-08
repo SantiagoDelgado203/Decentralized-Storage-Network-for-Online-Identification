@@ -34,18 +34,17 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
   const lang = ((sp.get("lang") as Lang) || "en") as Lang;
   const t = copy[lang] ?? copy.en;
 
+  // ✅ 关键：replace + refresh，保证 server pages 根据 searchParams 重新渲染
   function setLang(next: Lang) {
     const nextParams = new URLSearchParams(sp.toString());
     nextParams.set("lang", next);
-    router.push(`${pathname}?${nextParams.toString()}`);
+
+    router.replace(`${pathname}?${nextParams.toString()}`);
+    router.refresh();
   }
 
-  // 带上 lang，避免切页后语言丢失
-  const withLang = (href: string) => {
-    const nextParams = new URLSearchParams(sp.toString());
-    nextParams.set("lang", lang);
-    return `${href}?${nextParams.toString()}`;
-  };
+  // ✅ 简化：每个链接都只带 lang（不会把其它参数带过去导致混乱）
+  const withLang = (href: string) => `${href}?lang=${lang}`;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -98,4 +97,3 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
     </div>
   );
 }
-
