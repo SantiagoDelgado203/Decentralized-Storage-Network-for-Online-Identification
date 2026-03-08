@@ -5,6 +5,7 @@ import { uploadUserData } from "@/Connectors";
 import { UploadRequest, UserInfo } from "@/Models";
 
 export default function Upload() {
+  const [userID, setUserID] = useState("");
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [gender, setGender] = useState("")
@@ -27,7 +28,7 @@ export default function Upload() {
     };
 
     const payload: UploadRequest = {
-      UserID: "9a3fc47b-98b2-4d51-bb5e-a4a641812ebb",
+      UserID: userID,
       Data: user_info
     }
 
@@ -49,6 +50,23 @@ export default function Upload() {
         <h1 className="text-2xl font-mono tracking-wide text-neutral-100 mb-6">
           Submit User Data
         </h1>
+
+        <div className="space-y-5">
+          {/* User ID */}
+          <div>
+            <label className="block text-sm text-neutral-400 mb-1">
+              User ID
+            </label>
+            <input
+              className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-2 text-neutral-100
+                         focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30"
+              value={userID}
+              onChange={(e) => setUserID(e.target.value)}
+              placeholder="9a3fc47b-98b2-4d51-bb5e-a4a641812ebb"
+            />
+          </div>
+        </div>
+
 
         <div className="space-y-5">
           {/* Name */}
