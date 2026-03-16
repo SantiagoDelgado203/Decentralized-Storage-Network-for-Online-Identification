@@ -42,15 +42,59 @@ A peer-to-peer decentralized storage network using libp2p for secure, distribute
 
 ---
 
+## Docker Hub Images
+
+Pre-built images are available on Docker Hub:
+
+| Image | Description |
+|-------|-------------|
+| `kanishd/dsn-web-portal` | Next.js web interface |
+| `kanishd/dsn-admin-node` | Express.js API gateway |
+| `kanishd/dsn-storage-node` | Go libp2p storage node |
+
+### Pull Images (All Team Members)
+
+```bash
+docker pull kanishd/dsn-storage-node
+docker pull kanishd/dsn-admin-node
+docker pull kanishd/dsn-web-portal
+```
+
+### Pull All at Once
+
+```bash
+docker pull kanishd/dsn-storage-node && docker pull kanishd/dsn-admin-node && docker pull kanishd/dsn-web-portal
+```
+
+---
+
 ## Quick Start (Single Machine)
 
-### 1. Clone the Repository
+### Option A: Using Pre-built Images (Recommended)
+
+#### 1. Clone the Repository
 ```bash
 git clone https://github.com/your-org/Decentralized-Storage-Network-for-Online-Identification.git
 cd Decentralized-Storage-Network-for-Online-Identification
 ```
 
-### 2. Build and Start All Services
+#### 2. Pull Images and Start Services
+```bash
+docker pull kanishd/dsn-storage-node
+docker pull kanishd/dsn-admin-node
+docker pull kanishd/dsn-web-portal
+docker-compose up -d
+```
+
+### Option B: Build Locally
+
+#### 1. Clone the Repository
+```bash
+git clone https://github.com/your-org/Decentralized-Storage-Network-for-Online-Identification.git
+cd Decentralized-Storage-Network-for-Online-Identification
+```
+
+#### 2. Build and Start All Services
 ```bash
 docker-compose build
 docker-compose up -d
@@ -146,17 +190,25 @@ ghi789         worker2     Ready     Active
 docker network create --driver overlay --attachable dsn-swarm-network
 ```
 
-### Step 5: Deploy the Stack
+### Step 5: Pull Images on All Machines
+
+Each machine in the swarm needs the Docker images. Run on **every machine**:
 
 ```bash
-# Build images first (on manager)
-docker-compose build
+docker pull kanishd/dsn-storage-node
+docker pull kanishd/dsn-admin-node
+docker pull kanishd/dsn-web-portal
+```
 
-# Deploy to swarm
+### Step 6: Deploy the Stack
+
+On the **manager node**:
+
+```bash
 docker stack deploy -c docker-compose.swarm.yml dsn
 ```
 
-### Step 6: Verify Deployment
+### Step 7: Verify Deployment
 
 ```bash
 # Check services
@@ -170,7 +222,7 @@ docker service ps dsn_storage-node-2
 docker service logs dsn_storage-node-1
 ```
 
-### Step 7: Scale Storage Nodes
+### Step 8: Scale Storage Nodes
 
 ```bash
 # Add more storage node replicas
@@ -348,4 +400,3 @@ docker-compose build --no-cache
 
 ## License
 
-MIT License
