@@ -11,7 +11,7 @@ export class Provider {
     hashedpassword: string;
   }) {
     this.providerid = params.providerid || "";
-    this.email = params.email
+    this.email = params.email;
     this.registeredname = params.registeredname;
     this.hashedpassword = params.hashedpassword;
   }

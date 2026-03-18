@@ -1,0 +1,60 @@
+{
+  "nav": {
+    "about": "About Us",
+    "login": "Login",
+    "register": "Register",
+    "dashboard": "Dashboard",
+    "networkDashboard": "Network Dashboard"
+  },
+  "home": {
+    "heroTitle": "Decentralized Verification Network",
+    "heroDesc": "Verify once, encrypt and distribute, and enforce across decentralized nodes.",
+    "readDocs": "Read Docs",
+    "joinNetwork": "Join Network",
+    "overviewTitle": "Overview",
+    "overviewBody1": "DIDN provides a privacy-preserving verification workflow where data is verified once and reused securely.",
+    "overviewBody2": "Encrypted shards are distributed across nodes to improve resilience and reduce single points of failure.",
+    "guaranteesTitle": "Design Guarantees",
+    "guarantees": [
+      "Encryption and access control",
+      "Decentralized storage of verification artifacts",
+      "Auditability and traceability",
+      "Resilience through distribution"
+    ],
+    "authorityTitle": "Trusted Authority",
+    "authorityBody1": "A trusted authority verifies user attributes once (e.g., age or student status).",
+    "authorityBody2": "The signed result can be reused without exposing raw personal data.",
+    "storageTitle": "Storage & Encryption",
+    "storageBody1": "Verification artifacts are encrypted and split into shards for distributed storage.",
+    "storageBody2": "Threshold reconstruction and integrity checks help maintain privacy and reliability.",
+    "requestsTitle": "Verification Queries",
+    "requestCardTitle": "Request",
+    "requestCardBody": "A verifier requests proof of a specific attribute without asking for the full identity.",
+    "executionCardTitle": "Execution",
+    "executionCardBody": "Nodes validate policies and cryptographic proofs against stored artifacts.",
+    "responseCardTitle": "Response",
+    "responseCardBody": "The verifier receives a yes/no (or policy-compliant proof), not the underlying data.",
+    "trustTitle": "Trust Model",
+    "trustBody1": "The authority is trusted only for the initial verification step, not for ongoing access.",
+    "trustBody2": "Decentralized nodes enforce policies, reduce single points of failure, and improve transparency."
+  },
+  "about": {
+    "title": "About DIDN",
+    "body": "DIDN is a course project that explores privacy-preserving verification using decentralized storage and threshold cryptography. Our goal is to let user data be verified once by a trusted authority, then encrypted and distributed across independent nodes—so future checks can return policy-compliant proofs without exposing raw personal data.",
+    "whyTitle": "Why we built it",
+    "bullets": [
+      "Reduce repeated identity verification and unnecessary data exposure",
+      "Minimize trust after the initial verification step",
+      "Keep custody decentralized and auditable"
+    ]
+  },
+"auth": {
+  "loginTitle": "Login",
+  "loginSubtitle": "Welcome back to DIDN Portal.",
+  "email": "Email",
+  "password": "Password",
+  "signIn": "Log In",
+  "noAccount": "No account?",
+  "createOne": "Create one"
+}
+}

@@ -1,0 +1,66 @@
+{
+  "nav": {
+    "about": "Sobre nosotros",
+    "login": "Iniciar sesión",
+    "register": "Registrarse",
+    "dashboard": "Panel",
+    "networkDashboard": "Panel de red"
+  },
+  "home": {
+    "heroTitle": "Red de Verificación Descentralizada",
+    "heroDesc": "Verifica una vez, cifra y distribuye, y aplica políticas en nodos descentralizados.",
+    "readDocs": "Leer documentación",
+    "joinNetwork": "Unirse a la red",
+    "overviewTitle": "Resumen",
+    "overviewBody1": "DIDN ofrece un flujo de verificación que protege la privacidad: los datos se verifican una sola vez y se reutilizan de forma segura.",
+    "overviewBody2": "Los fragmentos cifrados se distribuyen entre nodos para mejorar la resiliencia y reducir puntos únicos de fallo.",
+    "guaranteesTitle": "Garantías de diseño",
+    "guarantees": [
+      "Cifrado de extremo a extremo y control de acceso",
+      "Almacenamiento descentralizado de artefactos de verificación",
+      "Auditabilidad y trazabilidad",
+      "Resiliencia mediante distribución"
+    ],
+    "authorityTitle": "Autoridad de confianza",
+    "authorityBody1": "Una autoridad de confianza verifica atributos del usuario una sola vez (p. ej., edad o condición de estudiante).",
+    "authorityBody2": "El resultado se firma y puede reutilizarse sin exponer datos personales en bruto.",
+    "storageTitle": "Almacenamiento y cifrado",
+    "storageBody1": "Los artefactos de verificación del usuario se cifran y se dividen en fragmentos para su almacenamiento distribuido.",
+    "storageBody2": "La reconstrucción por umbral y las comprobaciones de integridad ayudan a mantener privacidad y fiabilidad.",
+    "requestsTitle": "Consultas de verificación",
+    "requestCardTitle": "Solicitud",
+    "requestCardBody": "Un verificador solicita prueba de un atributo específico sin pedir la identidad completa.",
+    "executionCardTitle": "Ejecución",
+    "executionCardBody": "Los nodos validan reglas y pruebas criptográficas frente a los artefactos almacenados.",
+    "responseCardTitle": "Respuesta",
+    "responseCardBody": "El verificador recibe un resultado sí/no (o una prueba compatible con la política), no los datos subyacentes.",
+    "trustTitle": "Modelo de confianza",
+    "trustBody1": "La autoridad solo se confía para la verificación inicial, no para el acceso continuo a los datos del usuario.",
+    "trustBody2": "Los nodos descentralizados aplican políticas, reducen puntos únicos de fallo y mejoran la transparencia."
+  },
+  "about": {
+    "title": "Acerca de DIDN",
+    "body": "DIDN es un proyecto de curso que explora la verificación con preservación de privacidad mediante almacenamiento descentralizado y criptografía de umbral. Nuestro objetivo es que los datos del usuario se verifiquen una sola vez por una autoridad confiable, luego se cifren y se distribuyan entre nodos independientes, de modo que las verificaciones futuras devuelvan pruebas o resultados compatibles con la política sin exponer datos personales en bruto.",
+    "whyTitle": "Por qué lo construimos",
+    "bullets": [
+      "Reducir verificaciones de identidad repetidas y exposición innecesaria de datos",
+      "Minimizar la confianza requerida después de la verificación inicial",
+      "Mantener la custodia descentralizada y auditable"
+    ]
+  },
+  "auth": {
+    "loginTitle": "Iniciar sesión",
+    "loginSubtitle": "Bienvenido/a de nuevo al portal DIDN.",
+    "registerTitle": "Registrarse",
+    "registerSubtitle": "Crea tu cuenta para unirte a la red.",
+    "name": "Nombre",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "signIn": "Entrar",
+    "createAccount": "Crear cuenta",
+    "noAccount": "¿No tienes cuenta?",
+    "createOne": "Crear una",
+    "haveAccount": "¿Ya tienes cuenta?",
+    "goLogin": "Iniciar sesión"
+  }
+}
