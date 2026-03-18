@@ -51,15 +51,34 @@ func (db *Database) StoreSimple(data SimpleData) error {
 	defer cancel()
 
 	now := time.Now().UTC()
-	data.CreatedAt = now
-	data.UpdatedAt = now
 
-	_, err := db.main.InsertOne(ctx, data)
-	if err != nil {
-		return fmt.Errorf("failed to store data: %v", err)
+	// Filter: find by hash
+	filter := bson.M{"hash": data.Hash}
+
+	// Update: set fields
+	update := bson.M{
+		"$set": bson.M{
+			"cipher":     data.Data,
+			"updated_at": now,
+		},
+		"$setOnInsert": bson.M{
+			"created_at": now,
+		},
 	}
 
-	log.Printf("Data stored successfully, hash: %s\n", data.Hash)
+	opts := options.Update().SetUpsert(true)
+
+	result, err := db.main.UpdateOne(ctx, filter, update, opts)
+	if err != nil {
+		return fmt.Errorf("failed to upsert data: %v", err)
+	}
+
+	if result.UpsertedCount > 0 {
+		log.Printf("New data inserted, hash: %s\n", data.Hash)
+	} else {
+		log.Printf("Existing data updated, hash: %s\n", data.Hash)
+	}
+
 	return nil
 }
 

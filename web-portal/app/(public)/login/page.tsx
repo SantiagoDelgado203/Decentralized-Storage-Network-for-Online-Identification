@@ -1,8 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { login } from "../../../Connectors";
+import Loading from "@/app/loading";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -11,34 +12,72 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [response, setResponse] = useState<string | null>(null);
 
-  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
-    e.preventDefault();
+  // check if already logged in
+  useEffect(() => {
+    async function checkSession() {
+      try {
+        const res = await fetch("http://localhost:5000/api/me", {
+          credentials: "include",
+        });
 
+        if (!res.ok) return; // not logged in
+
+        const data = await res.json();
+
+        if (data.type === "user") {
+          router.push("/user/dashboard");
+        } else if (data.type === "verifier") {
+          router.push("/verifier/dashboard");
+        }
+      } catch (err) {
+        console.error("Session check failed:", err);
+      }
+    }
+    checkSession();
+  }, [router]);
+
+  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+    e.preventDefault()
     try {
       const res = await login({ email, password });
 
-      console.log("LOGIN RESPONSE:", res);
-
+      console.log("LOGIN RESPONSE:" + JSON.stringify(res));
       setResponse(res?.reply ?? null);
 
-      if (res?.status === 200) {
-        router.push("/user/dashboard");
+      if (res?.ok) {
+        const me = await fetch("http://localhost:5000/api/me", {
+          credentials: "include",
+        });
+
+        if (!me.ok) {
+          setResponse("Could not verify session.");
+          return;
+        }
+
+        const data = await me.json();
+
+        if (data.type === "user") {
+          router.push("/user/dashboard");
+        } else if (data.type === "verifier") {
+          router.push("/verifier/dashboard");
+        } else {
+          setResponse("Unknown account type.");
+        }
+
       }
+
     } catch (err) {
-      console.error(err);
+      alert(err);
       setResponse("Something went wrong.");
     }
   }
-
   return (
     <div className="flex items-center justify-center my-10">
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-sm space-y-6 rounded-xl border border-gray-800 bg-black p-8 shadow-lg"
       >
-        <h1 className="text-2xl font-semibold text-center">
-          Login
-        </h1>
+        <h1 className="text-2xl font-semibold text-center">Login</h1>
 
         {/* Email */}
         <div className="flex flex-col gap-2">

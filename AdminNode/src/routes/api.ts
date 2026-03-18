@@ -177,9 +177,10 @@ router.get('/node-info', (req: Request, res: Response) => {
 
 router.post("/db/request-verification", async (req: Request, res: Response) => {
 
+  
   //Get the request body
   const request_body = req.body
-
+  
   //Create a new request
   const newRequest = new DB_Request({
     providerid: request_body.verifierID,
@@ -188,15 +189,16 @@ router.post("/db/request-verification", async (req: Request, res: Response) => {
     datarequests: request_body.criteria,
     status: "Pending"
   })
-
+  
   //try to create the request in the database
   try {
     await createRequest(pool,newRequest)
-    res.json({
+    console.log('Received')
+    return res.json({
       reply: "Request created!"
     })
   } catch (e) {
-    res.status(500)
+    return res.status(500)
   }
 })
 
@@ -221,7 +223,7 @@ router.post("/db/update-request", async (req: Request, res: Response) => {
 
   const rep = await updateRequest(pool, updated_request)
 
-  res.json(rep)
+  return res.json(rep)
 
 })
 
@@ -232,10 +234,9 @@ router.post("/db/register-user", async (req: Request, res: Response) => {
   const user_check = await getUserByEmail(pool, request_body.email)
 
   if(user_check != null){
-    res.json({
+    return res.json({
       reply :"User already exists"
     })
-    return
   }
 
   const hash = await bcrypt.hash(request_body.password, 10);
@@ -243,7 +244,7 @@ router.post("/db/register-user", async (req: Request, res: Response) => {
   const new_user = new User({userid: "", email:request_body.email, hashedpassword: hash})
   await upsertUser(pool, new_user)
 
-  res.status(200).json({ reply: "User created" });
+  return res.status(200).json({ reply: "User created" });
 
 })
 
@@ -254,10 +255,9 @@ router.post("/db/register-verifier", async (req: Request, res: Response) => {
   const user_check = await getProviderByEmail(pool, request_body.email)
 
   if(user_check != null){
-    res.json({
+    return res.json({
       reply :"User already exists"
     })
-    return
   }
 
   const hash = await bcrypt.hash(request_body.password, 10);
@@ -265,7 +265,7 @@ router.post("/db/register-verifier", async (req: Request, res: Response) => {
   const new_user = new Provider({providerid: "", email:request_body.email, hashedpassword: hash, registeredname: request_body.companyname})
   await upsertProvider(pool, new_user)
 
-  res.status(200).json({ reply: "User created" });
+  return res.status(200).json({ reply: "User created" });
 
 })
 
@@ -333,7 +333,7 @@ router.post("/db/logout", (req: Request, res: Response) => {
     sameSite: "lax",
   });
 
-  res.status(200).json({ reply: "Logged out successfully" });
+  return res.status(200).json({ reply: "Logged out successfully" });
 });
 
 export default router

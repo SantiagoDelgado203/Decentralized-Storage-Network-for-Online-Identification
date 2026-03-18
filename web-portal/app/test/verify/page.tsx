@@ -4,8 +4,8 @@ import { JSX, useState } from "react";
 import { Criteria, Rule } from "@/Models";
 import { requestVerification } from "@/Connectors";
 
-const TEST_USERID = "9a3fc47b-98b2-4d51-bb5e-a4a641812ebb";
-const TEST_PROVIDERID = "6cbf4598-339d-4b4b-8d63-30c53c20c4ec";
+const TEST_USERID = "6eb79757-2c74-4c9e-b347-e1cd0d2fec30";
+const TEST_PROVIDERID = "821b370a-0b59-4952-8ea3-48daf6f2712a";
 
 /* -----------------------------
    FACTORY HELPERS

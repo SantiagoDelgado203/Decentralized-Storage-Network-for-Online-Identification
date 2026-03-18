@@ -74,7 +74,6 @@ export async function register_provider(payload :{email: string, password: strin
 
 /**check credentials and create JWT (db/login)*/
 export async function login(payload: {email: string,  password: string}){
-
   const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/db/login", {
     method: "POST",
     credentials: "include",
@@ -146,7 +145,7 @@ export async function resolveRequest(payload : {requestID: string, accepted: boo
 /** to modify an existing request, from a verifier */
 export async function updateRequest(payload : {requestID: string, criteria: Criteria, status: string}){
   
-  const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/db/logout", {
+  const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/db/update-request", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

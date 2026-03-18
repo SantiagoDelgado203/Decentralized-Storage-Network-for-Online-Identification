@@ -1,6 +1,7 @@
-export default function loading(){
+export default function Loading(){
     return (
-        <div className=" h-screen w-full bg-white">
+        <div className=" h-screen w-full bg-black">
+            LOADING...
         </div>
     )
 }

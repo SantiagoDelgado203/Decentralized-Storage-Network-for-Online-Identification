@@ -138,6 +138,7 @@ export async function deleteProvider(pool: Pool, providerid: string) {
 }
 
 export async function createRequest(pool: Pool, request: DB_Request) {
+  console.log("looking")
   const { rows } = await pool.query(
     `
     INSERT INTO requests (
@@ -158,6 +159,7 @@ export async function createRequest(pool: Pool, request: DB_Request) {
       request.status
     ]
   );
+  console.log(rows)
   return rows[0];
 }
 
