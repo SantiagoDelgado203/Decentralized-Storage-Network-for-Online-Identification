@@ -28,7 +28,7 @@ export default async function RegisterSelectionPage(props: {
         <div className="mt-10 grid gap-6 md:grid-cols-2">
           {/* User */}
           <Link
-            href="/register/user"
+            href={`/register/user${q}`}
             className="group rounded-3xl bg-white p-7 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md"
           >
             <div className="flex items-start justify-between gap-4">
@@ -69,7 +69,7 @@ export default async function RegisterSelectionPage(props: {
 
           {/* Provider */}
           <Link
-            href="/register/verifier"
+            href={`/register/verifier${q}`}
             className="group rounded-3xl bg-white p-7 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md"
           >
             <div className="flex items-start justify-between gap-4">

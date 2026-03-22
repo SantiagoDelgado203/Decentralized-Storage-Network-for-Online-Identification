@@ -26,7 +26,7 @@ export default async function LoginSelectionPage(props: {
         <div className="mt-10 grid gap-6 md:grid-cols-2">
           {/* User */}
           <Link
-            href="/login/user"
+            href={`/login/user${q}`}
             className="group rounded-3xl bg-white p-7 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md"
           >
             <div className="flex items-start justify-between gap-4">
@@ -67,7 +67,7 @@ export default async function LoginSelectionPage(props: {
 
           {/* Provider */}
           <Link
-            href="/login/verifier" // 如果你实际是 /login/verifier，就改这里
+            href={`/login/verifier${q}`} // 如果你实际是 /login/verifier，就改这里
             className="group rounded-3xl bg-white p-7 shadow-sm ring-1 ring-slate-200 transition hover:-translate-y-0.5 hover:shadow-md"
           >
             <div className="flex items-start justify-between gap-4">

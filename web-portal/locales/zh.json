@@ -56,7 +56,12 @@
     "username": "用户名",
     "signIn": "登录",
     "noAccount": "还没有账号？",
-    "createOne": "去注册"
+    "createOne": "去注册",
+    "registerTitle": "注册",
+    "registerSubtitle": "创建你的 DIDN Portal 账户。",
+    "createAccount": "创建账户",
+    "haveAccount": "已经有账号？",
+    "goLogin": "登录"
   },
   "loginSelection": {
     "title": "登录",
