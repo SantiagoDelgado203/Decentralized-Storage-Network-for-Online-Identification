@@ -1,13 +1,13 @@
 import { Router, type Request, type Response } from 'express'
 import { multiaddr } from "@multiformats/multiaddr";
-import { getNode, getConnectionInfo } from '../p2p/node'
-import { DB_Request, User } from '../../Models';
-import { createRequest, getProviderById, getRequests, getUserByEmail, updateRequest, upsertUser } from '../../Database';
+import { getNode, getConnectionInfo } from '../p2p/node.js'
+import { DB_Request, Provider, User } from '../../Models';
+import { createRequest, getProviderById, getRequests, getUserByEmail, getUserById, updateRequest, upsertUser, getProviderByEmail, upsertProvider } from '../../Database';
 import { Pool } from 'pg';
 import dotenv from 'dotenv';
 import * as bcrypt from 'bcryptjs';
-import {pipe} from "it-pipe"
-import { Uint8ArrayList } from 'uint8arraylist'
+import jwt from "jsonwebtoken";
+import { authMiddleware, authorizeRole } from '../../AuthMiddleware';
 
 /**
  * API ROUTES FILE
@@ -29,13 +29,70 @@ const pool = new Pool({
     port: parseInt(process.env.PG_PORT || '5432'),
 });
 
+router.get("/me", authMiddleware, async (req: any, res: Response) => {
+  try {
+    const { id, type } = req.user;
 
+    let account = null;
 
+    if (type === "user") {
+      account = await getUserById(pool, id);
+      return res.json({
+        id: account.userid,
+        email: account.email,
+        type: type
+      });
+    }
 
-// Health check
-router.get('/test', async (req, res) => {
-  res.send('Hello World')
-})
+    if (type === "verifier") {
+      account = await getProviderById(pool, id);
+      return res.json({
+        id: account.providerid,
+        email: account.email,
+        companyname: account.registeredname,
+        type: type,
+      });
+    }
+
+    if (!account) {
+      return res.status(401).json({ error: "Account not found" });
+    }
+
+  } catch (err) {
+    console.error("Error in /me:", err);
+    return res.status(500).json({ error: "Server error" });
+  }
+});
+
+router.get(
+  "/auth/user",
+  authMiddleware,
+  authorizeRole("user"),
+  (req: Request, res: Response) => {
+    const user = (req as any).user;
+
+    res.json({
+      ok: true,
+      role: "user",
+      id: user.id
+    });
+  }
+);
+
+router.get(
+  "/auth/verifier",
+  authMiddleware,
+  authorizeRole("verifier"),
+  (req: Request, res: Response) => {
+    const user = (req as any).user;
+
+    res.json({
+      ok: true,
+      role: "verifier",
+      id: user.id
+    });
+  }
+);
 
 router.post('/net/upload', async (req: Request, res: Response) => {
 
@@ -166,9 +223,10 @@ router.get('/peers', (req: Request, res: Response) => {
 
 router.post("/db/request-verification", async (req: Request, res: Response) => {
 
+  
   //Get the request body
   const request_body = req.body
-
+  
   //Create a new request
   const newRequest = new DB_Request({
     providerid: request_body.verifierID,
@@ -177,15 +235,16 @@ router.post("/db/request-verification", async (req: Request, res: Response) => {
     datarequests: request_body.criteria,
     status: "Pending"
   })
-
+  
   //try to create the request in the database
   try {
     await createRequest(pool,newRequest)
-    res.json({
+    console.log('Received')
+    return res.json({
       reply: "Request created!"
     })
   } catch (e) {
-    res.status(500)
+    return res.status(500)
   }
 })
 
@@ -195,30 +254,20 @@ router.post("/db/get-requests", async (req: Request, res: Response) => {
   const requests = await getRequests(pool, {userid: request_body.userID, providerid: request_body.verifierID})
 
   res.json(requests)
-
-
-
 })
 
 router.post("/db/resolve-requests", async (req: Request, res: Response) => {
   const request_body = req.body
 
-  const db_request = await getRequests(pool, {requestid: request_body.requestID})
+  const db_request = await getRequests(pool, { requestid: request_body.requestID })
+  const updated_request = new DB_Request(db_request[0])
 
-  let updated_request = new DB_Request(db_request[0])
-
-  if(request_body.accepted){
-    //HERE IS WHERE WE DIAL THE NODE TO START THE VERIFICATION PROCESS
-  }
-  
   updated_request.status = request_body.accepted ? "Accepted" : "Rejected"
 
   const rep = await updateRequest(pool, updated_request)
 
-  res.json(rep)
-
+  return res.json(rep)
 })
-
 
 router.post("/db/update-request", async (req: Request, res: Response) => {
   const request_body = req.body
@@ -231,54 +280,117 @@ router.post("/db/update-request", async (req: Request, res: Response) => {
 
   const rep = await updateRequest(pool, updated_request)
 
-  res.json(rep)
+  return res.json(rep)
 
 })
 
-router.post("/db/register", async (req: Request, res: Response) => {
+router.post("/db/register-user", async (req: Request, res: Response) => {
+
   const request_body = req.body
 
   const user_check = await getUserByEmail(pool, request_body.email)
 
   if(user_check != null){
-    res.json({
+    return res.json({
       reply :"User already exists"
     })
-    return
   }
 
   const hash = await bcrypt.hash(request_body.password, 10);
   
   const new_user = new User({userid: "", email:request_body.email, hashedpassword: hash})
-  upsertUser(pool, new_user)
+  await upsertUser(pool, new_user)
 
-  res.status(200).json({ reply: "User created" });
+  return res.status(200).json({ reply: "User created" });
+
+})
+
+router.post("/db/register-verifier", async (req: Request, res: Response) => {
+
+  const request_body = req.body
+
+  const user_check = await getProviderByEmail(pool, request_body.email)
+
+  if(user_check != null){
+    return res.json({
+      reply :"User already exists"
+    })
+  }
+
+  const hash = await bcrypt.hash(request_body.password, 10);
+  
+  const new_user = new Provider({providerid: "", email:request_body.email, hashedpassword: hash, registeredname: request_body.companyname})
+  await upsertProvider(pool, new_user)
+
+  return res.status(200).json({ reply: "User created" });
 
 })
 
 router.post("/db/login", async (req: Request, res: Response) => {
-  const request_body = req.body
+  const { email, password } = req.body;
 
-  const user = await getUserByEmail(pool, request_body.email)
-  if(user == null){
-    res.status(404).json({
-      reply: "User not found."
-    })
-    return
+  let type = "";
+  let id: string = "";
+  let user: any;
+
+  // check users table
+  user = await getUserByEmail(pool, email);
+  if (user) {
+    type = "user";
+    id = user.userid;
+  } else {
+    // check verifier table
+    user = await getProviderByEmail(pool, email);
+    if (user) {
+      type = "verifier";
+      id = user.providerid;
+    }
   }
 
-  const check_password = await bcrypt.compare(request_body.password, user.hashedpassword)
-
-  if(check_password){
-    res.status(200).json({
-      reply: "Successfully logged in"
-    })
-  }else{
-    res.status(401).json({
-      reply: "Wrong credentials"
-    })
+  if (!user) {
+    return res.status(401).json({
+      reply: "Invalid credentials"
+    });
   }
 
-})
+  const check_password = await bcrypt.compare(password, user.hashedpassword);
+
+  if (!check_password) {
+    return res.status(401).json({
+      reply: "Invalid credentials"
+    });
+  }
+
+  const token = jwt.sign(
+    {
+      id: id,
+      type: type
+    },
+    process.env.JWT_SECRET!,
+    { expiresIn: "1d" }
+  );
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    maxAge: 24 * 60 * 60 * 1000,
+  });
+
+  return res.status(200).json({
+    ok: true,
+    reply: "Successfully logged in"
+  });
+});
+
+router.post("/db/logout", (req: Request, res: Response) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: false, // true in production (HTTPS)
+    sameSite: "lax",
+  });
+
+  return res.status(200).json({ reply: "Logged out successfully" });
+});
 
 export default router

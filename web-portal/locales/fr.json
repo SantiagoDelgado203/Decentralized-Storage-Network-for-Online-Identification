@@ -1,0 +1,66 @@
+{
+  "nav": {
+    "about": "À propos",
+    "login": "Connexion",
+    "register": "S’inscrire",
+    "dashboard": "Tableau de bord",
+    "networkDashboard": "Tableau de bord réseau"
+  },
+  "home": {
+    "heroTitle": "Réseau de vérification décentralisé",
+    "heroDesc": "Vérifier une fois, chiffrer et distribuer, puis appliquer des politiques via des nœuds décentralisés.",
+    "readDocs": "Lire la documentation",
+    "joinNetwork": "Rejoindre le réseau",
+    "overviewTitle": "Aperçu",
+    "overviewBody1": "DIDN propose un flux de vérification respectueux de la vie privée : les données sont vérifiées une seule fois puis réutilisées de manière sécurisée.",
+    "overviewBody2": "Les fragments chiffrés sont distribués sur plusieurs nœuds pour améliorer la résilience et réduire les points de défaillance uniques.",
+    "guaranteesTitle": "Garanties de conception",
+    "guarantees": [
+      "Chiffrement de bout en bout et contrôle d’accès",
+      "Stockage décentralisé des artefacts de vérification",
+      "Auditabilité et traçabilité",
+      "Résilience par la distribution"
+    ],
+    "authorityTitle": "Autorité de confiance",
+    "authorityBody1": "Une autorité de confiance vérifie les attributs utilisateur une seule fois (ex. âge, statut étudiant).",
+    "authorityBody2": "Le résultat est signé et réutilisable sans exposer les données personnelles brutes.",
+    "storageTitle": "Stockage et chiffrement",
+    "storageBody1": "Les artefacts de vérification sont chiffrés puis découpés en fragments pour un stockage distribué.",
+    "storageBody2": "La reconstruction par seuil et les contrôles d’intégrité renforcent la confidentialité et la fiabilité.",
+    "requestsTitle": "Requêtes de vérification",
+    "requestCardTitle": "Demande",
+    "requestCardBody": "Un vérificateur demande une preuve d’un attribut précis sans exiger l’identité complète.",
+    "executionCardTitle": "Exécution",
+    "executionCardBody": "Les nœuds valident les règles et les preuves cryptographiques par rapport aux artefacts stockés.",
+    "responseCardTitle": "Réponse",
+    "responseCardBody": "Le vérificateur reçoit un résultat oui/non (ou une preuve conforme à la politique), pas les données sous-jacentes.",
+    "trustTitle": "Modèle de confiance",
+    "trustBody1": "L’autorité n’est fiable que pour la vérification initiale, pas pour l’accès continu aux données de l’utilisateur.",
+    "trustBody2": "Les nœuds décentralisés appliquent les politiques, réduisent les points uniques de défaillance et améliorent la transparence."
+  },
+  "about": {
+    "title": "À propos de DIDN",
+    "body": "DIDN est un projet de cours qui explore une vérification respectueuse de la vie privée grâce au stockage décentralisé et à la cryptographie à seuil. Notre objectif est que les données utilisateur soient vérifiées une seule fois par une autorité de confiance, puis chiffrées et distribuées sur des nœuds indépendants, afin que les vérifications futures renvoient des preuves ou résultats conformes à la politique sans exposer les données personnelles brutes.",
+    "whyTitle": "Pourquoi nous l’avons créé",
+    "bullets": [
+      "Réduire les vérifications d’identité répétées et l’exposition inutile des données",
+      "Minimiser la confiance requise après l’étape de vérification initiale",
+      "Garder la garde des données décentralisée et auditable"
+    ]
+  },
+  "auth": {
+    "loginTitle": "Connexion",
+    "loginSubtitle": "Bon retour sur le portail DIDN.",
+    "registerTitle": "Inscription",
+    "registerSubtitle": "Créez votre compte pour rejoindre le réseau.",
+    "name": "Nom",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "signIn": "Se connecter",
+    "createAccount": "Créer un compte",
+    "noAccount": "Pas de compte ?",
+    "createOne": "En créer un",
+    "haveAccount": "Vous avez déjà un compte ?",
+    "goLogin": "Se connecter"
+  }
+}

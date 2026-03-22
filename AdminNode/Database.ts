@@ -19,27 +19,26 @@ export async function upsertUser(pool: Pool, user: User) {
       UPDATE users
       SET email = $1,
           hashedpassword = $2,
-          salt = $3
       WHERE userid = $4
       RETURNING *
       `,
-      [user.email, user.hashedpassword, user, user.userid]
+      [user.email, user.hashedpassword, user.userid]
     );
     return rows[0];
   }
 
   const { rows } = await pool.query(
     `
-    INSERT INTO users (email, hashedpassword, salt)
-    VALUES ($1, $2, $3)
+    INSERT INTO users (email, hashedpassword)
+    VALUES ($1, $2)
     RETURNING *
     `,
-    [user.email, user.hashedpassword, user]
+    [user.email, user.hashedpassword]
   );
   return rows[0];
 }
 
-export async function getUserById(pool: Pool, userid: string) {
+export async function  getUserById(pool: Pool, userid: string) {
   const { rows } = await pool.query(
     `
     SELECT *
@@ -51,6 +50,7 @@ export async function getUserById(pool: Pool, userid: string) {
 
   return rows[0] ?? null;
 }
+
 
 export async function getUserByEmail(pool: Pool, email: string) {
   const { rows } = await pool.query(
@@ -65,7 +65,18 @@ export async function getUserByEmail(pool: Pool, email: string) {
   return rows[0] ?? null;
 }
 
+export async function getProviderByEmail(pool: Pool, email: string) {
+  const { rows } = await pool.query(
+    `
+    SELECT *
+    FROM providers
+    WHERE email = $1
+    `,
+    [email]
+  );
 
+  return rows[0] ?? null;
+}
 
 export async function deleteUser(pool: Pool, userid: string) {
   await pool.query(
@@ -81,7 +92,6 @@ export async function upsertProvider(pool: Pool, provider: Provider) {
       UPDATE providers
       SET registeredname = $1,
           hashedpassword = $2,
-          salt = $3
       WHERE providerid = $4
       RETURNING *
       `,
@@ -97,11 +107,11 @@ export async function upsertProvider(pool: Pool, provider: Provider) {
 
   const { rows } = await pool.query(
     `
-    INSERT INTO providers (registeredname, hashedpassword, salt)
+    INSERT INTO providers (email, registeredname, hashedpassword)
     VALUES ($1, $2, $3)
     RETURNING *
     `,
-    [provider.registeredname, provider.hashedpassword, provider]
+    [provider.email, provider.registeredname, provider.hashedpassword]
   );
   return rows[0];
 }
@@ -128,6 +138,7 @@ export async function deleteProvider(pool: Pool, providerid: string) {
 }
 
 export async function createRequest(pool: Pool, request: DB_Request) {
+  console.log("looking")
   const { rows } = await pool.query(
     `
     INSERT INTO requests (
@@ -148,6 +159,7 @@ export async function createRequest(pool: Pool, request: DB_Request) {
       request.status
     ]
   );
+  console.log(rows)
   return rows[0];
 }
 

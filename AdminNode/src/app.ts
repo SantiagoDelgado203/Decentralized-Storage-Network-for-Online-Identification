@@ -8,6 +8,7 @@
 
 import express from 'express'
 import cors from 'cors'
+import cookieParser from 'cookie-parser'
 import apiRoutes from './routes/api.js'
 import { getConfig } from './config.js'
 
@@ -19,9 +20,11 @@ app.use(cors({
   origin: config.corsOrigins,
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type'],
+  credentials: true,
 }))
 
 app.use(express.json())
+app.use(cookieParser());
 app.use('/api', apiRoutes)
 
 // Health check endpoint

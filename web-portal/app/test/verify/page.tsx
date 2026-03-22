@@ -1,221 +1,334 @@
 "use client";
 
-import { useState } from "react";
+import { JSX, useState } from "react";
+import { Criteria, Rule } from "@/Models";
 import { requestVerification } from "@/Connectors";
 
-export type Rule = {
-  Field: string;
-  Type: "equals" | "minimum";
-  Value: any;
-};
+const TEST_USERID = "6eb79757-2c74-4c9e-b347-e1cd0d2fec30";
+const TEST_PROVIDERID = "821b370a-0b59-4952-8ea3-48daf6f2712a";
 
-export type Criteria = {
-  All: Rule[];
-  Any: Rule[];
-};
+/* -----------------------------
+   FACTORY HELPERS
+------------------------------*/
 
+const createEmptyRule = (): Rule => ({
+  Type: "Rule",
+  Field: "",
+  Operation: "equals",
+  Value: ""
+});
 
-  const OperatorSelect = ({
-    value,
-    onChange,
-  }: {
-    value: "equals" | "minimum";
-    onChange: (v: "equals" | "minimum") => void;
-  }) => (
-    <select
-      className="bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-neutral-100"
-      value={value}
-      onChange={(e) => onChange(e.target.value as any)}
-    >
-      <option value="equals">Equals</option>
-      <option value="minimum">Minimum</option>
-    </select>
-  );
+const createLogical = (type: "AND" | "OR"): Criteria => ({
+  Type: type,
+  Criteria: []
+});
 
-  const LogicSelect = ({
-    value,
-    onChange,
-  }: {
-    value: "All" | "Any";
-    onChange: (v: "All" | "Any") => void;
-  }) => (
-    <select
-      className="bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-neutral-100"
-      value={value}
-      onChange={(e) => onChange(e.target.value as any)}
-    >
-      <option value="All">ALL (AND)</option>
-      <option value="Any">ANY (OR)</option>
-    </select>
-  );
+const createNot = (): Criteria => ({
+  Type: "NOT"
+});
 
-  const FieldBlock = ({
-    children,
-  }: {
-    children: React.ReactNode;
-  }) => (
-    <div className="space-y-2 border border-neutral-800 p-4 rounded-xl">
-      {children}
-    </div>
-  );
+/* -----------------------------
+   COMPONENT
+------------------------------*/
 
-export default function Verify() {
-  // Value states
-  const [name, setName] = useState("");
-  const [address, setAddress] = useState("");
-  const [gender, setGender] = useState("");
-  const [age, setAge] = useState("");
+export default function VerificationBuilder() {
+  const [tree, setTree] = useState<Criteria>({
+    Type: "AND",
+    Criteria: []
+  });
 
-  // Operator states
-  const [nameOp, setNameOp] = useState<"equals" | "minimum">("equals");
-  const [addressOp, setAddressOp] = useState<"equals" | "minimum">("equals");
-  const [genderOp, setGenderOp] = useState<"equals" | "minimum">("equals");
-  const [ageOp, setAgeOp] = useState<"equals" | "minimum">("equals");
-
-  // Logic states
-  const [nameLogic, setNameLogic] = useState<"All" | "Any">("All");
-  const [addressLogic, setAddressLogic] = useState<"All" | "Any">("All");
-  const [genderLogic, setGenderLogic] = useState<"All" | "Any">("All");
-  const [ageLogic, setAgeLogic] = useState<"All" | "Any">("All");
-
-  const [response, setResponse] = useState<string | null>(null);
+  const [selected, setSelected] = useState<Criteria | null>(null);
   const [loading, setLoading] = useState(false);
+  const [responseMsg, setResponseMsg] = useState("");
 
-  const sendUserData = async () => {
+  /* -----------------------------
+     ADD CHILDREN
+  ------------------------------*/
+
+  const addToLogical = (
+    parent: Extract<Criteria, { Type: "AND" | "OR" }>,
+    child: Criteria
+  ) => {
+    parent.Criteria.push(child);
+    setTree({ ...tree });
+  };
+
+  const replaceNotChild = (
+    parent: Extract<Criteria, { Type: "NOT" }>,
+    child: Criteria
+  ) => {
+    // Only allow setting if empty
+    if (!parent.Criteria) {
+      parent.Criteria = child;
+      setTree({ ...tree });
+    }
+  };
+
+  /* -----------------------------
+     SEND
+  ------------------------------*/
+
+  const sendVerification = async () => {
     try {
       setLoading(true);
-
-      const criteria: Criteria = { All: [], Any: [] };
-
-      const pushRule = (
-        field: string,
-        type: "equals" | "minimum",
-        value: any,
-        logic: "All" | "Any"
-      ) => {
-        criteria[logic].push({
-          Field: field,
-          Type: type,
-          Value: value,
-        });
-      };
-
-      // Only push if field has value
-
-      if (name.trim() !== "")
-        pushRule("Name", nameOp, name.trim(), nameLogic);
-
-      if (gender !== "")
-        pushRule("Gender", genderOp, gender, genderLogic);
-
-      if (address.trim() !== "")
-        pushRule("Address", addressOp, address.trim(), addressLogic);
-
-      if (age !== "")
-        pushRule("Age", ageOp, Number(age), ageLogic);
+      setResponseMsg("");
 
       const res = await requestVerification({
-        userID: "9a3fc47b-98b2-4d51-bb5e-a4a641812ebb",
-        verifierID: "6cbf4598-339d-4b4b-8d63-30c53c20c4ec",
-        company: "Facebook",
-        criteria: criteria,
+        userID: TEST_USERID,
+        verifierID: TEST_PROVIDERID,
+        company: "Company",
+        criteria: tree
       });
 
-      setResponse(JSON.stringify(res.reply, null, 2));
-    } catch (err) {
-      console.error(err);
-      setResponse("Request failed");
+      setResponseMsg(res.reply ?? "Request sent");
+    } catch (e) {
+      console.error(e);
+      setResponseMsg("Error sending request");
     } finally {
       setLoading(false);
     }
   };
 
+  /* -----------------------------
+     TREE RENDERING
+  ------------------------------*/
+
+  const renderNode = (node: Criteria, depth = 0): JSX.Element => {
+    const isSelected = selected === node;
+
+    const baseStyle = `cursor-pointer px-2 py-1 rounded text-sm ${
+      isSelected ? "bg-blue-600" : "hover:bg-neutral-700"
+    }`;
+
+    return (
+      <div key={Math.random()} className="flex flex-col">
+        {/* LABEL */}
+        <div
+          onClick={() => setSelected(node)}
+          className={baseStyle}
+          style={{ marginLeft: depth * 16 }}
+        >
+          {node.Type === "Rule" && `📄 ${node.Field || "New Rule"}`}
+          {(node.Type === "AND" || node.Type === "OR") &&
+            `📁 ${node.Type}`}
+          {node.Type === "NOT" && `🚫 NOT`}
+        </div>
+
+        {/* CHILDREN */}
+        {node.Type === "AND" || node.Type === "OR"
+          ? node.Criteria.map((child, i) => (
+              <div key={i}>{renderNode(child, depth + 1)}</div>
+            ))
+          : node.Type === "NOT" && node.Criteria
+          ? renderNode(node.Criteria, depth + 1)
+          : null
+        }
+
+        {/* ADD BUTTONS */}
+        {(node.Type === "AND" || node.Type === "OR") && (
+          <div
+            className="flex gap-2 mt-1"
+            style={{ marginLeft: depth * 16 + 16 }}
+          >
+            <button
+              className="text-xs bg-neutral-700 px-2 rounded"
+              onClick={() => addToLogical(node, createEmptyRule())}
+            >
+              + Rule
+            </button>
+            <button
+              className="text-xs bg-neutral-700 px-2 rounded"
+              onClick={() => addToLogical(node, createLogical("AND"))}
+            >
+              + AND
+            </button>
+            <button
+              className="text-xs bg-neutral-700 px-2 rounded"
+              onClick={() => addToLogical(node, createLogical("OR"))}
+            >
+              + OR
+            </button>
+            <button
+              className="text-xs bg-neutral-700 px-2 rounded"
+              onClick={() => addToLogical(node, createNot())}
+            >
+              + NOT
+            </button>
+          </div>
+        )}
+
+        {node.Type === "NOT" && !node.Criteria && (
+          <div
+            className="flex gap-2 mt-1"
+            style={{ marginLeft: depth * 16 + 16 }}
+          >
+            <button
+              className="text-xs bg-neutral-700 px-2 rounded"
+              onClick={() => replaceNotChild(node, createEmptyRule())}
+            >
+              Rule
+            </button>
+
+            <button
+              className="text-xs bg-neutral-700 px-2 rounded"
+              onClick={() => replaceNotChild(node, createLogical("AND"))}
+            >
+              AND
+            </button>
+
+            <button
+              className="text-xs bg-neutral-700 px-2 rounded"
+              onClick={() => replaceNotChild(node, createLogical("OR"))}
+            >
+              OR
+            </button>
+
+            <button
+              className="text-xs bg-neutral-700 px-2 rounded"
+              onClick={() => replaceNotChild(node, createNot())}
+            >
+              NOT
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  /* -----------------------------
+     RIGHT PANEL FORM
+  ------------------------------*/
+
+  const updateRule = (
+    field: "Field" | "Operation" | "Value",
+    value: string | Number
+  ) => {
+    if (!selected || selected.Type !== "Rule") return;
+
+    if (field === "Field") {
+      selected.Field = value as string;
+    }
+
+    if (field === "Operation") {
+      selected.Operation = value as Rule["Operation"];
+    }
+
+    if (field === "Value") {
+      selected.Value = value;
+    }
+
+    setTree({ ...tree });
+  };
+
+  const renderForm = () => {
+    if (!selected)
+      return <div className="text-neutral-400">Select a node</div>;
+
+    if (selected.Type === "Rule") {
+      return (
+        <div className="flex flex-col gap-4">
+          <div>
+            <label>Field</label>
+            <input
+              className="w-full bg-neutral-800 p-2 rounded"
+              value={selected.Field}
+              onChange={(e) =>
+                updateRule("Field", e.target.value)
+              }
+            />
+          </div>
+
+          <div>
+            <label>Operation</label>
+            <select
+              className="w-full bg-neutral-800 p-2 rounded"
+              value={selected.Operation}
+              onChange={(e) =>
+                updateRule(
+                  "Operation",
+                  e.target.value as Rule["Operation"]
+                )
+              }
+            >
+              <option value="equals">equals</option>
+              <option value="minimum">minimum</option>
+              <option value="maximum">maximum</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Value</label>
+            <input
+              className="w-full bg-neutral-800 p-2 rounded"
+              value={selected.Value as string}
+              onChange={(e) =>
+                updateRule("Value", e.target.value)
+              }
+            />
+          </div>
+        </div>
+      );
+    }
+
+    if (selected.Type === "AND" || selected.Type === "OR") {
+      return (
+        <div>
+          <h3 className="text-xl">{selected.Type} Group</h3>
+          <p className="text-neutral-400">
+            Combines children using {selected.Type}.
+          </p>
+        </div>
+      );
+    }
+
+    if (selected.Type === "NOT") {
+      return (
+        <div>
+          <h3 className="text-xl">NOT Expression</h3>
+          <p className="text-neutral-400">
+            Negates its single child expression.
+          </p>
+        </div>
+      );
+    }
+  };
+
+  /* -----------------------------
+     UI
+  ------------------------------*/
 
   return (
-    <section className="max-w-2xl mx-auto">
-      <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-8 shadow-lg">
-        <h1 className="text-2xl font-mono text-neutral-100 mb-6">
-          Build Verification Rules
-        </h1>
-
-        <div className="space-y-6">
-
-          {/* NAME */}
-          <FieldBlock>
-            <input
-              className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-2 text-neutral-100"
-              placeholder="Full Name (optional)"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-            <div className="flex gap-2">
-              <OperatorSelect value={nameOp} onChange={setNameOp} />
-              <LogicSelect value={nameLogic} onChange={setNameLogic} />
-            </div>
-          </FieldBlock>
-
-          {/* GENDER */}
-          <FieldBlock>
-            <select
-              className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-2 text-neutral-100"
-              value={gender}
-              onChange={(e) => setGender(e.target.value)}
-            >
-              <option value="">Gender (optional)</option>
-              <option value="M">Male</option>
-              <option value="F">Female</option>
-              <option value="X">Nonbinary</option>
-            </select>
-            <div className="flex gap-2">
-              <OperatorSelect value={genderOp} onChange={setGenderOp} />
-              <LogicSelect value={genderLogic} onChange={setGenderLogic} />
-            </div>
-          </FieldBlock>
-
-          {/* ADDRESS */}
-          <FieldBlock>
-            <input
-              className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-2 text-neutral-100"
-              placeholder="Address (optional)"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-            />
-            <div className="flex gap-2">
-              <OperatorSelect value={addressOp} onChange={setAddressOp} />
-              <LogicSelect value={addressLogic} onChange={setAddressLogic} />
-            </div>
-          </FieldBlock>
-
-          {/* AGE */}
-          <FieldBlock>
-            <input
-              type="number"
-              className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-2 text-neutral-100"
-              placeholder="Age (optional)"
-              value={age}
-              onChange={(e) => setAge(e.target.value)}
-            />
-            <div className="flex gap-2">
-              <OperatorSelect value={ageOp} onChange={setAgeOp} />
-              <LogicSelect value={ageLogic} onChange={setAgeLogic} />
-            </div>
-          </FieldBlock>
-
-          <button
-            onClick={sendUserData}
-            disabled={loading}
-            className="w-full bg-emerald-500 text-black font-mono py-2.5 rounded-lg"
-          >
-            {loading ? "Submitting…" : "Verify"}
-          </button>
-
-          {response && (
-            <pre className="bg-neutral-950 border border-neutral-800 rounded-lg p-4 text-emerald-400 text-sm overflow-auto">
-              {response}
-            </pre>
+    <div className="w-11/12 mx-auto">
+      <div className=" flex flex-row justify-between my-5">
+        <h2 className=" text-4xl">
+          Verification Request Builder
+        </h2>
+        <div className=" flex gap-4 items-center">
+          {responseMsg && (
+            <span className="text-sm text-green-400">
+              {responseMsg}
+            </span>
           )}
+          <button
+            onClick={sendVerification}
+            disabled={loading}
+            className="px-6 py-3 bg-green-600 hover:bg-green-700 rounded-xl font-semibold disabled:opacity-50"
+          >
+            {loading ? "Sending..." : "Request Verification"}
+          </button>
         </div>
       </div>
-    </section>
+      <div className="flex bg-neutral-900 h-fit rounded-2xl overflow-hidden">
+        <div className="w-1/3 p-6 border-r border-neutral-800 overflow-auto">
+          {renderNode(tree)}
+        </div>
+        <div className="w-2/3 p-8 bg-neutral-950">
+          {renderForm()}
+        </div>
+      </div>
+      <pre className="mt-6 text-xs bg-neutral-900 p-4 rounded-xl">
+        {JSON.stringify(tree, null, 2)}
+      </pre>
+    </div>
   );
 }

@@ -56,8 +56,8 @@ func NodeCreateWithPrivKey(priv crypto.PrivKey, customNamespace string) (context
 	// Build libp2p options
 	opts := []libp2p.Option{
 		libp2p.Identity(priv),
-		libp2p.ListenAddrStrings("/ip4/127.0.0.1/udp/4001/quic-v1"),
-		libp2p.ListenAddrStrings("/ip4/127.0.0.1/tcp/4001"),
+		libp2p.ListenAddrStrings("/ip4/0.0.0.0/udp/4001/quic-v1"),
+		libp2p.ListenAddrStrings("/ip4/0.0.0.0/tcp/4001"),
 		//quic transpot, with tcp+tls as a fallback
 		libp2p.Transport(quic.NewTransport),
 		libp2p.Transport(tcp.NewTCPTransport),

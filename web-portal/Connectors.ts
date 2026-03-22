@@ -1,4 +1,4 @@
-import { Criteria, TestUserInfo, UploadRequest } from "./Models";
+import { Criteria, UploadRequest } from "./Models";
 
 const EXPRESS_HOST_ADDRESS = "http://localhost:5000"
 
@@ -40,9 +40,9 @@ export async function verify(payload: {requestid: string, userID: string, criter
 /*Funtions to create/read/update/delete stuff from the SQL database */
 
 /**create new account (db/register)*/
-export async function register(payload :{username: string, email: string, password: string}){
+export async function register_user(payload :{email: string, password: string}){
 
-  const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/db/register", {
+  const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/db/register-user", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -56,10 +56,9 @@ export async function register(payload :{username: string, email: string, passwo
   
 }
 
-/**check credentials (db/login)*/
-export async function login(payload: {email: string,  password: string}){
+export async function register_provider(payload :{email: string, password: string, companyname: string}){
 
-  const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/db/login", {
+  const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/db/register-verifier", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -70,8 +69,34 @@ export async function login(payload: {email: string,  password: string}){
   const reply = await res.json();
 
   return reply
+  
+}
 
-  return
+/**check credentials and create JWT (db/login)*/
+export async function login(payload: {email: string,  password: string}){
+  const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/db/login", {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+  
+  const reply = await res.json();
+
+  return reply
+}
+
+export async function logout(){
+  const res = await fetch(EXPRESS_HOST_ADDRESS + "/api/db/logout", {
+    method: "POST",
+    credentials: "include",
+  });
+  
+  const reply = await res.json();
+
+  return reply
 }
 
 /**for verifiers use (example, facebook requests a verification from a user) (db/request-verification)*/

@@ -1,34 +1,83 @@
-"use client"
-import { redirect } from "next/dist/server/api-utils";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { login } from "../../../Connectors"; // adjust import path
+"use client";
 
+import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { login } from "../../../Connectors";
+import Loading from "@/app/loading";
 
 export default function LoginPage() {
-  const router = useRouter()
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [response, setResponse] = useState(null);
+  const [response, setResponse] = useState<string | null>(null);
 
-  async function handleSubmit(e: React.FormEvent) {
-      e.preventDefault();
-    
-  
-      const res = await login({
-        email,
-        password,
-      });
-  
-      setResponse(res.reply)
+  // check if already logged in
+  useEffect(() => {
+    async function checkSession() {
+      try {
+        const res = await fetch("http://localhost:5000/api/me", {
+          credentials: "include",
+        });
+
+        if (!res.ok) return; // not logged in
+
+        const data = await res.json();
+
+        if (data.type === "user") {
+          router.push("/user/dashboard");
+        } else if (data.type === "verifier") {
+          router.push("/verifier/dashboard");
+        }
+      } catch (err) {
+        console.error("Session check failed:", err);
+      }
     }
+    checkSession();
+  }, [router]);
 
+  async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
+    e.preventDefault()
+    try {
+      const res = await login({ email, password });
+
+      console.log("LOGIN RESPONSE:" + JSON.stringify(res));
+      setResponse(res?.reply ?? null);
+
+      if (res?.ok) {
+        const me = await fetch("http://localhost:5000/api/me", {
+          credentials: "include",
+        });
+
+        if (!me.ok) {
+          setResponse("Could not verify session.");
+          return;
+        }
+
+        const data = await me.json();
+
+        if (data.type === "user") {
+          router.push("/user/dashboard");
+        } else if (data.type === "verifier") {
+          router.push("/verifier/dashboard");
+        } else {
+          setResponse("Unknown account type.");
+        }
+
+      }
+
+    } catch (err) {
+      alert(err);
+      setResponse("Something went wrong.");
+    }
+  }
   return (
-    <div className="flex  items-center justify-center">
-      <form className="w-full max-w-sm space-y-6 rounded-xl border border-gray-800 bg-black p-8 shadow-lg">
-        <h1 className="text-2xl font-semibold text-center">
-          Login
-        </h1>
+    <div className="flex items-center justify-center my-10">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-sm space-y-6 rounded-xl border border-gray-800 bg-black p-8 shadow-lg"
+      >
+        <h1 className="text-2xl font-semibold text-center">Login</h1>
 
         {/* Email */}
         <div className="flex flex-col gap-2">
@@ -62,20 +111,17 @@ export default function LoginPage() {
 
         {/* Button */}
         <button
-          type="button"
+          type="submit"
           className="w-full rounded-md bg-green-600 py-2 font-medium hover:bg-green-700 transition"
-          onClick={handleSubmit}
         >
           Log In
         </button>
-      <div>
-            {response && (
-              <pre className="mt-4 bg-neutral-950 border border-neutral-800 rounded-lg p-4
-                              text-emerald-400 text-sm overflow-auto">
-                {response}
-              </pre>
-            )}
-          </div>
+
+        {response && (
+          <pre className="mt-4 bg-neutral-950 border border-neutral-800 rounded-lg p-4 text-emerald-400 text-sm overflow-auto">
+            {response}
+          </pre>
+        )}
       </form>
     </div>
   );

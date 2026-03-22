@@ -20,9 +20,11 @@
     "@libp2p/websockets": "^10.1.2",
     "@types/pg": "^8.16.0",
     "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "libp2p": "^3.1.2",
     "pg": "^8.18.0",
     "uint8arrays": "^5.1.0"
@@ -30,6 +32,7 @@
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^24.10.1",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
