@@ -44,13 +44,13 @@ A peer-to-peer decentralized storage network using libp2p for secure, distribute
 
 ## Docker Hub Images
 
-Pre-built images are available on Docker Hub:
+Pre-built images are available on Docker Hub (supports both **Intel** and **Apple Silicon** Macs):
 
 | Image | Description |
 |-------|-------------|
-| `kanishd/dsn-web-portal` | Next.js web interface |
-| `kanishd/dsn-admin-node` | Express.js API gateway |
 | `kanishd/dsn-storage-node` | Go libp2p storage node |
+| `kanishd/dsn-admin-node` | Express.js API gateway |
+| `kanishd/dsn-web-portal` | Next.js web interface |
 
 ### Pull Images (All Team Members)
 
@@ -394,6 +394,207 @@ docker-compose build --no-cache
 ├── bootstrap-identity/  # Pre-generated bootstrap node identity
 ├── docker-compose.yml   # Local development
 └── README.md
+```
+
+---
+
+## Component Documentation
+
+### Web Portal
+
+The Web Portal is the user-facing frontend for the Decentralized Verification Network. It allows users to register, log in, upload identity data, manage verification requests, and test network operations.
+
+| Aspect | Details |
+|--------|---------|
+| **Stack** | Next.js 16, React 19, Tailwind CSS 4 |
+| **Port** | 3000 |
+| **Docker Image** | `kanishd/dsn-web-portal` |
+
+#### Key Features
+- **Public pages**: Landing page (`/`), login (`/login`), register (`/register`)
+- **User dashboard** (`/user/dashboard`): Pending verification requests
+- **Verifier dashboard** (`/verifier/dashboard`): Manage verification requests
+- **Test pages** (`/test/upload`, `/test/verify`, `/test/requests`): Dev/testing for upload and verification flows
+
+#### Local Development
+```bash
+cd web-portal
+npm install
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000).
+
+#### Configuration
+- **`NEXT_PUBLIC_API_URL`**: Admin Node API base URL (e.g. `http://localhost:5000`). Set at **build time** via Docker `args` or `.env`.
+- The portal calls Admin Node endpoints under `/api/*`. Ensure the Admin Node is running and CORS allows the portal origin.
+
+#### Directory Layout
+```
+web-portal/
+├── app/
+│   ├── (public)/       # Login, register, landing
+│   ├── (protected)/    # User & verifier dashboards
+│   └── test/           # Dev/test pages (upload, verify, requests)
+├── Connectors.ts       # API client functions (fetch wrappers)
+├── Models.ts           # TypeScript types (UserInfo, Criteria, etc.)
+└── next.config.ts      # Standalone output for Docker
+```
+
+---
+
+### Admin Node
+
+The Admin Node is the API gateway and bridge between the web portal and the P2P storage network. It exposes REST endpoints for user/verifier operations and uses libp2p to communicate with storage nodes.
+
+| Aspect | Details |
+|--------|---------|
+| **Stack** | Express.js 5, TypeScript, libp2p, PostgreSQL |
+| **Ports** | 5000 (API), 4001 (P2P TCP), 4002 (P2P WebSocket) |
+| **Docker Image** | `kanishd/dsn-admin-node` |
+
+#### API Endpoints
+
+**Network (P2P-facing)**
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/net/upload` | Forward user data to storage network (encrypt, shard, distribute) |
+| POST | `/api/net/verify` | Request verification from storage nodes; returns yes/no result |
+
+**Database (PostgreSQL)**
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/db/register` | Create user account |
+| POST | `/api/db/login` | Authenticate user |
+| POST | `/api/db/request-verification` | Verifier creates verification request |
+| POST | `/api/db/get-requests` | Get requests by user or verifier ID |
+| POST | `/api/db/resolve-requests` | User accepts or rejects request |
+| POST | `/api/db/update-request` | Verifier updates request criteria/status |
+
+**Utility**
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/health` | Health check |
+| GET | `/api/node-info` | libp2p node info |
+| GET | `/api/peers` | Connected peers |
+
+#### Prerequisites
+- **PostgreSQL**: Admin Node uses PostgreSQL for users, providers, and requests. Set `PG_USER`, `PG_HOST`, `PG_DATABASE`, `PG_PASSWORD`, `PG_PORT` in the environment. Ensure tables `users`, `providers`, and `requests` exist.
+
+#### Local Development
+```bash
+cd AdminNode
+npm install
+# Set PG_* and DSN_BOOTSTRAP_PEERS in .env
+npm run dev
+```
+
+#### Configuration (Environment Variables)
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `ADMIN_API_PORT` | Express API port | `5000` |
+| `ADMIN_P2P_PORT` | libp2p TCP port | `4001` |
+| `ADMIN_P2P_WS_PORT` | libp2p WebSocket port | `4002` |
+| `ADMIN_CORS_ORIGINS` | Comma-separated CORS origins | `http://localhost:3000` |
+| `DSN_BOOTSTRAP_PEERS` | Bootstrap node multiaddr(s) | — |
+| `DSN_NAMESPACE` | DHT namespace | `dsn` |
+
+#### Directory Layout
+```
+AdminNode/
+├── src/
+│   ├── index.ts        # Entry point
+│   ├── app.ts          # Express app & CORS
+│   ├── config.ts       # Env config loader
+│   ├── routes/api.ts   # All /api/* routes
+│   └── p2p/node.ts     # libp2p node setup
+├── Database.ts         # PostgreSQL queries
+├── Models.ts           # User, Provider, DB_Request
+└── SymmetricEncryption.ts
+```
+
+---
+
+### Storage Node
+
+The Storage Node is a Go libp2p node that participates in the P2P storage network. It stores encrypted data fragments and key shares (Shamir's Secret Sharing), provides them via DHT, and runs the verification protocol to evaluate criteria without exposing raw data.
+
+| Aspect | Details |
+|--------|---------|
+| **Stack** | Go 1.25, libp2p, Kademlia DHT, MongoDB |
+| **Port** | 11111 (TCP + UDP/QUIC) |
+| **Docker Image** | `kanishd/dsn-storage-node` |
+
+#### Commands
+```bash
+# One-time init (creates ID.json, Bootstrap.txt)
+./storagenode init
+
+# Start the node
+./storagenode run
+
+# Test with deterministic PeerID from seed
+./storagenode test <seed>
+```
+
+Docker uses `entrypoint.sh`, which runs `init` if `ID.json` is missing, then executes the given command (default: `run`).
+
+#### Protocols
+| Protocol | Path | Role |
+|----------|------|------|
+| Print | `/print/1.0.0` | Debug/echo |
+| Upload | `/upload/1.0.0` | Receive user data; encrypt, shard, distribute |
+| Store | `/store/1.0.0` | Store encrypted blob or key fragment; provide CID in DHT |
+| Resource | `/resource/1.0.0` | Retrieve blob by hash |
+| Verification | `/verification/1.0.0` | Fetch data + fragments, decrypt, run criteria, return yes/no |
+
+#### Data Flow
+- **Upload**: Data → encrypt → store cipher + provide CID; key → Shamir (5-of-3) → store fragments + provide CIDs
+- **Verification**: Lookup CIDs in DHT → fetch cipher + 3 key fragments → reconstruct key → decrypt → evaluate criteria → return result only
+
+#### Prerequisites
+- **MongoDB**: Storage nodes use MongoDB (`didn_storage.main`) for encrypted data and key fragments. Set `MONGO_URI` (e.g. `mongodb://mongodb:27017` in Docker).
+
+#### Local Development
+```bash
+cd StorageNode
+go build -o storagenode .
+
+# First run
+./storagenode init
+
+# Start (ensure MongoDB is running; set MONGO_URI if needed)
+MONGO_URI=mongodb://localhost:27017 ./storagenode run
+```
+
+#### Configuration (Environment Variables)
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `DSN_PORT` | P2P listen port | `11111` |
+| `DSN_NAMESPACE` | DHT namespace | `dsn` |
+| `DSN_DATA_DIR` | Data directory (ID.json, Bootstrap.txt) | `.` / `/app/data` |
+| `DSN_BOOTSTRAP_PEERS` | Bootstrap multiaddr(s) | — |
+| `DSN_NODE_SEED` | Seed for deterministic peer ID (Docker) | — |
+| `DSN_ANNOUNCE_ADDRESSES` | External announce addrs (NAT/Docker) | — |
+| `MONGO_URI` | MongoDB connection string | `mongodb://localhost:27017` |
+
+#### Directory Layout
+```
+StorageNode/
+├── main.go             # CLI entry (init, run, test)
+├── entrypoint.sh       # Docker init + run
+├── config/config.go    # Env config
+├── exec/
+│   ├── init.go         # Identity generation
+│   ├── start.go        # Node startup, handlers, peer manager
+│   └── test.go         # Test node
+└── core/
+    ├── NodeConfig.go   # libp2p host creation
+    ├── StreamHandlers.go   # Protocol handlers
+    ├── Database.go     # MongoDB operations
+    ├── Crypto.go       # Encryption, Shamir
+    ├── PeerDiscovery.go
+    ├── VerificationEngine.go
+    └── Models.go
 ```
 
 ---
