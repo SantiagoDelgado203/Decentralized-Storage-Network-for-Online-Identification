@@ -11,3 +11,7 @@
 /ip4/10.0.0.183/tcp/56675/p2p/12D3KooWLsdGetwCmHwNjmf4ZdJR7kV3Kvt7miKQcx7EojA2dCVi
 /ip4/10.0.0.183/tcp/8787/p2p/12D3KooWLsdGetwCmHwNjmf4ZdJR7kV3Kvt7miKQcx7EojA2dCVi
 /ip4/10.0.0.183/tcp/8850/p2p/12D3KooWLsdGetwCmHwNjmf4ZdJR7kV3Kvt7miKQcx7EojA2dCVi
+/ip4/10.0.0.183/tcp/39417/p2p/12D3KooWLsdGetwCmHwNjmf4ZdJR7kV3Kvt7miKQcx7EojA2dCVi
+/ip4/10.0.0.183/tcp/39075/p2p/12D3KooWLsdGetwCmHwNjmf4ZdJR7kV3Kvt7miKQcx7EojA2dCVi
+/ip4/127.0.0.1/tcp/64499/p2p/12D3KooWLsdGetwCmHwNjmf4ZdJR7kV3Kvt7miKQcx7EojA2dCVi
+/ip4/10.0.0.183/tcp/14452/p2p/12D3KooWLsdGetwCmHwNjmf4ZdJR7kV3Kvt7miKQcx7EojA2dCVi

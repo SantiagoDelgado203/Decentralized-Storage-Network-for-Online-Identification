@@ -8,15 +8,70 @@ import { AuthContext } from "@/app/context/AuthContext";
 export default function Upload() {
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
-  const [gender, setGender] = useState("")
+  const [gender, setGender] = useState("");
   const [year, setYear] = useState("");
   const [month, setMonth] = useState("");
   const [day, setDay] = useState("");
+
   const [response, setResponse] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const context = useContext(AuthContext); 
+  const [submitted, setSubmitted] = useState(false);
+
+  const context = useContext(AuthContext);
+
+  // ✅ Date validation
+  const isValidDate = () => {
+    const y = Number(year);
+    const m = Number(month);
+    const d = Number(day);
+
+    if (!y || !m || !d) return false;
+
+    const currentYear = new Date().getFullYear();
+
+    // Year range
+    if (y < 1900 || y > currentYear) return false;
+
+    // Month range
+    if (m < 1 || m > 12) return false;
+
+    // Days in month (handles leap years)
+    const daysInMonth = new Date(y, m, 0).getDate();
+    if (d < 1 || d > daysInMonth) return false;
+
+    // No future dates
+    const inputDate = new Date(y, m - 1, d);
+    const today = new Date();
+    if (inputDate > today) return false;
+
+    return true;
+  };
+
+  // ✅ Overall validation
+  const isFormValid = () => {
+    return (
+      name.trim() &&
+      address.trim() &&
+      gender &&
+      year &&
+      month &&
+      day &&
+      isValidDate()
+    );
+  };
 
   const sendUserData = async () => {
+    if (!isFormValid()) {
+      if (!year || !month || !day) {
+        setResponse("Please fill in all fields.");
+      } else if (!isValidDate()) {
+        setResponse("Please enter a valid date of birth.");
+      } else {
+        setResponse("Please fill in all fields.");
+      }
+      return;
+    }
+
     const user_info: UserInfo = {
       Name: name,
       Gender: gender,
@@ -30,13 +85,14 @@ export default function Upload() {
 
     const payload: UploadRequest = {
       UserID: context?.user.id,
-      Data: user_info
-    }
+      Data: user_info,
+    };
 
     try {
       setLoading(true);
       const res = await uploadUserData(payload);
-      setResponse(JSON.stringify(res, null, 2));
+      setResponse(res);
+      setSubmitted(true);
     } catch (err) {
       console.error(err);
       setResponse("Request failed");
@@ -44,6 +100,20 @@ export default function Upload() {
       setLoading(false);
     }
   };
+
+  // ✅ After submit view
+  if (submitted) {
+    return (
+      <section className="max-w-2xl mx-auto">
+        <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-8 shadow-lg text-center">
+          <h1 className="text-xl font-mono text-neutral-100">
+            At this step, your data would be reviewed by a human to verify its accuracy
+          </h1>
+        </div>
+        <p className="block mx-auto w-full text-center mt-2">{response}</p>
+      </section>
+    );
+  }
 
   return (
     <section className="max-w-2xl mx-auto">
@@ -59,8 +129,7 @@ export default function Upload() {
               Full Name
             </label>
             <input
-              className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-2 text-neutral-100
-                         focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30"
+              className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-2 text-neutral-100"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Jhon Doe"
@@ -73,8 +142,7 @@ export default function Upload() {
               Gender
             </label>
             <select
-              className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-2 text-neutral-100
-                        focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30"
+              className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-2 text-neutral-100"
               value={gender}
               onChange={(e) => setGender(e.target.value)}
             >
@@ -93,8 +161,7 @@ export default function Upload() {
               Address
             </label>
             <input
-              className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-2 text-neutral-100
-                         focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30"
+              className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-4 py-2 text-neutral-100"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               placeholder="123 Fake Street, WPB, FL"
@@ -107,28 +174,47 @@ export default function Upload() {
               Date of Birth
             </label>
             <div className="grid grid-cols-3 gap-3">
-              {[
-                { v: year, s: setYear, p: "YYYY" },
-                { v: month, s: setMonth, p: "MM" },
-                { v: day, s: setDay, p: "DD" },
-              ].map(({ v, s, p }) => (
-                <input
-                  key={p}
-                  type="number"
-                  placeholder={p}
-                  className="bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-neutral-100
-                             focus:outline-none focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400/30"
-                  value={v}
-                  onChange={(e) => s(e.target.value)}
-                />
-              ))}
+              <input
+                type="number"
+                placeholder="YYYY"
+                min="1900"
+                max={new Date().getFullYear()}
+                className="bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-neutral-100"
+                value={year}
+                onChange={(e) => setYear(e.target.value)}
+              />
+              <input
+                type="number"
+                placeholder="MM"
+                min="1"
+                max="12"
+                className="bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-neutral-100"
+                value={month}
+                onChange={(e) => setMonth(e.target.value)}
+              />
+              <input
+                type="number"
+                placeholder="DD"
+                min="1"
+                max="31"
+                className="bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-neutral-100"
+                value={day}
+                onChange={(e) => setDay(e.target.value)}
+              />
             </div>
+
+            {/* Inline date error */}
+            {year && month && day && !isValidDate() && (
+              <p className="text-red-400 text-sm mt-1">
+                Invalid date of birth
+              </p>
+            )}
           </div>
 
           {/* Submit */}
           <button
             onClick={sendUserData}
-            disabled={loading}
+            disabled={loading || !isFormValid()}
             className="w-full mt-6 bg-emerald-500/90 hover:bg-emerald-500
                        text-neutral-950 font-mono tracking-wide py-2.5 rounded-lg
                        transition disabled:opacity-50"
@@ -136,12 +222,9 @@ export default function Upload() {
             {loading ? "Submitting…" : "Submit"}
           </button>
 
-          {/* Response */}
-          {response && (
-            <pre className="mt-4 bg-neutral-950 border border-neutral-800 rounded-lg p-4
-                            text-emerald-400 text-sm overflow-auto">
-              {response}
-            </pre>
+          {/* General error */}
+          {response && !submitted && (
+            <p className="text-red-400 text-sm mt-2">{response}</p>
           )}
         </div>
       </div>

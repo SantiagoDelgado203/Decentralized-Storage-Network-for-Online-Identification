@@ -5,6 +5,7 @@ import { createContext, useEffect, useState, ReactNode } from "react";
 type AuthContextType = {
   user: any | null;
   loading: boolean;
+  setUser: (user: any | null) => void; 
 };
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -31,7 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthContext.Provider value={{ user, loading, setUser }}>
       {children}
     </AuthContext.Provider>
   );

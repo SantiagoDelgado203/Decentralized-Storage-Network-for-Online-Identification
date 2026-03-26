@@ -1,8 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { login } from "../../../Connectors";
+import { AuthContext } from "@/app/context/AuthContext";
 import Loading from "@/app/loading";
 
 export default function LoginPage() {
@@ -11,6 +12,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [response, setResponse] = useState<string | null>(null);
+  var context = useContext(AuthContext);
 
   // check if already logged in
   useEffect(() => {
@@ -23,6 +25,8 @@ export default function LoginPage() {
         if (!res.ok) return; // not logged in
 
         const data = await res.json();
+
+        context?.setUser(data)
 
         if (data.type === "user") {
           router.push("/user/dashboard");

@@ -16,11 +16,11 @@ export default function ProtectedLayout({
   const router = useRouter();
 
   useEffect(() => {
-    if (!context?.loading && !context?.user) {
-      alert("Log in first.");
+    if (!context?.user) {
+      // alert("Log in first")
       router.push("/login");
     }
-  }, [context?.loading, context?.user, router]);
+  }, []);
 
   if (context?.loading) return <Loading/>;
   if (!context?.user) return null;
