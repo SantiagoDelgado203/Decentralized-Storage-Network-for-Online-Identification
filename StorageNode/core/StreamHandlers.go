@@ -139,7 +139,18 @@ func (p *UploadProtocol) Name() protocol.ID {
 // handler for incoming new user protocol dials
 func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 	return func(s network.Stream) {
+		fmt.Println("\n#########################################################################")
+		fmt.Println("##                     INCOMING USER DATA UPLOAD                       ##")
+		fmt.Println("#########################################################################")
+
 		defer s.Close()
+
+		// ✅ Always runs at the end (even on error)
+		defer func() {
+			fmt.Println("\n#########################################################################")
+			fmt.Println("##                     USER DATA UPLOAD COMPLETED                      ##")
+			fmt.Println("#########################################################################")
+		}()
 
 		reader := bufio.NewReader(s)
 		raw, err := reader.ReadBytes('\n')
@@ -155,8 +166,8 @@ func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 		err = json.Unmarshal(raw, &uploaded)
 		if err != nil {
 			fmt.Println("Error unmarshaling upload")
+			return
 		}
-
 		data, err := json.Marshal(uploaded.Data)
 
 		cipher, key, err := Encrypt([]byte(data))
@@ -164,6 +175,7 @@ func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 			fmt.Println("Encrypt error:", err)
 			return
 		}
+		fmt.Println("Data encrypted succesfully.")
 
 		// fmt.Println("Generated key: ", key)
 
@@ -178,7 +190,9 @@ func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 
 		if err := sm.StoreSend(context.Background(), GetRandomPeer(sm.h), blob); err != nil {
 			fmt.Println("Error handling off DataBlock:", err)
+			return
 		}
+		fmt.Println("\nEncrypted data distributed succesfully.")
 
 		const total = 5
 		const threshold = 3
@@ -196,9 +210,12 @@ func (p *UploadProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 			// Send fragments to storage network
 			if err := sm.StoreSend(context.Background(), GetRandomPeer(sm.h), fp); err != nil {
 				fmt.Printf("Error sending fragment %d: %v\n", i+1, err)
+				return
 			}
+			fmt.Printf("\nKey share %d/5 distributed succesfully.", i+1)
+			time.Sleep(time.Duration(1) * time.Second)
 		}
-		fmt.Println("Data uploaded.")
+		fmt.Println("\nData uploaded.")
 	}
 }
 
@@ -221,7 +238,19 @@ func (p *StoreProtocol) Name() protocol.ID {
 // handler for incoming store protocol dials
 func (p *StoreProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 	return func(s network.Stream) {
+
+		fmt.Println("\n#########################################################################")
+		fmt.Println("##                     INCOMING STORING REQUEST                       ##")
+		fmt.Println("#########################################################################")
+
 		defer s.Close()
+
+		// ✅ Always runs at the end (even on error)
+		defer func() {
+			fmt.Println("\n#########################################################################")
+			fmt.Println("##                     STORING REQUEST COMPLETED                      ##")
+			fmt.Println("#########################################################################")
+		}()
 
 		reader := bufio.NewReader(s)
 		raw, err := reader.ReadBytes('\n')
@@ -233,22 +262,29 @@ func (p *StoreProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 		simpleData := SimpleData{}
 		err = json.Unmarshal(raw, &simpleData)
 		if err != nil {
-			panic("Error parsing json to object")
+			fmt.Println("Error parsing json to object")
 		}
 
-		fmt.Printf("\nI received a data block or key fragment: %s\n", simpleData.Data)
+		// fmt.Printf("\nI received a data block or key fragment: %s\n", simpleData.Data)
 
 		db, err := NewDatabase("mongodb://localhost:27017")
+		if err != nil {
+			println("Error connecting to database.")
+		}
+		fmt.Println("\nConnected to database.")
 
 		err = db.StoreSimple(simpleData)
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
+			return
 		}
+		fmt.Println("\nData stored succesfully.")
 
 		cid, err := cid.Decode(simpleData.Hash)
 		err = DHTProvide(sm.ctx, sm.dht, cid)
 		if err != nil {
-			panic(err)
+			fmt.Println(err)
+			return
 		}
 
 	}
@@ -287,7 +323,19 @@ func (p *ResourceProtocol) Name() protocol.ID {
 // handler for incoming store protocol dials
 func (p *ResourceProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 	return func(s network.Stream) {
+
+		fmt.Println("\n#########################################################################")
+		fmt.Println("##                     INCOMING RESOURCE REQUEST                       ##")
+		fmt.Println("#########################################################################")
+
 		defer s.Close()
+
+		// ✅ Always runs at the end (even on error)
+		defer func() {
+			fmt.Println("\n#########################################################################")
+			fmt.Println("##                     RESOURCE REQUEST COMPLETED                      ##")
+			fmt.Println("#########################################################################")
+		}()
 
 		reader := bufio.NewReader(s)
 		raw, err := reader.ReadBytes('\n')
@@ -299,28 +347,59 @@ func (p *ResourceProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 		resource_request := ResourceRequest{}
 		err = json.Unmarshal(raw, &resource_request)
 		if err != nil {
-			panic(err)
+			fmt.Println("Unmarshal error:", err)
+			return
 		}
 
 		res_hash := resource_request.Hash
 
 		db, err := NewDatabase("mongodb://localhost:27017")
 		if err != nil {
-			panic(err)
+			fmt.Println("DB connection error:", err)
+			return
 		}
+
 		resource, err := db.RetrieveSimpleData(res_hash)
 		if err != nil {
-			panic(err)
+			fmt.Println("DB retrieve error:", err)
+			return
 		}
 
+		if len(resource) == 0 {
+			fmt.Println("No resource found")
+			return
+		}
+
+		fmt.Println("\nResource retrieved successfully.")
+
 		json_resource, err := json.Marshal(resource[0])
+		if err != nil {
+			fmt.Println("Marshal error:", err)
+			return
+		}
 
 		writer := bufio.NewWriter(s)
-		writer.Write(json_resource)
-		writer.WriteString("\n")
-		writer.Flush()
-		s.CloseWrite()
+		_, err = writer.Write(json_resource)
+		if err != nil {
+			fmt.Println("Write error:", err)
+			return
+		}
 
+		_, err = writer.WriteString("\n")
+		if err != nil {
+			fmt.Println("Write error:", err)
+			return
+		}
+
+		err = writer.Flush()
+		if err != nil {
+			fmt.Println("Flush error:", err)
+			return
+		}
+
+		fmt.Printf("\n Resource sent to %s", s.Conn().RemotePeer().String())
+
+		s.CloseWrite()
 	}
 }
 
@@ -376,7 +455,18 @@ func (p *VerificationProtocol) Name() protocol.ID {
 // handler for incoming store protocol dials
 func (p *VerificationProtocol) Handler(sm *StreamsMaster) network.StreamHandler {
 	return func(s network.Stream) {
+
+		fmt.Println("\n#########################################################################")
+		fmt.Println("##                    VERIFICATION PROCESS STARTS                      ##")
+		fmt.Println("#########################################################################")
+
 		defer s.Close()
+
+		defer func() {
+			fmt.Println("#########################################################################")
+			fmt.Println("##                    VERIFICATION PROCESS ENDS                        ##")
+			fmt.Println("#########################################################################")
+		}()
 
 		//get raw input (should be a marshaled VerificationRequest)
 		reader := bufio.NewReader(s)
@@ -392,7 +482,7 @@ func (p *VerificationProtocol) Handler(sm *StreamsMaster) network.StreamHandler 
 		err = json.Unmarshal(raw, &verification_request)
 		if err != nil {
 			fmt.Println(err)
-			panic("")
+			return
 		}
 		fmt.Println("\nVerification request: ", verification_request)
 		//get id and set parameters (in the future these will be gotten from .env or something like that)
@@ -409,8 +499,12 @@ func (p *VerificationProtocol) Handler(sm *StreamsMaster) network.StreamHandler 
 		//try to find providers for the encrypted data
 		data_providers, err := DHTGetProviders(sm.ctx, sm.dht, data_hash)
 		if len(data_providers) == 0 {
-			panic("NO ENCRYPTED DATA PROVIDERS FOUND")
+			fmt.Println("NO ENCRYPTED DATA PROVIDERS FOUND")
+			return
 		}
+
+		fmt.Println("\nEncrypted data provider found.")
+
 		//if providers found, then ask for it until found
 		//MAYBE: for the future, use go routines for parallel execution. might be faster!
 		var user_data SimpleData
@@ -425,8 +519,11 @@ func (p *VerificationProtocol) Handler(sm *StreamsMaster) network.StreamHandler 
 		}
 
 		if user_data == (SimpleData{}) {
-			panic("USER DATA NOT FOUND")
+			fmt.Println("USER DATA NOT FOUND")
+			return
 		}
+
+		fmt.Println("\nUser data retrieved successfully.")
 
 		//look for key fragments providers
 		key_fragments_providers := [][]peer.AddrInfo{}
@@ -439,8 +536,11 @@ func (p *VerificationProtocol) Handler(sm *StreamsMaster) network.StreamHandler 
 		}
 
 		if len(key_fragments_providers) == 0 {
-			panic("NO KEY FRAGMENTS PROVIDERS FOUND")
+			fmt.Println("NO KEY FRAGMENTS PROVIDERS FOUND")
+			return
 		}
+
+		fmt.Println("\nKey fragments providers found.")
 
 		//ask for the fragments to the providers
 		var key_fragments []SimpleData
@@ -456,8 +556,11 @@ func (p *VerificationProtocol) Handler(sm *StreamsMaster) network.StreamHandler 
 		}
 
 		if len(key_fragments) == REQUIRED_FRAGMENTS {
-			panic("NOT ENOUGH FRAGMENTS FOR KEY RECOVERY")
+			fmt.Println("NOT ENOUGH FRAGMENTS FOR KEY RECOVERY")
+			return
 		}
+
+		fmt.Println("\nNecessary key fragments retrieved.")
 
 		//if enough fragments, get the fragments values
 		var fragments_values []string
@@ -477,8 +580,10 @@ func (p *VerificationProtocol) Handler(sm *StreamsMaster) network.StreamHandler 
 		decrypted_data, err := Decrypt([]byte(key), cipher)
 		if err != nil {
 			fmt.Println("Something went wrong with decryption: ", err)
-			panic("")
+			return
 		}
+
+		fmt.Println("\nData decrypted succesfully.")
 
 		// fmt.Println(string(decrypted_data))
 
@@ -489,11 +594,17 @@ func (p *VerificationProtocol) Handler(sm *StreamsMaster) network.StreamHandler 
 		err = json.Unmarshal(decrypted_data, &data)
 		if err != nil {
 			fmt.Println("Error unmarshaling data: ", err)
+			return
 		}
 
 		agent := &VerificationAgent{}
 
+		fmt.Println("\nVerification criteria comparison started.")
+
 		verified := agent.Verify(data, criteria)
+
+		//delete decrypted data from memory
+		data = nil
 
 		fmt.Println("\nResult: ", verified)
 
@@ -505,6 +616,7 @@ func (p *VerificationProtocol) Handler(sm *StreamsMaster) network.StreamHandler 
 		json_res, err := json.Marshal(res)
 		if err != nil {
 			fmt.Println("Error marshaling json response")
+			return
 		}
 
 		writer := bufio.NewWriter(s)
@@ -512,6 +624,7 @@ func (p *VerificationProtocol) Handler(sm *StreamsMaster) network.StreamHandler 
 		writer.WriteString("\n")
 		writer.Flush()
 		s.CloseWrite()
+
 	}
 }
 

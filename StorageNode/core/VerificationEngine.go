@@ -109,8 +109,6 @@ func (v *VerificationAgent) Verify(data map[string]any, criteria map[string]any)
 		}
 
 		if !v.ResolveAND(data, parsed) {
-			fmt.Println("\nFailed rule: ", criteria)
-			fmt.Println("\nData: ", data)
 			return false
 		}
 
