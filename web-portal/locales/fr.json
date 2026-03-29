@@ -126,5 +126,187 @@
     "requestFailed": "Échec de la requête",
     "namePlaceholder": "Santiago Delgado",
     "addressPlaceholder": "123 Fake Street, WPB, FL"
+  },
+  "dashboard": {
+    "title": "Tableau de bord",
+    "subtitle": "Consultez vos demandes de vérification et l’état de votre compte.",
+    "profileTitle": "Profil",
+    "userLabel": "Utilisateur :",
+    "statusLabel": "Statut :",
+    "lastVerificationLabel": "Dernière vérification :",
+    "demoUser": "Utilisateur démo",
+    "active": "Actif",
+    "pendingTitle": "Demandes en attente",
+    "historyTitle": "Historique",
+    "deny": "Refuser",
+    "accept": "Accepter",
+    "approved": "Approuvé",
+    "denied": "Refusé",
+    "uiOnlyNote": "*Boutons UI uniquement (aucune fonctionnalité).",
+    "demoVerifierA": "Vérificateur A",
+    "demoVerifierB": "Vérificateur B",
+    "demoReqOver18": "Plus de 18 ans ?",
+    "demoReqFAU": "Étudiant FAU ?",
+    "demoReqOver21": "Plus de 21 ans ?",
+    "demoReqAddress": "Adresse vérifiée ?",
+    "demoTimeToday": "Aujourd’hui 10:24",
+    "demoTimeYesterday": "Hier 18:10",
+    "demoTimeLastWeek": "La semaine dernière",
+    "demoTime2Weeks": "Il y a 2 semaines",
+    "demoLastVerification": "2026-02-10"
+  },
+  "networkDashboard": {
+    "title": "Aperçu du réseau",
+    "subtitle": "Aperçu du réseau (lecture seule). Les métriques sont des données de démo (UI).",
+    "tagline": "Identité décentralisée • fragments chiffrés • découverte DHT",
+    "exportReport": "Exporter le rapport",
+    "newUpload": "Nouveau dépôt",
+    "statsActiveNodes": "Nœuds actifs",
+    "statsActiveNodesSub": "+1 cette semaine",
+    "statsShardsStored": "Fragments stockés",
+    "statsShardsStoredSub": "24 h : 96",
+    "statsRetrievals": "Récupérations",
+    "statsRetrievalsSub": "succès : 98,7 %",
+    "statsAvgLatency": "Latence moyenne",
+    "statsAvgLatencySub": "p95 : 320 ms",
+    "storageTrend": "Tendance de stockage",
+    "last7Days": "7 derniers jours",
+    "chartPlaceholder": "Emplacement graphique (UI)",
+    "replication": "Réplication",
+    "threshold": "Seuil",
+    "encryption": "Chiffrement",
+    "recentActivity": "Activité récente",
+    "nodesTitle": "Nœuds",
+    "searchUi": "Rechercher (UI)",
+    "thName": "Nom",
+    "thStatus": "Statut",
+    "thRegion": "Région",
+    "thUptime": "Uptime",
+    "statusHealthy": "Sain",
+    "statusDegraded": "Dégradé",
+    "demoOnly": "* Contenu de démo — aucune donnée en direct.",
+    "actUploadTitle": "Lot de fragments téléversé",
+    "actUploadTime": "il y a 2 min",
+    "actUploadDetail": "CID : bafy...91a2 • 12 fragments",
+    "actNodeJoinTitle": "Nœud rejoint le réseau",
+    "actNodeJoinTime": "il y a 18 min",
+    "actNodeJoinDetail": "peer : 12D3KooW...X3f",
+    "actReconstructTitle": "Événement de reconstruction (démo)",
+    "actReconstructTime": "il y a 1 h",
+    "actReconstructDetail": "k=3 sur n=5 • UI uniquement",
+    "actHealthTitle": "Vérification de santé réussie",
+    "actHealthTime": "il y a 3 h",
+    "actHealthDetail": "tous les nœuds joignables"
+  },
+  "help": {
+    "title": "Aide",
+    "subtitle": "Guide rapide pour utiliser le portail DIDN. Si quelque chose n’est pas clair, consultez d’abord la FAQ.",
+    "gettingStartedTitle": "Bien démarrer",
+    "gettingStartedSteps": [
+      "Créer un compte (Utilisateur ou Vérificateur)",
+      "Compléter les informations du profil",
+      "Consulter les demandes dans le tableau de bord"
+    ],
+    "commonActionsTitle": "Actions courantes",
+    "commonActions": [
+      "Examiner les demandes de vérification en attente",
+      "Suivre les résultats terminés dans l’historique",
+      "Mettre à jour les informations du compte/profil"
+    ],
+    "supportTitle": "Support",
+    "supportBody": "En cas de problème, prenez une capture d’écran et notez l’URL (y compris ?lang=...).",
+    "supportChecklistTitle": "Infos utiles à inclure :",
+    "supportChecklist": [
+      "URL de la page",
+      "Étapes de reproduction",
+      "Erreur console (si applicable)"
+    ],
+    "faqTitle": "FAQ",
+    "faqs": [
+      {
+        "q": "Comment DIDN protège-t-il mes données personnelles ?",
+        "a": "DIDN minimise l’exposition en chiffrant les artefacts de vérification et en les distribuant sur des nœuds. Seuls des résultats conformes à la politique sont renvoyés."
+      },
+      {
+        "q": "Qu’est-ce qu’une demande de vérification ?",
+        "a": "Un vérificateur demande une preuve d’un attribut (ex. âge > 18). Le système renvoie oui/non ou une preuve conforme sans divulguer les données brutes."
+      },
+      {
+        "q": "Pourquoi vois-je En attente / Historique sur le tableau de bord ?",
+        "a": "En attente correspond aux demandes à traiter. Historique regroupe les résultats terminés pour vos archives."
+      },
+      {
+        "q": "J’ai choisi la mauvaise langue. Comment changer ?",
+        "a": "Utilisez le sélecteur de langue en haut. La langue est conservée dans le paramètre d’URL (?lang=...)."
+      }
+    ]
+  },
+  "userProfile": {
+    "title": "Profil utilisateur",
+    "subtitle": "Consultez les détails de votre compte et vos préférences de vérification.",
+    "edit": "Modifier (UI uniquement)",
+    "demoName": "Utilisateur démo",
+    "demoEmail": "demo.user@example.com",
+    "statusLabel": "Statut :",
+    "statusValue": "Actif",
+    "memberSinceLabel": "Membre depuis :",
+    "memberSinceValue": "2026",
+    "lastRequestLabel": "Dernière demande :",
+    "lastRequestValue": "2026-03-08",
+    "personalTitle": "Informations personnelles",
+    "personalFields": [
+      {
+        "k": "Nom complet",
+        "v": "Utilisateur démo"
+      },
+      {
+        "k": "Date de naissance",
+        "v": "YYYY-MM-DD"
+      },
+      {
+        "k": "Adresse",
+        "v": "123 Example St"
+      },
+      {
+        "k": "Pays/Région",
+        "v": "US"
+      }
+    ],
+    "noteTitle": "Note",
+    "noteBody": "Cette page est uniquement UI pour le moment. Aucune logique backend n’a été modifiée."
+  },
+  "verifierProfile": {
+    "title": "Profil du vérificateur",
+    "subtitle": "Détails de l’organisation et paramètres de traitement des demandes (UI uniquement).",
+    "edit": "Modifier (UI uniquement)",
+    "demoOrg": "Organisation vérificatrice (démo)",
+    "demoEmail": "verifier@example.com",
+    "roleLabel": "Rôle :",
+    "roleValue": "Fournisseur de services",
+    "statusLabel": "Statut :",
+    "statusValue": "Actif",
+    "queueLabel": "File :",
+    "queueValue": "2 en attente",
+    "orgTitle": "Informations de l’organisation",
+    "orgFields": [
+      {
+        "k": "Nom de l’organisation",
+        "v": "Organisation vérificatrice (démo)"
+      },
+      {
+        "k": "Type de service",
+        "v": "Vérification d’identité"
+      },
+      {
+        "k": "Région",
+        "v": "US"
+      },
+      {
+        "k": "Contact",
+        "v": "verifier@example.com"
+      }
+    ],
+    "noteTitle": "Rappel",
+    "noteBody": "Changements UI uniquement : améliorations de mise en page/lisibilité. Aucune logique backend modifiée."
   }
 }

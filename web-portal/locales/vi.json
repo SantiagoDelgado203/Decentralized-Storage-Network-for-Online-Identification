@@ -126,5 +126,187 @@
     "requestFailed": "Yêu cầu thất bại",
     "namePlaceholder": "Nguyễn Văn A",
     "addressPlaceholder": "123 Đường ABC, Quận 1"
+  },
+  "dashboard": {
+    "title": "Bảng điều khiển",
+    "subtitle": "Xem yêu cầu xác minh và trạng thái tài khoản của bạn.",
+    "profileTitle": "Hồ sơ",
+    "userLabel": "Người dùng:",
+    "statusLabel": "Trạng thái:",
+    "lastVerificationLabel": "Xác minh gần nhất:",
+    "demoUser": "Người dùng demo",
+    "active": "Đang hoạt động",
+    "pendingTitle": "Yêu cầu đang chờ",
+    "historyTitle": "Lịch sử",
+    "deny": "Từ chối",
+    "accept": "Chấp nhận",
+    "approved": "Đã duyệt",
+    "denied": "Bị từ chối",
+    "uiOnlyNote": "*Nút chỉ dùng cho demo (chưa có chức năng).",
+    "demoVerifierA": "Bên xác minh A",
+    "demoVerifierB": "Bên xác minh B",
+    "demoReqOver18": "Trên 18 tuổi?",
+    "demoReqFAU": "Sinh viên FAU?",
+    "demoReqOver21": "Trên 21 tuổi?",
+    "demoReqAddress": "Địa chỉ đã xác minh?",
+    "demoTimeToday": "Hôm nay 10:24",
+    "demoTimeYesterday": "Hôm qua 18:10",
+    "demoTimeLastWeek": "Tuần trước",
+    "demoTime2Weeks": "2 tuần trước",
+    "demoLastVerification": "2026-02-10"
+  },
+  "networkDashboard": {
+    "title": "Tổng quan mạng",
+    "subtitle": "Tổng quan mạng (chỉ đọc). Các chỉ số hiển thị là dữ liệu demo (UI).",
+    "tagline": "Định danh phi tập trung • mảnh mã hóa • khám phá DHT",
+    "exportReport": "Xuất báo cáo",
+    "newUpload": "Tải lên mới",
+    "statsActiveNodes": "Nút hoạt động",
+    "statsActiveNodesSub": "+1 tuần này",
+    "statsShardsStored": "Mảnh đã lưu",
+    "statsShardsStoredSub": "24 giờ qua: 96",
+    "statsRetrievals": "Lần truy xuất",
+    "statsRetrievalsSub": "thành công: 98,7%",
+    "statsAvgLatency": "Độ trễ TB",
+    "statsAvgLatencySub": "p95: 320ms",
+    "storageTrend": "Xu hướng lưu trữ",
+    "last7Days": "7 ngày gần đây",
+    "chartPlaceholder": "Chỗ đặt biểu đồ (UI)",
+    "replication": "Nhân bản",
+    "threshold": "Ngưỡng",
+    "encryption": "Mã hóa",
+    "recentActivity": "Hoạt động gần đây",
+    "nodesTitle": "Các nút",
+    "searchUi": "Tìm kiếm (UI)",
+    "thName": "Tên",
+    "thStatus": "Trạng thái",
+    "thRegion": "Khu vực",
+    "thUptime": "Thời gian chạy",
+    "statusHealthy": "Tốt",
+    "statusDegraded": "Suy giảm",
+    "demoOnly": "* Chỉ nội dung demo — chưa kết nối dữ liệu thật.",
+    "actUploadTitle": "Tải lên lô mảnh",
+    "actUploadTime": "2 phút trước",
+    "actUploadDetail": "CID: bafy...91a2 • 12 mảnh",
+    "actNodeJoinTitle": "Nút tham gia mạng",
+    "actNodeJoinTime": "18 phút trước",
+    "actNodeJoinDetail": "peer: 12D3KooW...X3f",
+    "actReconstructTitle": "Sự kiện tái dựng (demo)",
+    "actReconstructTime": "1 giờ trước",
+    "actReconstructDetail": "k=3 trên n=5 • chỉ UI",
+    "actHealthTitle": "Kiểm tra sức khỏe đạt",
+    "actHealthTime": "3 giờ trước",
+    "actHealthDetail": "tất cả nút đều truy cập được"
+  },
+  "help": {
+    "title": "Trợ giúp",
+    "subtitle": "Hướng dẫn nhanh để sử dụng cổng DIDN. Nếu chưa rõ, hãy xem FAQ trước.",
+    "gettingStartedTitle": "Bắt đầu",
+    "gettingStartedSteps": [
+      "Tạo tài khoản (Người dùng hoặc Nhà xác minh)",
+      "Hoàn thiện thông tin hồ sơ",
+      "Xem yêu cầu trong bảng điều khiển"
+    ],
+    "commonActionsTitle": "Thao tác phổ biến",
+    "commonActions": [
+      "Xem các yêu cầu xác minh đang chờ",
+      "Theo dõi kết quả đã hoàn tất trong lịch sử",
+      "Cập nhật thông tin tài khoản/hồ sơ"
+    ],
+    "supportTitle": "Hỗ trợ",
+    "supportBody": "Nếu gặp sự cố, hãy chụp màn hình và ghi lại URL (bao gồm ?lang=...).",
+    "supportChecklistTitle": "Thông tin nên kèm theo:",
+    "supportChecklist": [
+      "URL trang",
+      "Các bước tái hiện",
+      "Lỗi console (nếu có)"
+    ],
+    "faqTitle": "FAQ",
+    "faqs": [
+      {
+        "q": "DIDN bảo vệ dữ liệu cá nhân như thế nào?",
+        "a": "DIDN giảm lộ lọt bằng cách mã hóa các artefact xác minh và phân tán chúng trên các nút. Khi kiểm tra chỉ trả về kết quả phù hợp chính sách."
+      },
+      {
+        "q": "Yêu cầu xác minh là gì?",
+        "a": "Nhà xác minh yêu cầu bằng chứng về một thuộc tính (ví dụ: trên 18 tuổi). Hệ thống trả về có/không hoặc bằng chứng phù hợp chính sách mà không lộ dữ liệu thô."
+      },
+      {
+        "q": "Vì sao tôi thấy Pending/History trên dashboard?",
+        "a": "Pending là các yêu cầu đang chờ xử lý. History là các kết quả đã hoàn tất để bạn tra cứu."
+      },
+      {
+        "q": "Tôi chọn sai ngôn ngữ. Đổi như thế nào?",
+        "a": "Dùng bộ chọn ngôn ngữ ở thanh điều hướng trên. Ngôn ngữ được giữ trong tham số URL (?lang=...)."
+      }
+    ]
+  },
+  "userProfile": {
+    "title": "Hồ sơ người dùng",
+    "subtitle": "Xem thông tin tài khoản và tuỳ chọn xác minh của bạn.",
+    "edit": "Chỉnh sửa (chỉ UI)",
+    "demoName": "Người dùng demo",
+    "demoEmail": "demo.user@example.com",
+    "statusLabel": "Trạng thái:",
+    "statusValue": "Hoạt động",
+    "memberSinceLabel": "Tham gia từ:",
+    "memberSinceValue": "2026",
+    "lastRequestLabel": "Yêu cầu gần nhất:",
+    "lastRequestValue": "2026-03-08",
+    "personalTitle": "Thông tin cá nhân",
+    "personalFields": [
+      {
+        "k": "Họ tên",
+        "v": "Người dùng demo"
+      },
+      {
+        "k": "Ngày sinh",
+        "v": "YYYY-MM-DD"
+      },
+      {
+        "k": "Địa chỉ",
+        "v": "123 Example St"
+      },
+      {
+        "k": "Quốc gia/Khu vực",
+        "v": "US"
+      }
+    ],
+    "noteTitle": "Ghi chú",
+    "noteBody": "Trang này hiện chỉ là UI. Không thay đổi logic hoặc backend."
+  },
+  "verifierProfile": {
+    "title": "Hồ sơ nhà xác minh",
+    "subtitle": "Thông tin tổ chức và cài đặt xử lý yêu cầu (chỉ UI).",
+    "edit": "Chỉnh sửa (chỉ UI)",
+    "demoOrg": "Tổ chức xác minh (demo)",
+    "demoEmail": "verifier@example.com",
+    "roleLabel": "Vai trò:",
+    "roleValue": "Nhà cung cấp dịch vụ",
+    "statusLabel": "Trạng thái:",
+    "statusValue": "Hoạt động",
+    "queueLabel": "Hàng đợi:",
+    "queueValue": "2 đang chờ",
+    "orgTitle": "Thông tin tổ chức",
+    "orgFields": [
+      {
+        "k": "Tên tổ chức",
+        "v": "Tổ chức xác minh (demo)"
+      },
+      {
+        "k": "Loại dịch vụ",
+        "v": "Xác minh danh tính"
+      },
+      {
+        "k": "Khu vực",
+        "v": "US"
+      },
+      {
+        "k": "Liên hệ",
+        "v": "verifier@example.com"
+      }
+    ],
+    "noteTitle": "Nhắc nhở",
+    "noteBody": "Chỉ thay đổi UI: cải thiện bố cục/độ dễ đọc. Không thay đổi logic backend."
   }
 }

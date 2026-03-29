@@ -126,5 +126,187 @@
     "requestFailed": "リクエストに失敗しました",
     "namePlaceholder": "山田 太郎",
     "addressPlaceholder": "東京都○○区 1-2-3"
+  },
+  "dashboard": {
+    "title": "ダッシュボード",
+    "subtitle": "検証リクエストとアカウント状況を確認できます。",
+    "profileTitle": "プロフィール",
+    "userLabel": "ユーザー：",
+    "statusLabel": "状態：",
+    "lastVerificationLabel": "最終検証：",
+    "demoUser": "デモユーザー",
+    "active": "有効",
+    "pendingTitle": "保留中のリクエスト",
+    "historyTitle": "履歴",
+    "deny": "拒否",
+    "accept": "承認",
+    "approved": "承認済み",
+    "denied": "拒否済み",
+    "uiOnlyNote": "*ボタンはUIデモ用（機能なし）。",
+    "demoVerifierA": "検証者A",
+    "demoVerifierB": "検証者B",
+    "demoReqOver18": "18歳以上？",
+    "demoReqFAU": "FAU学生？",
+    "demoReqOver21": "21歳以上？",
+    "demoReqAddress": "住所は確認済み？",
+    "demoTimeToday": "今日 10:24",
+    "demoTimeYesterday": "昨日 18:10",
+    "demoTimeLastWeek": "先週",
+    "demoTime2Weeks": "2週間前",
+    "demoLastVerification": "2026-02-10"
+  },
+  "networkDashboard": {
+    "title": "ネットワーク概要",
+    "subtitle": "ネットワーク概要（読み取り専用）。表示される指標はデモ用の UI プレースホルダーです。",
+    "tagline": "分散型ID • 暗号化シャード • DHT ディスカバリ",
+    "exportReport": "レポートをエクスポート",
+    "newUpload": "新規アップロード",
+    "statsActiveNodes": "稼働ノード",
+    "statsActiveNodesSub": "今週 +1",
+    "statsShardsStored": "保存シャード数",
+    "statsShardsStoredSub": "直近24時間: 96",
+    "statsRetrievals": "取得回数",
+    "statsRetrievalsSub": "成功率: 98.7%",
+    "statsAvgLatency": "平均遅延",
+    "statsAvgLatencySub": "p95: 320ms",
+    "storageTrend": "保存トレンド",
+    "last7Days": "過去7日間",
+    "chartPlaceholder": "チャート表示（UIのみ）",
+    "replication": "レプリケーション",
+    "threshold": "しきい値",
+    "encryption": "暗号化",
+    "recentActivity": "最近のアクティビティ",
+    "nodesTitle": "ノード",
+    "searchUi": "検索（UI）",
+    "thName": "名前",
+    "thStatus": "状態",
+    "thRegion": "リージョン",
+    "thUptime": "稼働時間",
+    "statusHealthy": "正常",
+    "statusDegraded": "低下",
+    "demoOnly": "* デモ表示のみ — ライブデータ未接続。",
+    "actUploadTitle": "シャード一括アップロード",
+    "actUploadTime": "2分前",
+    "actUploadDetail": "CID: bafy...91a2 • 12シャード",
+    "actNodeJoinTitle": "ノードがネットワークに参加",
+    "actNodeJoinTime": "18分前",
+    "actNodeJoinDetail": "peer: 12D3KooW...X3f",
+    "actReconstructTitle": "再構成イベント（デモ）",
+    "actReconstructTime": "1時間前",
+    "actReconstructDetail": "k=3 / n=5 • UIのみ",
+    "actHealthTitle": "ヘルスチェック合格",
+    "actHealthTime": "3時間前",
+    "actHealthDetail": "全ノード到達可能"
+  },
+  "help": {
+    "title": "ヘルプ",
+    "subtitle": "DIDN ポータルの使い方ガイドです。不明点があれば、まず FAQ を確認してください。",
+    "gettingStartedTitle": "はじめに",
+    "gettingStartedSteps": [
+      "アカウントを作成（ユーザー / 検証者）",
+      "プロフィール情報を入力",
+      "ダッシュボードでリクエストを確認"
+    ],
+    "commonActionsTitle": "よくある操作",
+    "commonActions": [
+      "保留中の検証リクエストを確認",
+      "履歴で完了結果を追跡",
+      "アカウント/プロフィール情報を更新"
+    ],
+    "supportTitle": "サポート",
+    "supportBody": "問題が発生した場合は、スクリーンショットを取り URL（?lang=... を含む）を控えてください。",
+    "supportChecklistTitle": "共有すると良い情報：",
+    "supportChecklist": [
+      "ページ URL",
+      "再現手順",
+      "コンソールエラー（あれば）"
+    ],
+    "faqTitle": "FAQ",
+    "faqs": [
+      {
+        "q": "DIDN は個人データをどのように保護しますか？",
+        "a": "検証成果物を暗号化し複数ノードへ分散することで露出を最小化します。検証時はポリシー準拠の結果のみ返します。"
+      },
+      {
+        "q": "検証リクエストとは？",
+        "a": "検証者が属性（例：18歳以上）の証明を要求します。システムは生データを開示せず、はい/いいえや準拠証明を返します。"
+      },
+      {
+        "q": "ダッシュボードに「保留/履歴」があるのは？",
+        "a": "保留は未処理の要求、履歴は完了結果の記録です。"
+      },
+      {
+        "q": "言語を間違えました。どう変えますか？",
+        "a": "上部ナビの言語セレクタを使ってください。言語は URL パラメータ（?lang=...）に保存されます。"
+      }
+    ]
+  },
+  "userProfile": {
+    "title": "ユーザープロフィール",
+    "subtitle": "アカウント情報と検証設定を確認します。",
+    "edit": "編集（UIのみ）",
+    "demoName": "デモユーザー",
+    "demoEmail": "demo.user@example.com",
+    "statusLabel": "状態：",
+    "statusValue": "有効",
+    "memberSinceLabel": "開始：",
+    "memberSinceValue": "2026",
+    "lastRequestLabel": "最新リクエスト：",
+    "lastRequestValue": "2026-03-08",
+    "personalTitle": "個人情報",
+    "personalFields": [
+      {
+        "k": "氏名",
+        "v": "デモユーザー"
+      },
+      {
+        "k": "生年月日",
+        "v": "YYYY-MM-DD"
+      },
+      {
+        "k": "住所",
+        "v": "123 Example St"
+      },
+      {
+        "k": "国/地域",
+        "v": "US"
+      }
+    ],
+    "noteTitle": "注記",
+    "noteBody": "このページは現在 UI のみです。バックエンドのロジックは変更していません。"
+  },
+  "verifierProfile": {
+    "title": "検証者プロフィール",
+    "subtitle": "組織情報とリクエスト処理設定（UIのみ）。",
+    "edit": "編集（UIのみ）",
+    "demoOrg": "デモ検証機関",
+    "demoEmail": "verifier@example.com",
+    "roleLabel": "役割：",
+    "roleValue": "サービス提供者",
+    "statusLabel": "状態：",
+    "statusValue": "有効",
+    "queueLabel": "キュー：",
+    "queueValue": "保留 2 件",
+    "orgTitle": "組織情報",
+    "orgFields": [
+      {
+        "k": "組織名",
+        "v": "デモ検証機関"
+      },
+      {
+        "k": "サービス種別",
+        "v": "本人確認"
+      },
+      {
+        "k": "地域",
+        "v": "US"
+      },
+      {
+        "k": "連絡先",
+        "v": "verifier@example.com"
+      }
+    ],
+    "noteTitle": "注意",
+    "noteBody": "UI のみの変更（レイアウト/可読性改善）。バックエンドのロジックは変更していません。"
   }
 }

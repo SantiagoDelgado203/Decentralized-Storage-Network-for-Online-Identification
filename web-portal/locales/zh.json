@@ -126,5 +126,187 @@
     "requestFailed": "请求失败",
     "namePlaceholder": "张三",
     "addressPlaceholder": "某某路 123 号"
+  },
+  "dashboard": {
+    "title": "仪表盘",
+    "subtitle": "查看你的验证请求与账户状态。",
+    "profileTitle": "资料",
+    "userLabel": "用户：",
+    "statusLabel": "状态：",
+    "lastVerificationLabel": "最近验证：",
+    "demoUser": "示例用户",
+    "active": "正常",
+    "pendingTitle": "待处理请求",
+    "historyTitle": "历史记录",
+    "deny": "拒绝",
+    "accept": "同意",
+    "approved": "已通过",
+    "denied": "已拒绝",
+    "uiOnlyNote": "*按钮仅用于 UI 演示（暂不包含真实功能）。",
+    "demoVerifierA": "验证方 A",
+    "demoVerifierB": "验证方 B",
+    "demoReqOver18": "是否年满 18 岁？",
+    "demoReqFAU": "是否为 FAU 学生？",
+    "demoReqOver21": "是否年满 21 岁？",
+    "demoReqAddress": "地址是否验证？",
+    "demoTimeToday": "今天 10:24",
+    "demoTimeYesterday": "昨天 18:10",
+    "demoTimeLastWeek": "上周",
+    "demoTime2Weeks": "两周前",
+    "demoLastVerification": "2026-02-10"
+  },
+  "networkDashboard": {
+    "title": "网络概览",
+    "subtitle": "网络概览（只读）。此处指标为演示用的 UI 占位数据。",
+    "tagline": "去中心化身份存储 • 加密分片 • DHT 发现",
+    "exportReport": "导出报告",
+    "newUpload": "新上传",
+    "statsActiveNodes": "活跃节点",
+    "statsActiveNodesSub": "本周 +1",
+    "statsShardsStored": "已存分片",
+    "statsShardsStoredSub": "24 小时：96",
+    "statsRetrievals": "检索次数",
+    "statsRetrievalsSub": "成功率：98.7%",
+    "statsAvgLatency": "平均延迟",
+    "statsAvgLatencySub": "p95：320ms",
+    "storageTrend": "存储趋势",
+    "last7Days": "近 7 天",
+    "chartPlaceholder": "图表占位（仅 UI）",
+    "replication": "副本数",
+    "threshold": "门限",
+    "encryption": "加密",
+    "recentActivity": "最近活动",
+    "nodesTitle": "节点列表",
+    "searchUi": "搜索（UI）",
+    "thName": "名称",
+    "thStatus": "状态",
+    "thRegion": "区域",
+    "thUptime": "运行时长",
+    "statusHealthy": "健康",
+    "statusDegraded": "降级",
+    "demoOnly": "* 仅演示内容 — 未接入实时数据。",
+    "actUploadTitle": "分片批量上传",
+    "actUploadTime": "2 分钟前",
+    "actUploadDetail": "CID: bafy...91a2 • 12 个分片",
+    "actNodeJoinTitle": "节点加入网络",
+    "actNodeJoinTime": "18 分钟前",
+    "actNodeJoinDetail": "peer: 12D3KooW...X3f",
+    "actReconstructTitle": "重构事件（演示）",
+    "actReconstructTime": "1 小时前",
+    "actReconstructDetail": "k=3 / n=5 • 仅 UI",
+    "actHealthTitle": "健康检查通过",
+    "actHealthTime": "3 小时前",
+    "actHealthDetail": "所有节点可达"
+  },
+  "help": {
+    "title": "帮助",
+    "subtitle": "快速了解如何使用 DIDN Portal。若有不清楚的地方，请先查看常见问题。",
+    "gettingStartedTitle": "快速开始",
+    "gettingStartedSteps": [
+      "创建账户（用户 / 验证方）",
+      "完善个人/机构资料",
+      "在仪表盘查看请求与历史记录"
+    ],
+    "commonActionsTitle": "常见操作",
+    "commonActions": [
+      "查看待处理的验证请求",
+      "在历史记录中追踪已完成结果",
+      "更新账户/资料信息"
+    ],
+    "supportTitle": "支持",
+    "supportBody": "遇到问题时，请截图并记录当前页面 URL（包含 ?lang=...）。",
+    "supportChecklistTitle": "建议提供的信息：",
+    "supportChecklist": [
+      "页面 URL",
+      "复现步骤",
+      "控制台错误（如有）"
+    ],
+    "faqTitle": "常见问题",
+    "faqs": [
+      {
+        "q": "DIDN 如何保护我的个人数据？",
+        "a": "DIDN 会对验证产物加密，并将其分布式存储在多个节点中；验证时仅返回符合策略的结果，从而减少原始数据暴露。"
+      },
+      {
+        "q": "什么是验证请求？",
+        "a": "验证方请求某个属性的证明（例如是否年满 18 岁）。系统返回“是/否”或符合策略的证明，而不泄露原始数据。"
+      },
+      {
+        "q": "为什么仪表盘里有 Pending / History？",
+        "a": "Pending 表示等待处理的请求；History 表示已完成的结果记录，方便回溯。"
+      },
+      {
+        "q": "语言选错了，怎么切换？",
+        "a": "使用顶部导航的语言选择器。语言会保存在 URL 参数中（?lang=...）。"
+      }
+    ]
+  },
+  "userProfile": {
+    "title": "用户资料",
+    "subtitle": "查看你的账户信息与验证偏好设置。",
+    "edit": "编辑（仅 UI）",
+    "demoName": "示例用户",
+    "demoEmail": "demo.user@example.com",
+    "statusLabel": "状态：",
+    "statusValue": "正常",
+    "memberSinceLabel": "加入时间：",
+    "memberSinceValue": "2026",
+    "lastRequestLabel": "最近请求：",
+    "lastRequestValue": "2026-03-08",
+    "personalTitle": "个人信息",
+    "personalFields": [
+      {
+        "k": "姓名",
+        "v": "示例用户"
+      },
+      {
+        "k": "出生日期",
+        "v": "YYYY-MM-DD"
+      },
+      {
+        "k": "地址",
+        "v": "示例地址 123 号"
+      },
+      {
+        "k": "国家/地区",
+        "v": "US"
+      }
+    ],
+    "noteTitle": "说明",
+    "noteBody": "该页面目前仅用于展示 UI（未改动任何后端逻辑）。"
+  },
+  "verifierProfile": {
+    "title": "验证方资料",
+    "subtitle": "机构信息与请求处理设置（仅 UI 展示）。",
+    "edit": "编辑（仅 UI）",
+    "demoOrg": "示例验证机构",
+    "demoEmail": "verifier@example.com",
+    "roleLabel": "角色：",
+    "roleValue": "服务提供方",
+    "statusLabel": "状态：",
+    "statusValue": "正常",
+    "queueLabel": "队列：",
+    "queueValue": "2 条待处理",
+    "orgTitle": "机构信息",
+    "orgFields": [
+      {
+        "k": "机构名称",
+        "v": "示例验证机构"
+      },
+      {
+        "k": "服务类型",
+        "v": "身份验证"
+      },
+      {
+        "k": "地区",
+        "v": "US"
+      },
+      {
+        "k": "联系方式",
+        "v": "verifier@example.com"
+      }
+    ],
+    "noteTitle": "提醒",
+    "noteBody": "仅做 UI 改进（排版/可读性），未改动任何后端逻辑。"
   }
 }

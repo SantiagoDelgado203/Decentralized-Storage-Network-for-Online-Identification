@@ -94,5 +94,187 @@
     "continue": "Continue",
     "footer": "Already have an account?",
     "login": "Login"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Review your verification requests and account status.",
+    "profileTitle": "Profile",
+    "userLabel": "User:",
+    "statusLabel": "Status:",
+    "lastVerificationLabel": "Last Verification:",
+    "demoUser": "Demo User",
+    "active": "Active",
+    "pendingTitle": "Pending Requests",
+    "historyTitle": "History",
+    "deny": "Deny",
+    "accept": "Accept",
+    "approved": "Approved",
+    "denied": "Denied",
+    "uiOnlyNote": "*Buttons are UI-only for the demo (no functionality yet).",
+    "demoVerifierA": "Verifier A",
+    "demoVerifierB": "Verifier B",
+    "demoReqOver18": "Over 18?",
+    "demoReqFAU": "FAU Student?",
+    "demoReqOver21": "Over 21?",
+    "demoReqAddress": "Address verified?",
+    "demoTimeToday": "Today 10:24 AM",
+    "demoTimeYesterday": "Yesterday 6:10 PM",
+    "demoTimeLastWeek": "Last week",
+    "demoTime2Weeks": "2 weeks ago",
+    "demoLastVerification": "2026-02-10"
+  },
+  "networkDashboard": {
+    "title": "Network Overview",
+    "subtitle": "Network overview (read-only). Metrics shown are UI placeholders for the demo.",
+    "tagline": "Decentralized identity storage • encrypted shards • DHT discovery",
+    "exportReport": "Export Report",
+    "newUpload": "New Upload",
+    "statsActiveNodes": "Active Nodes",
+    "statsActiveNodesSub": "+1 this week",
+    "statsShardsStored": "Shards Stored",
+    "statsShardsStoredSub": "last 24h: 96",
+    "statsRetrievals": "Retrievals",
+    "statsRetrievalsSub": "success: 98.7%",
+    "statsAvgLatency": "Avg Latency",
+    "statsAvgLatencySub": "p95: 320ms",
+    "storageTrend": "Storage Trend",
+    "last7Days": "Last 7 days",
+    "chartPlaceholder": "Chart Placeholder (UI only)",
+    "replication": "Replication",
+    "threshold": "Threshold",
+    "encryption": "Encryption",
+    "recentActivity": "Recent Activity",
+    "nodesTitle": "Nodes",
+    "searchUi": "Search (UI)",
+    "thName": "Name",
+    "thStatus": "Status",
+    "thRegion": "Region",
+    "thUptime": "Uptime",
+    "statusHealthy": "Healthy",
+    "statusDegraded": "Degraded",
+    "demoOnly": "* Demo content only — no live data connected.",
+    "actUploadTitle": "Shard batch uploaded",
+    "actUploadTime": "2 min ago",
+    "actUploadDetail": "CID: bafy...91a2 • 12 shards",
+    "actNodeJoinTitle": "Node joined network",
+    "actNodeJoinTime": "18 min ago",
+    "actNodeJoinDetail": "peer: 12D3KooW...X3f",
+    "actReconstructTitle": "Reconstruction event (demo)",
+    "actReconstructTime": "1 hr ago",
+    "actReconstructDetail": "k=3 of n=5 • UI-only",
+    "actHealthTitle": "Health check passed",
+    "actHealthTime": "3 hr ago",
+    "actHealthDetail": "all nodes reachable"
+  },
+  "help": {
+    "title": "Help",
+    "subtitle": "Quick guidance for using the DIDN Portal. If something looks unclear, check FAQs first.",
+    "gettingStartedTitle": "Getting Started",
+    "gettingStartedSteps": [
+      "Create an account (User or Verifier)",
+      "Complete your profile info",
+      "View requests in your dashboard"
+    ],
+    "commonActionsTitle": "Common Actions",
+    "commonActions": [
+      "Review pending verification requests",
+      "Track completed results in history",
+      "Update account/profile details"
+    ],
+    "supportTitle": "Support",
+    "supportBody": "If you run into issues, capture a screenshot and note your URL (including ?lang=...).",
+    "supportChecklistTitle": "Helpful info to include:",
+    "supportChecklist": [
+      "Page URL",
+      "Steps to reproduce",
+      "Console error (if any)"
+    ],
+    "faqTitle": "FAQ",
+    "faqs": [
+      {
+        "q": "How does DIDN protect my personal data?",
+        "a": "DIDN minimizes exposure by encrypting verification artifacts and distributing them across nodes. Only policy-compliant results are returned during checks."
+      },
+      {
+        "q": "What is a verification request?",
+        "a": "A verifier asks for proof of an attribute (e.g., age over 18). The system returns a yes/no or policy-compliant proof without revealing raw data."
+      },
+      {
+        "q": "Why do I see Pending / History on my dashboard?",
+        "a": "Pending items are requests awaiting action. History shows completed outcomes for your records."
+      },
+      {
+        "q": "I selected the wrong language. How do I change it?",
+        "a": "Use the language selector in the top navigation. The selected language is kept in the URL parameter (?lang=...)."
+      }
+    ]
+  },
+  "userProfile": {
+    "title": "User Profile",
+    "subtitle": "Review your account details and verification preferences.",
+    "edit": "Edit (UI only)",
+    "demoName": "Demo User",
+    "demoEmail": "demo.user@example.com",
+    "statusLabel": "Status:",
+    "statusValue": "Active",
+    "memberSinceLabel": "Member since:",
+    "memberSinceValue": "2026",
+    "lastRequestLabel": "Last request:",
+    "lastRequestValue": "2026-03-08",
+    "personalTitle": "Personal Information",
+    "personalFields": [
+      {
+        "k": "Full Name",
+        "v": "Demo User"
+      },
+      {
+        "k": "Date of Birth",
+        "v": "YYYY-MM-DD"
+      },
+      {
+        "k": "Address",
+        "v": "123 Example St"
+      },
+      {
+        "k": "Country/Region",
+        "v": "US"
+      }
+    ],
+    "noteTitle": "Note",
+    "noteBody": "This page is UI-only for now. No logic or backend operations were modified."
+  },
+  "verifierProfile": {
+    "title": "Verifier Profile",
+    "subtitle": "Organization details and request handling settings (UI-only).",
+    "edit": "Edit (UI only)",
+    "demoOrg": "Demo Verifier Org",
+    "demoEmail": "verifier@example.com",
+    "roleLabel": "Role:",
+    "roleValue": "Service Provider",
+    "statusLabel": "Status:",
+    "statusValue": "Active",
+    "queueLabel": "Queue:",
+    "queueValue": "2 pending",
+    "orgTitle": "Organization Information",
+    "orgFields": [
+      {
+        "k": "Organization Name",
+        "v": "Demo Verifier Org"
+      },
+      {
+        "k": "Service Type",
+        "v": "Identity Verification"
+      },
+      {
+        "k": "Region",
+        "v": "US"
+      },
+      {
+        "k": "Contact",
+        "v": "verifier@example.com"
+      }
+    ],
+    "noteTitle": "Reminder",
+    "noteBody": "UI changes only: layout/typography improvements. No backend logic was modified."
   }
 }
