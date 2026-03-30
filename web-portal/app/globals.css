@@ -15,7 +15,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground: #f5f5f5; /* Lighter text for dark mode */
   }
 }
 
@@ -24,6 +24,7 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
 /* ---------- Readability defaults (Week2 UI fix) ---------- */
 
 /* Make long text easier to read */
@@ -36,9 +37,12 @@ p {
   color: color-mix(in srgb, var(--foreground) 92%, var(--background));
   line-height: 1.65;
 }
+
+/* List items: increase contrast in dark mode */
 li {
   color: color-mix(in srgb, var(--foreground) 92%, var(--background));
 }
+
 /* Headings: full foreground */
 h1, h2, h3, h4, h5, h6 {
   color: var(--foreground);
@@ -48,4 +52,27 @@ h1, h2, h3, h4, h5, h6 {
 /* Small text: still readable */
 small, .muted {
   color: color-mix(in srgb, var(--foreground) 70%, var(--background));
+}
+
+/* ---------- Specific container fixes for readability ---------- */
+
+/* For light mode, set a white background and dark text */
+section {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+/* For dark mode, use a slightly lighter background for sections */
+@media (prefers-color-scheme: dark) {
+  section {
+    background-color: #1a1a1a;  /* Dark gray background for better contrast */
+    color: #f5f5f5;  /* Light text color */
+  }
+}
+
+/* Override text color inside sections for better contrast in dark mode */
+@media (prefers-color-scheme: dark) {
+  h1, h2, h3, h4, h5, h6, p, li {
+    color: #f5f5f5;  /* Light text for all headings and paragraphs */
+  }
 }

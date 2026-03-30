@@ -10,15 +10,15 @@ export default async function AboutPage(props: {
   return (
     <div className="space-y-8">
       {/* Hero */}
-      <section className="rounded-2xl border bg-gradient-to-b from-white to-gray-50 p-8">
-        <h1 className="text-3xl font-semibold tracking-tight">{t.about.title}</h1>
-        <p className="mt-4 max-w-3xl text-sm leading-6 text-gray-700">{t.about.body}</p>
+      <section className="rounded-2xl border bg-gradient-to-b from-white to-gray-50 dark:bg-gradient-to-b dark:from-gray-900 dark:to-gray-800 p-8">
+        <h1 className="text-3xl font-semibold tracking-tight dark:text-white">{t.about.title}</h1>
+        <p className="mt-4 max-w-3xl text-sm leading-6 text-gray-700 dark:text-gray-300">{t.about.body}</p>
       </section>
 
       {/* Why */}
-      <section className="rounded-2xl border bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold">{t.about.whyTitle}</h2>
-        <ul className="mt-4 space-y-2 text-sm text-gray-700">
+      <section className="rounded-2xl border bg-white dark:bg-gray-800 p-6 shadow-sm">
+        <h2 className="text-lg font-semibold dark:text-white">{t.about.whyTitle}</h2>
+        <ul className="mt-4 space-y-2 text-sm text-gray-700 dark:text-gray-300">
           {(t.about.bullets ?? []).map((b: string, idx: number) => (
             <li key={idx} className="flex gap-3">
               <span className="mt-1 inline-block h-2 w-2 rounded-full bg-gray-400" />
@@ -29,15 +29,15 @@ export default async function AboutPage(props: {
       </section>
 
       {/* Our Vision */}
-      <section className="rounded-2xl border bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold">{t.about.ourVisionTitle}</h2>
-        <p className="text-sm text-gray-700">{t.about.ourVisionBody}</p>
+      <section className="rounded-2xl border bg-white dark:bg-gray-800 p-6 shadow-sm">
+        <h2 className="text-lg font-semibold dark:text-white">{t.about.ourVisionTitle}</h2>
+        <p className="text-sm text-gray-700 dark:text-gray-300">{t.about.ourVisionBody}</p>
       </section>
 
       {/* Our Values */}
-      <section className="rounded-2xl border bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold">{t.about.ourValuesTitle}</h2>
-        <ul className="mt-4 space-y-2 text-sm text-gray-700">
+      <section className="rounded-2xl border bg-white dark:bg-gray-800 p-6 shadow-sm">
+        <h2 className="text-lg font-semibold dark:text-white">{t.about.ourValuesTitle}</h2>
+        <ul className="mt-4 space-y-2 text-sm text-gray-700 dark:text-gray-300">
           {(t.about.values ?? []).map((value: string, idx: number) => (
             <li key={idx} className="flex gap-3">
               <span className="mt-1 inline-block h-2 w-2 rounded-full bg-gray-400" />
@@ -48,9 +48,9 @@ export default async function AboutPage(props: {
       </section>
 
       {/* Meet the Team */}
-      <section className="rounded-2xl border bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold">{t.about.meetTheTeamTitle}</h2>
-        <ul className="mt-4 space-y-2 text-sm text-gray-700">
+      <section className="rounded-2xl border bg-white dark:bg-gray-800 p-6 shadow-sm">
+        <h2 className="text-lg font-semibold dark:text-white">{t.about.meetTheTeamTitle}</h2>
+        <ul className="mt-4 space-y-2 text-sm text-gray-700 dark:text-gray-300">
           {(t.about.teamMembers ?? []).map((member: { name: string, role: string }, idx: number) => (
             <li key={idx} className="flex gap-3">
               <span className="mt-1 inline-block h-2 w-2 rounded-full bg-gray-400" />
@@ -63,9 +63,9 @@ export default async function AboutPage(props: {
       </section>
 
       {/* Contact Us */}
-      <section className="rounded-2xl border bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold">{t.about.contactTitle}</h2>
-        <p className="text-sm text-gray-700">{t.about.contactBody}</p>
+      <section className="rounded-2xl border bg-white dark:bg-gray-800 p-6 shadow-sm">
+        <h2 className="text-lg font-semibold dark:text-white">{t.about.contactTitle}</h2>
+        <p className="text-sm text-gray-700 dark:text-gray-300">{t.about.contactBody}</p>
       </section>
     </div>
   );
