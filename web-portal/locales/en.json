@@ -46,7 +46,25 @@
       "Reduce repeated identity verification and unnecessary data exposure",
       "Minimize trust after the initial verification step",
       "Keep custody decentralized and auditable"
-    ]
+    ],
+    "ourVisionTitle": "Our Vision",
+    "ourVisionBody": "We envision a world where decentralized technology revolutionizes how we store and share information. By decentralizing storage, we aim to build a more secure and transparent ecosystem, where security is ensured and privacy is protected, not by promises, but by robust system design.",
+    "ourValuesTitle": "Our Values",
+    "values": [
+      "Security: We prioritize the security of our users' data.",
+      "Transparency: We are committed to an open-source, transparent approach.",
+      "Community: We value the input and collaboration of our users and developers."
+    ],
+    "meetTheTeamTitle": "Meet the Team",
+    "teamMembers": [
+      { "name": "Santiago Delgado", "role": "Team Leader" },
+      { "name": "Kanish Dangol", "role": "Member" },
+      { "name": "Syed Shah", "role": "Member" },
+      { "name": "Shiqiang Mo", "role": "Member" },
+      { "name": "Bao Nguyen", "role": "Member" }
+    ],
+    "contactTitle": "Contact Us",
+    "contactBody": "If you have any questions or feedback, feel free to reach out to us at: contact@decentralizedstorage.com"
   },
 "auth": {
   "loginTitle": "Login",

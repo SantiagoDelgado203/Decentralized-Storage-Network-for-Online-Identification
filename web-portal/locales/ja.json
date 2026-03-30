@@ -39,14 +39,32 @@
     "trustBody2": "分散ノードがポリシーを適用し、単一障害点を減らし、透明性を高めます。"
   },
   "about": {
-    "title": "DIDN について",
-    "body": "DIDN は、分散型ストレージとしきい値暗号を用いたプライバシー保護型検証を探究する授業プロジェクトです。ユーザーデータを信頼できる機関が一度だけ検証し、その後は暗号化して独立したノードへ分散保存します。これにより、将来の検証では生データを公開せず、ポリシーに準拠した証明／結果のみを返せます。",
-    "whyTitle": "開発した理由",
+    "title": "About DIDN",
+    "body": "DIDN is a course project that explores privacy-preserving verification using decentralized storage and threshold cryptography. Our goal is to let user data be verified once by a trusted authority, then encrypted and distributed across independent nodes—so future checks can return policy-compliant proofs without exposing raw personal data.",
+    "whyTitle": "Why we built it",
     "bullets": [
-      "繰り返しの本人確認と不要なデータ露出を減らす",
-      "初回検証後に必要な信頼を最小化する",
-      "保管を分散化し、監査可能にする"
-    ]
+      "Reduce repeated identity verification and unnecessary data exposure",
+      "Minimize trust after the initial verification step",
+      "Keep custody decentralized and auditable"
+    ],
+    "ourVisionTitle": "Our Vision",
+    "ourVisionBody": "We envision a world where decentralized technology revolutionizes how we store and share information. By decentralizing storage, we aim to build a more secure and transparent ecosystem, where security is ensured and privacy is protected, not by promises, but by robust system design.",
+    "ourValuesTitle": "Our Values",
+    "values": [
+      "Security: We prioritize the security of our users' data.",
+      "Transparency: We are committed to an open-source, transparent approach.",
+      "Community: We value the input and collaboration of our users and developers."
+    ],
+    "meetTheTeamTitle": "Meet the Team",
+    "teamMembers": [
+      { "name": "Santiago Delgado", "role": "Team Leader" },
+      { "name": "Kanish Dangol", "role": "Member" },
+      { "name": "Syed Shah", "role": "Member" },
+      { "name": "Shiqiang Mo", "role": "Member" },
+      { "name": "Bao Nguyen", "role": "Member" }
+    ],
+    "contactTitle": "Contact Us",
+    "contactBody": "If you have any questions or feedback, feel free to reach out to us at: contact@decentralizedstorage.com"
   },
   "auth": {
     "loginTitle": "ログイン",
