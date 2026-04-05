@@ -39,32 +39,32 @@
     "trustBody2": "Các nút phi tập trung thực thi chính sách, giảm điểm lỗi đơn và tăng tính minh bạch."
   },
   "about": {
-    "title": "About DIDN",
-    "body": "DIDN is a course project that explores privacy-preserving verification using decentralized storage and threshold cryptography. Our goal is to let user data be verified once by a trusted authority, then encrypted and distributed across independent nodes—so future checks can return policy-compliant proofs without exposing raw personal data.",
-    "whyTitle": "Why we built it",
+    "title": "Về DIDN",
+    "body": "DIDN là một dự án môn học khám phá việc xác minh bảo vệ quyền riêng tư bằng cách sử dụng lưu trữ phi tập trung và mật mã ngưỡng. Mục tiêu của chúng tôi là cho phép dữ liệu người dùng được xác minh một lần bởi một cơ quan đáng tin cậy, sau đó được mã hóa và phân phối trên các nút độc lập—để các lần kiểm tra sau này có thể cung cấp bằng chứng tuân thủ chính sách mà không tiết lộ dữ liệu cá nhân thô.",
+    "whyTitle": "Tại sao chúng tôi xây dựng nó",
     "bullets": [
-      "Reduce repeated identity verification and unnecessary data exposure",
-      "Minimize trust after the initial verification step",
-      "Keep custody decentralized and auditable"
+      "Giảm việc xác minh danh tính lặp lại và việc lộ dữ liệu không cần thiết",
+      "Giảm thiểu sự phụ thuộc vào niềm tin sau bước xác minh ban đầu",
+      "Duy trì việc lưu trữ phi tập trung và có thể kiểm toán"
     ],
-    "ourVisionTitle": "Our Vision",
-    "ourVisionBody": "We envision a world where decentralized technology revolutionizes how we store and share information. By decentralizing storage, we aim to build a more secure and transparent ecosystem, where security is ensured and privacy is protected, not by promises, but by robust system design.",
-    "ourValuesTitle": "Our Values",
+    "ourVisionTitle": "Tầm nhìn của chúng tôi",
+    "ourVisionBody": "Chúng tôi hình dung một thế giới nơi công nghệ phi tập trung cách mạng hóa cách chúng ta lưu trữ và chia sẻ thông tin. Bằng cách phi tập trung hóa lưu trữ, chúng tôi hướng tới việc xây dựng một hệ sinh thái an toàn và minh bạch hơn, nơi an ninh được đảm bảo và quyền riêng tư được bảo vệ, không phải bằng những lời hứa, mà bằng thiết kế hệ thống mạnh mẽ.",
+    "ourValuesTitle": "Giá trị của chúng tôi",
     "values": [
-      "Security: We prioritize the security of our users' data.",
-      "Transparency: We are committed to an open-source, transparent approach.",
-      "Community: We value the input and collaboration of our users and developers."
+      "Bảo mật: Chúng tôi ưu tiên bảo mật dữ liệu của người dùng.",
+      "Minh bạch: Chúng tôi cam kết theo đuổi cách tiếp cận mã nguồn mở và minh bạch.",
+      "Cộng đồng: Chúng tôi coi trọng sự đóng góp và hợp tác của người dùng và các nhà phát triển."
     ],
-    "meetTheTeamTitle": "Meet the Team",
+    "meetTheTeamTitle": "Gặp gỡ đội ngũ",
     "teamMembers": [
-      { "name": "Santiago Delgado", "role": "Team Leader" },
-      { "name": "Kanish Dangol", "role": "Member" },
-      { "name": "Syed Shah", "role": "Member" },
-      { "name": "Shiqiang Mo", "role": "Member" },
-      { "name": "Bao Nguyen", "role": "Member" }
+      { "name": "Santiago Delgado", "role": "Trưởng nhóm" },
+      { "name": "Kanish Dangol", "role": "Thành viên" },
+      { "name": "Syed Shah", "role": "Thành viên" },
+      { "name": "Shiqiang Mo", "role": "Thành viên" },
+      { "name": "Bao Nguyen", "role": "Thành viên" }
     ],
-    "contactTitle": "Contact Us",
-    "contactBody": "If you have any questions or feedback, feel free to reach out to us at: contact@decentralizedstorage.com"
+    "contactTitle": "Liên hệ với chúng tôi",
+    "contactBody": "Nếu bạn có bất kỳ câu hỏi hoặc phản hồi nào, vui lòng liên hệ với chúng tôi tại: contact@decentralizedstorage.com"
   },
   "auth": {
     "loginTitle": "Đăng nhập",

@@ -39,32 +39,32 @@
     "trustBody2": "Les nœuds décentralisés appliquent les politiques, réduisent les points uniques de défaillance et améliorent la transparence."
   },
   "about": {
-    "title": "About DIDN",
-    "body": "DIDN is a course project that explores privacy-preserving verification using decentralized storage and threshold cryptography. Our goal is to let user data be verified once by a trusted authority, then encrypted and distributed across independent nodes—so future checks can return policy-compliant proofs without exposing raw personal data.",
-    "whyTitle": "Why we built it",
+    "title": "À propos de DIDN",
+    "body": "DIDN est un projet de cours qui explore la vérification respectueuse de la vie privée en utilisant le stockage décentralisé et la cryptographie à seuil. Notre objectif est de permettre que les données des utilisateurs soient vérifiées une seule fois par une autorité de confiance, puis chiffrées et distribuées à travers des nœuds indépendants, afin que les vérifications futures puissent fournir des preuves conformes aux politiques sans exposer les données personnelles brutes.",
+    "whyTitle": "Pourquoi nous l'avons construit",
     "bullets": [
-      "Reduce repeated identity verification and unnecessary data exposure",
-      "Minimize trust after the initial verification step",
-      "Keep custody decentralized and auditable"
+      "Réduire les vérifications répétées d'identité et l'exposition inutile des données",
+      "Minimiser la confiance après l'étape initiale de vérification",
+      "Maintenir une conservation décentralisée et vérifiable"
     ],
-    "ourVisionTitle": "Our Vision",
-    "ourVisionBody": "We envision a world where decentralized technology revolutionizes how we store and share information. By decentralizing storage, we aim to build a more secure and transparent ecosystem, where security is ensured and privacy is protected, not by promises, but by robust system design.",
-    "ourValuesTitle": "Our Values",
+    "ourVisionTitle": "Notre vision",
+    "ourVisionBody": "Nous imaginons un monde où la technologie décentralisée révolutionne la façon dont nous stockons et partageons les informations. En décentralisant le stockage, nous visons à construire un écosystème plus sécurisé et transparent, où la sécurité est assurée et la vie privée protégée, non pas par des promesses, mais par une conception de système robuste.",
+    "ourValuesTitle": "Nos valeurs",
     "values": [
-      "Security: We prioritize the security of our users' data.",
-      "Transparency: We are committed to an open-source, transparent approach.",
-      "Community: We value the input and collaboration of our users and developers."
+      "Sécurité : Nous accordons la priorité à la sécurité des données de nos utilisateurs.",
+      "Transparence : Nous nous engageons à adopter une approche transparente et open source.",
+      "Communauté : Nous valorisons les contributions et la collaboration de nos utilisateurs et développeurs."
     ],
-    "meetTheTeamTitle": "Meet the Team",
+    "meetTheTeamTitle": "Rencontrez l'équipe",
     "teamMembers": [
-      { "name": "Santiago Delgado", "role": "Team Leader" },
-      { "name": "Kanish Dangol", "role": "Member" },
-      { "name": "Syed Shah", "role": "Member" },
-      { "name": "Shiqiang Mo", "role": "Member" },
-      { "name": "Bao Nguyen", "role": "Member" }
+      { "name": "Santiago Delgado", "role": "Chef d'équipe" },
+      { "name": "Kanish Dangol", "role": "Membre" },
+      { "name": "Syed Shah", "role": "Membre" },
+      { "name": "Shiqiang Mo", "role": "Membre" },
+      { "name": "Bao Nguyen", "role": "Membre" }
     ],
-    "contactTitle": "Contact Us",
-    "contactBody": "If you have any questions or feedback, feel free to reach out to us at: contact@decentralizedstorage.com"
+    "contactTitle": "Contactez-nous",
+    "contactBody": "Si vous avez des questions ou des commentaires, n'hésitez pas à nous contacter à : contact@decentralizedstorage.com"
   },
   "auth": {
     "loginTitle": "Connexion",
