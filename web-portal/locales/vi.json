@@ -79,6 +79,7 @@
     "noAccount": "Chưa có tài khoản?",
     "createOne": "Tạo ngay",
     "haveAccount": "Đã có tài khoản?",
-    "goLogin": "Đăng nhập"
+    "goLogin": "Đăng nhập",
+    "companyName": "Tên công ty"
   }
 }

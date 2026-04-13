@@ -79,6 +79,7 @@
     "noAccount": "アカウントがありませんか？",
     "createOne": "登録する",
     "haveAccount": "すでにアカウントがありますか？",
-    "goLogin": "ログインへ"
+    "goLogin": "ログインへ",
+    "companyName": "会社名"
   }
 }

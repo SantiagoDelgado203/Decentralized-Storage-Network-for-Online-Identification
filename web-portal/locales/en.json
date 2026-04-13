@@ -79,6 +79,7 @@
     "noAccount": "No account?",
     "createOne": "Create one",
     "haveAccount": "Already have an account?",
-    "goLogin": "Log in"
+    "goLogin": "Log in",
+    "companyName": "Company Name"
   }
 }

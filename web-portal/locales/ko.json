@@ -79,6 +79,7 @@
     "noAccount": "계정이 없나요?",
     "createOne": "회원가입",
     "haveAccount": "이미 계정이 있나요?",
-    "goLogin": "로그인"
+    "goLogin": "로그인",
+    "companyName": "회사 이름"
   }
 }
