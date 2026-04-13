@@ -66,13 +66,19 @@
     "contactTitle": "Contact Us",
     "contactBody": "If you have any questions or feedback, feel free to reach out to us at: contact@decentralizedstorage.com"
   },
-"auth": {
-  "loginTitle": "Login",
-  "loginSubtitle": "Welcome back to DIDN Portal.",
-  "email": "Email",
-  "password": "Password",
-  "signIn": "Log In",
-  "noAccount": "No account?",
-  "createOne": "Create one"
-}
+  "auth": {
+    "loginTitle": "Login",
+    "loginSubtitle": "Welcome back to DIDN Portal.",
+    "registerTitle": "Register",
+    "registerSubtitle": "Create your account to join the network.",
+    "name": "Name",
+    "email": "Email",
+    "password": "Password",
+    "signIn": "Log In",
+    "createAccount": "Create Account",
+    "noAccount": "No account?",
+    "createOne": "Create one",
+    "haveAccount": "Already have an account?",
+    "goLogin": "Log in"
+  }
 }
