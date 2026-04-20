@@ -57,12 +57,12 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
 
           <div className="flex items-center gap-4">
             {/* Language Switch */}
-            <label className="flex items-center gap-2 text-sm text-gray-600">
+            <label className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
               <span className="hidden sm:inline">{t.lang}</span>
               <select
                 value={lang}
                 onChange={(e) => setLang(e.target.value as Lang)}
-                className="rounded-md border px-2 py-1 text-sm"
+                className="rounded-md border px-2 py-1 text-sm bg-white dark:bg-black text-black dark:text-white"
               >
                 {(Object.keys(copy) as Lang[]).map((k) => (
                   <option key={k} value={k}>
