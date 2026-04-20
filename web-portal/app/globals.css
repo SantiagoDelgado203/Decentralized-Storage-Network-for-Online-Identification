@@ -63,12 +63,12 @@ section {
 }
 
 /* For dark mode, use a slightly lighter background for sections */
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   section {
-    background-color: #1a1a1a;  /* Dark gray background for better contrast */
-    color: #f5f5f5;  /* Light text color */
+    background-color: #1a1a1a;  
+    color: #f5f5f5; 
   }
-}
+} */
 
 /* Override text color inside sections for better contrast in dark mode */
 @media (prefers-color-scheme: dark) {
