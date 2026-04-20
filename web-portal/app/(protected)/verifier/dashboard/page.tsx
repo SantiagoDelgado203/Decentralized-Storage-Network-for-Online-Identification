@@ -70,7 +70,7 @@ export default function Dashboard() {
     <div className="flex flex-col md:flex-row md:justify-evenly gap-10 p-6">
       
       {/* LEFT SIDE — REQUESTS */}
-      <div className="basis-7/12">
+      <div className="basis-7/12 sticky">
         <h1 className="text-2xl font-bold mb-6">All Requests</h1>
 
         {loading ? (
@@ -104,8 +104,40 @@ export default function Dashboard() {
           Account Information
         </h1>
 
-        <div className="flex flex-col min-h-52 bg-gray-900 rounded-xl p-5">
-          Additional info....
+        <div className="bg-gray-900/80 backdrop-blur border border-gray-800 rounded-2xl p-6 shadow-lg space-y-5">
+          
+          {/* User Info */}
+          <div>
+            <p className="text-sm text-gray-400">Email</p>
+            <p className="text-white font-medium break-all">
+              {context?.user.email}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-sm text-gray-400">Network ID</p>
+            <p className="text-white font-medium">
+              {context?.user.id}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-sm text-gray-400 mb-1">Account Type</p>
+            <span className="inline-block px-3 py-1 text-sm rounded-full bg-blue-600/20 text-blue-400 border border-blue-500/30">
+              {context?.user.type}
+            </span>
+          </div>
+
+          {/* Divider */}
+          <div className="border-t border-gray-800 pt-4">
+            <p className="text-sm text-gray-400 mb-2">What you can do</p>
+            <p className="text-gray-300 text-sm leading-relaxed">
+              This account can submit verification requests to the network by specifying the exact criteria needed for validation.
+              Once a request is processed, you will receive a simple boolean response indicating whether the user meets the required conditions, without exposing their underlying data.
+              This ensures secure and privacy-preserving verification.
+            </p>
+          </div>
+
         </div>
       </div>
 

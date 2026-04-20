@@ -40,6 +40,7 @@ export class DB_Request {
   companyname: string;
   datarequests: unknown; // jsonb
   status: string;
+  comment: string;
 
   constructor(params: {
     requestid?: string;
@@ -48,6 +49,7 @@ export class DB_Request {
     companyname: string;
     datarequests: unknown;
     status: string;
+    comment: string;
   }) {
     this.requestid = params.requestid || "";
     this.providerid = params.providerid;
@@ -55,5 +57,6 @@ export class DB_Request {
     this.companyname = params.companyname;
     this.datarequests = params.datarequests;
     this.status = params.status;
+    this.comment = params.comment;
   }
 }

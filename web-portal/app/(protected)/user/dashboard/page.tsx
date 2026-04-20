@@ -106,8 +106,41 @@ export default function Dashboard() {
           Account Information
         </h1>
 
-        <div className="flex flex-col min-h-52 bg-gray-900 rounded-xl p-5">
-          Additional info....
+        <div className="bg-gray-900/80 backdrop-blur border border-gray-800 rounded-2xl p-6 shadow-lg space-y-5">
+          
+          {/* User Info */}
+          <div>
+            <p className="text-sm text-gray-400">Email</p>
+            <p className="text-white font-medium break-all">
+              {context?.user.email}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-sm text-gray-400">Network ID</p>
+            <p className="text-white font-medium">
+              {context?.user.id}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-sm text-gray-400 mb-1">Account Type</p>
+            <span className="inline-block px-3 py-1 text-sm rounded-full bg-blue-600/20 text-blue-400 border border-blue-500/30">
+              {context?.user.type}
+            </span>
+          </div>
+
+          {/* Divider */}
+          <div className="border-t border-gray-800 pt-4">
+            <p className="text-sm text-gray-400 mb-2">What you can do</p>
+            <p className="text-gray-300 text-sm leading-relaxed">
+              This account can securely upload personal data to the decentralized network. 
+              You will also receive verification requests from external parties asking 
+              permission to access specific pieces of your data. You can review each request 
+              and choose to accept or deny it, maintaining full control over your information.
+            </p>
+          </div>
+
         </div>
       </div>
 

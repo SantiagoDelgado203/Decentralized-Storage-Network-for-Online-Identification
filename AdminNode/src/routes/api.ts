@@ -180,14 +180,15 @@ router.post("/db/request-verification", async (req: Request, res: Response) => {
   
   //Get the request body
   const request_body = req.body
-  
+  console.log("arrived:", request_body)
   //Create a new request
   const newRequest = new DB_Request({
     providerid: request_body.verifierID,
     userid: request_body.userID,
     companyname: request_body.company,
     datarequests: request_body.criteria,
-    status: "Pending"
+    status: "Pending",
+    comment: request_body.comment
   })
   
   //try to create the request in the database
@@ -222,6 +223,22 @@ router.post("/db/update-request", async (req: Request, res: Response) => {
   updated_request.status = request_body.status
 
   const rep = await updateRequest(pool, updated_request)
+
+  return res.json(rep)
+
+})
+
+router.post("/db/resolve-requests", async (req: Request, res: Response) => {
+  const request_body = req.body
+
+  const db_request = await getRequests(pool, {requestid: request_body.requestID})
+  let updated_request = new DB_Request(db_request[0])
+
+  if(!request_body.accepted){
+    updated_request.status = "Declined"
+  }
+
+  const rep = updateRequest(pool, updated_request)
 
   return res.json(rep)
 

@@ -39,6 +39,7 @@ export default function VerificationBuilder() {
   });
 
   const [userId, setUserId] = useState("");
+  const [comment, setComment] = useState("")
   const [selected, setSelected] = useState<Criteria | null>(null);
   const [loading, setLoading] = useState(false);
   const [responseMsg, setResponseMsg] = useState("");
@@ -80,7 +81,8 @@ export default function VerificationBuilder() {
         userID: userId,
         verifierID: context?.user.id,
         company: "Company",
-        criteria: tree
+        criteria: tree,
+        comment: comment
       });
 
       setResponseMsg(res.reply ?? "Request sent");
@@ -344,6 +346,11 @@ export default function VerificationBuilder() {
       <pre className="mt-6 text-xs bg-neutral-900 p-4 rounded-xl">
         {JSON.stringify(tree, null, 2)}
       </pre>
+      <p className=" mt-10">Comment</p>
+      <textarea className=" bg-gray-900 w-full h-44 p-2"
+      value={comment}
+      onChange={(e) => setComment(e.target.value)}/>
+
     </div>
   );
 }

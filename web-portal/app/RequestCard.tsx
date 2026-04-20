@@ -65,6 +65,11 @@ export default function RequestCard({
             {JSON.stringify(req.datarequests, null, 2)}
           </pre>
         )}
+        <div>
+          <p>
+            {req.comment}
+          </p>
+        </div>
       </div>
 
       {/* Buttons (ONLY in user mode + pending) */}
