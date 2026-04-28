@@ -6,7 +6,6 @@ import Loading from "../../loading"
 import Link from "next/link";
 import { AuthContext } from "../../context/AuthContext";
 import { logout } from "@/Connectors";
-import "../../globals.css";
 
 
 export default function UserLayout({
@@ -75,18 +74,13 @@ export default function UserLayout({
             <Link href="/user/dashboard" className="hover:text-green-400 transition">
               Dashboard
             </Link>
-            <Link href="/user/profile" className="hover:text-green-400 transition">
-              Profile
-            </Link>
             <Link href="/user/history" className="hover:text-green-400 transition">
               History
             </Link>
             <Link href="/user/upload" className="hover:text-green-400 transition">
               Upload
             </Link>
-            <Link href="/help" className="hover:text-green-400 transition">
-              Help
-            </Link>
+
 
             {/* ✅ Logout Button */}
             <button

@@ -23,18 +23,12 @@ export default async function Home(props: {
 
         <div className="flex gap-4 mt-4">
           <Link
-            href={`/docs${q}`}
+            href={`https://github.com/SantiagoDelgado203/Decentralized-Storage-Network-for-Online-Identification`}
             className="px-6 py-3 border border-green-500 text-green-500 hover:bg-green-500 hover:text-black transition font-mono"
           >
             {t.home.readDocs}
           </Link>
 
-          <Link
-            href={`/register${q}`}
-            className="px-6 py-3 border border-green-500 text-green-500 hover:bg-green-500 hover:text-black transition font-mono"
-          >
-            {t.home.joinNetwork}
-          </Link>
         </div>
       </div>
 
@@ -51,8 +45,6 @@ export default async function Home(props: {
           <p className="text-gray-700 dark:text-gray-400 leading-relaxed">
             {t.home.overviewBody1}
             <br />
-            <br />
-            {t.home.overviewBody2}
           </p>
         </div>
 
@@ -78,8 +70,7 @@ export default async function Home(props: {
         <p className="text-gray-700 dark:text-gray-400 leading-relaxed">
           {t.home.authorityBody1}
           <br />
-          <br />
-          {t.home.authorityBody2}
+          {/* {t.home.authorityBody2} */}
         </p>
       </div>
 
@@ -92,8 +83,7 @@ export default async function Home(props: {
         <p className="text-gray-700 dark:text-gray-400 leading-relaxed">
           {t.home.storageBody1}
           <br />
-          <br />
-          {t.home.storageBody2}
+          {/* {t.home.storageBody2} */}
         </p>
       </div>
 
@@ -142,8 +132,7 @@ export default async function Home(props: {
         <p className="text-gray-700 dark:text-gray-400 leading-relaxed">
           {t.home.trustBody1}
           <br />
-          <br />
-          {t.home.trustBody2}
+          {/* {t.home.trustBody2} */}
         </p>
       </div>
     </section>

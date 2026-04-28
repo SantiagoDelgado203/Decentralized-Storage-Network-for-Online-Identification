@@ -76,15 +76,11 @@ export default function VerifierLayout({
             <Link href="/verifier/dashboard" className="hover:text-green-400 transition">
               Dashboard
             </Link>
-            <Link href="/verifier/profile" className="hover:text-green-400 transition">
-              Profile
-            </Link>
+
             <Link href="/verifier/request" className="hover:text-green-400 transition">
               Request
             </Link>
-            <Link href="/help" className="hover:text-green-400 transition">
-              Help
-            </Link>
+
 
             {/* ✅ Logout Button */}
             <button
